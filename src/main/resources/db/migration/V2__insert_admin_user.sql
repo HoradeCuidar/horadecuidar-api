@@ -1,0 +1,31 @@
+INSERT INTO usuarios(
+    nome,
+    username,
+    senha,
+    data_de_nascimento,
+    role,
+    status,
+    telefone,
+    rua,
+    bairro,
+    estado,
+    cidade,
+    numero_da_casa,
+    genero,
+    email
+) VALUES (
+             'Administrador do Sistema',
+             'admin',
+             '$2a$10$PhTVm5uAAvIPb66HrLf.EebVY3DLWY7awT6oBnZFd3mZGDlNd8OW6',
+             '2002-02-02',
+             'ADMIN',
+             'ATIVO',
+             '(22) 2222-2222',
+             'Rua do Administrador',
+             'Centro Administrativo',
+             'Estado Administrativo',
+             'Cidade Administrativa',
+             '666',
+             'MASCULINO',
+             'admin@gmail.com'
+         );
