@@ -45,7 +45,7 @@ Este projeto adota um fluxo de versionamento baseado em **Pull Requests**, com o
 - **`developer`**  
   Branch de integração, onde as funcionalidades são consolidadas antes de irem para a `main`.
 
-- **`feature/*`**  
+- **`feat/*`**  
   Branches utilizadas para o desenvolvimento de novas funcionalidades, correções ou melhorias.
 
 ### Restrições de Push
@@ -64,12 +64,12 @@ Essas regras são aplicadas através das **Branch Protection Rules** do GitHub.
 
 1. Criar uma branch a partir de `developer`:
    ```bash
-   git checkout -b feature/nova-funcionalidade
+   git checkout -b feat/nova-funcionalidade
     ```
 2. Desenvolver a funcionalidade e realizar commits normalmente.
 3. Abrir um Pull Request de:
    ```
-   feature/* → developer
+   feat/* → developer
     ```
 4. Após validação e aprovação, a branch é integrada à developer.
 5. Quando o conjunto de funcionalidades estiver estável, é aberto um Pull Request de:
