@@ -39,6 +39,8 @@ public class SecurityConfigurationsProd{
 
                         // Profissional da Saúde
                         .requestMatchers(HttpMethod.POST, "/api/profissional/cadastrar").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/profissional/visualizar/{id_profissional}").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/profissional/visualizarTodos").hasAnyRole("ADMIN")
 
                 )
 
