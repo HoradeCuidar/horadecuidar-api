@@ -59,4 +59,11 @@ public class ProfissionalDaSaudeController {
         List<ProfissionalDaSaudeResponseDTO> profissionalDaSaudeResponseDTOList = profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudePage.getContent());
         return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
     }
+
+    @PutMapping("/inativar/{id_profissional}")
+    public ProfissionalDaSaudeResponseDTO inativar(
+            @PathVariable Integer id_profissional
+    ){
+        return profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudeService.inativar(id_profissional));
+    }
 }
