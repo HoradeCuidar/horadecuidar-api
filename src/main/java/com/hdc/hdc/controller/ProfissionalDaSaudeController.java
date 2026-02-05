@@ -60,6 +60,13 @@ public class ProfissionalDaSaudeController {
         return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
     }
 
+    @PutMapping("/ativar/{id_profissional}")
+    public ProfissionalDaSaudeResponseDTO ativar(
+            @PathVariable Integer id_profissional
+    ){
+        return profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudeService.ativar(id_profissional));
+    }
+
     @PutMapping("/inativar/{id_profissional}")
     public ProfissionalDaSaudeResponseDTO inativar(
             @PathVariable Integer id_profissional
