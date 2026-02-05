@@ -6,6 +6,8 @@ import com.hdc.hdc.model.enums.Status;
 import com.hdc.hdc.repository.interfaces.IProfissionalDaSaudeRepository;
 import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,37 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         profissionalDaSaude.setStatus(Status.ATIVO);
 
         // ADICIONAR O ENVIO DO E-MAIL
+        return profissionalDaSaudeRepository.save(profissionalDaSaude);
+    }
+
+    public ProfissionalDaSaude visualizar(Integer id_profissional){
+
+        return profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+    }
+
+    @Override
+    public Page<ProfissionalDaSaude> visualizarTodos(Pageable pageable) {
+        return profissionalDaSaudeRepository.findAll(pageable);
+    }
+
+    @Override
+    public ProfissionalDaSaude ativar(Integer id_profissional){
+
+        ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        profissionalDaSaude.setStatus(Status.ATIVO);
+        return profissionalDaSaudeRepository.save(profissionalDaSaude);
+    }
+
+    @Override
+    public ProfissionalDaSaude inativar(Integer id_profissional){
+
+        ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        profissionalDaSaude.setStatus(Status.INATIVO);
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 }
