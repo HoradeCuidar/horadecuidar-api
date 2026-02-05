@@ -54,4 +54,14 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
     public Page<ProfissionalDaSaude> visualizarTodos(Pageable pageable) {
         return profissionalDaSaudeRepository.findAll(pageable);
     }
+
+    @Override
+    public ProfissionalDaSaude inativar(Integer id_profissional){
+
+        ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        profissionalDaSaude.setStatus(Status.INATIVO);
+        return profissionalDaSaudeRepository.save(profissionalDaSaude);
+    }
 }
