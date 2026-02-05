@@ -3,10 +3,18 @@ package com.hdc.hdc.controller;
 import com.hdc.hdc.dto.create.ProfissionalDaSaudeCreateDTO;
 import com.hdc.hdc.dto.response.ProfissionalDaSaudeResponseDTO;
 import com.hdc.hdc.mapper.ProfissionalDaSaudeMapper;
+import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/profissional")
@@ -36,5 +44,19 @@ public class ProfissionalDaSaudeController {
             @PathVariable Integer id_profissional
     ){
         return profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudeService.visualizar(id_profissional));
+    }
+
+    @GetMapping("/visualizarTodos")
+    public Page<ProfissionalDaSaudeResponseDTO> visualizarTodos(
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC
+            ) Pageable pageable
+    ) {
+        Page<ProfissionalDaSaude> profissionalDaSaudePage = profissionalDaSaudeService.visualizarTodos(pageable);
+        List<ProfissionalDaSaudeResponseDTO> profissionalDaSaudeResponseDTOList = profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudePage.getContent());
+        return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
     }
 }

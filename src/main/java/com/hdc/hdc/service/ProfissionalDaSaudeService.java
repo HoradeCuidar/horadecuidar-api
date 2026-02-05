@@ -6,6 +6,8 @@ import com.hdc.hdc.model.enums.Status;
 import com.hdc.hdc.repository.interfaces.IProfissionalDaSaudeRepository;
 import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,5 +48,10 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
 
         return profissionalDaSaudeRepository.findById(id_profissional)
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+    }
+
+    @Override
+    public Page<ProfissionalDaSaude> visualizarTodos(Pageable pageable) {
+        return profissionalDaSaudeRepository.findAll(pageable);
     }
 }
