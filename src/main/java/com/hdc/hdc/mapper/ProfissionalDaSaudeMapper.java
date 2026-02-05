@@ -9,6 +9,9 @@ import com.hdc.hdc.util.formatter.StatusFormatter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { DataFormatter.class, GeneroFormatter.class, StatusFormatter.class})
 public interface ProfissionalDaSaudeMapper {
@@ -21,4 +24,10 @@ public interface ProfissionalDaSaudeMapper {
     @Mapping(source = "dataDeNascimento", target = "dataDeNascimento", qualifiedByName = "toStringDate")
     @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
     ProfissionalDaSaudeResponseDTO modeltoResponseDTO(ProfissionalDaSaude profissionalDaSaude);
+
+    @Named("modeltoResponseDTO")
+    @Mapping(source = "genero", target = "genero", qualifiedByName = "generoToString")
+    @Mapping(source = "dataDeNascimento", target = "dataDeNascimento", qualifiedByName = "toStringDate")
+    @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
+    List<ProfissionalDaSaudeResponseDTO> modeltoResponseDTO(List<ProfissionalDaSaude> profissionalDaSaude);
 }

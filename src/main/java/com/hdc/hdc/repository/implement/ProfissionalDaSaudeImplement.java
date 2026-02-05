@@ -4,6 +4,8 @@ import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.repository.ProfissionalDaSaudeRepository;
 import com.hdc.hdc.repository.interfaces.IProfissionalDaSaudeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -32,5 +34,9 @@ public class ProfissionalDaSaudeImplement implements IProfissionalDaSaudeReposit
 
     public boolean existsByUsername(String username){
         return profissionalDaSaudeRepository.existsByUsername(username);
+    }
+
+    public Page<ProfissionalDaSaude> findAll(Pageable pageable){
+        return profissionalDaSaudeRepository.findAll(pageable);
     }
 }
