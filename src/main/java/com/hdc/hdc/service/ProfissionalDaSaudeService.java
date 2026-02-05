@@ -41,4 +41,10 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         // ADICIONAR O ENVIO DO E-MAIL
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
+
+    public ProfissionalDaSaude visualizar(Integer id_profissional){
+
+        return profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+    }
 }

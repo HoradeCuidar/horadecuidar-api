@@ -6,10 +6,7 @@ import com.hdc.hdc.mapper.ProfissionalDaSaudeMapper;
 import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/profissional")
@@ -32,5 +29,12 @@ public class ProfissionalDaSaudeController {
         return profissionalDaSaudeMapper.modeltoResponseDTO(
                     profissionalDaSaudeService.cadastrar(
                         profissionalDaSaudeMapper.createDTOtoModel(profissionalDaSaudeCreateDTO)));
+    }
+
+    @GetMapping("/visualizar/{id_profissional}")
+    public ProfissionalDaSaudeResponseDTO visualizar(
+            @PathVariable Integer id_profissional
+    ){
+        return profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudeService.visualizar(id_profissional));
     }
 }
