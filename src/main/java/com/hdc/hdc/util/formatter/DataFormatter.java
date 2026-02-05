@@ -1,4 +1,4 @@
-package com.hdc.hdc.util;
+package com.hdc.hdc.util.formatter;
 
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;

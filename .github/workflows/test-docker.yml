@@ -29,12 +29,12 @@ jobs:
 
       - name: Build and validate container
         run: |
-          docker-compose -f docker-compose.yml up --build -d
+          docker-compose -f docker-compose.yaml up --build -d
           sleep 30
 
       - name: Stop and remove containers
         run: |
-          docker-compose -f docker-compose.yml down
+          docker-compose -f docker-compose.yaml down
 
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}

@@ -1,13 +1,11 @@
-FROM eclipse-temurin:25-jdk-alpine AS builder
-
-RUN apk update && apk add maven
+FROM maven:3.9.12-eclipse-temurin-25 AS builder
 
 COPY /src /app/src
 COPY pom.xml /app
 
 WORKDIR /app
 
-RUN mvn clean package -DskipTests
+RUN mvn -e clean package -DskipTests
 
 FROM eclipse-temurin:25-jdk-alpine
 

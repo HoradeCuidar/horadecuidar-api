@@ -1,4 +1,4 @@
-package com.hdc.hdc.util;
+package com.hdc.hdc.util.formatter;
 
 import com.hdc.hdc.model.enums.Status;
 import org.mapstruct.Named;
