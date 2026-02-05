@@ -72,7 +72,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, length = 50)
     private Genero genero;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Override

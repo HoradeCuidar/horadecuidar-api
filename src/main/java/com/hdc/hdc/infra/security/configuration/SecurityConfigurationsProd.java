@@ -37,6 +37,9 @@ public class SecurityConfigurationsProd{
                         // Authorization
                         .requestMatchers(HttpMethod.POST, "/api/auth/logar").permitAll()
 
+                        // Profissional da Saúde
+                        .requestMatchers(HttpMethod.POST, "/api/profissional/cadastrar").hasAnyRole("ADMIN")
+
                 )
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
