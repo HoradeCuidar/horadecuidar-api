@@ -41,8 +41,8 @@ public class DoencaService {
         this.validarUnicidade(dto.nome());
 
         Doenca entity = doencaRepository
-                .findByNome(dto.nome())
-                .orElseThrow(() -> new ResourceNotFoundException("Doença", "Doença com nome " + dto.nome() + " não encontrada."));
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doença", "Doença com o ID " + id + " não encontrada."));
         entity.setNome(dto.nome());
         doencaRepository.save(entity);
 
