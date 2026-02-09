@@ -6,6 +6,7 @@ import com.hdc.hdc.service.DoencaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,14 +14,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @RestController
-@RequestMapping(name = "/api/doencas")
 @RequiredArgsConstructor
+@RequestMapping("/api/doenca")
 public class DoencaController {
 
     private final DoencaService doencaService;
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     public ResponseEntity<Doenca> save(@RequestBody DoencaCreateDto dto) {
         Doenca created = doencaService.save(dto);
         UriComponentsBuilder uri  = ServletUriComponentsBuilder.fromUriString("/api/doencas" + created.getId());
@@ -30,17 +32,20 @@ public class DoencaController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     public ResponseEntity<List<Doenca>> findAll() {
         return ResponseEntity.ok().body(doencaService.getAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Doenca> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(doencaService.getById(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> update(@RequestBody DoencaCreateDto dto, @PathVariable Long id) {
         doencaService.update(dto, id);
@@ -48,6 +53,7 @@ public class DoencaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         doencaService.delete(id);

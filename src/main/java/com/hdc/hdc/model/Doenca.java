@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 public class Doenca {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doencas_gen")
+    @SequenceGenerator(
+            name = "doencas_gen",
+            sequenceName = "doencas_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(nullable = false, unique = true, columnDefinition = "varchar(244)")
