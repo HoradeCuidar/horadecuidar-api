@@ -1,6 +1,8 @@
 package com.hdc.hdc.service;
 
+import com.hdc.hdc.infra.email.interfaces.IEmailService;
 import com.hdc.hdc.model.ProfissionalDaSaude;
+import com.hdc.hdc.model.Usuario;
 import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
 import com.hdc.hdc.repository.interfaces.IProfissionalDaSaudeRepository;
@@ -16,12 +18,15 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
 
     private final IProfissionalDaSaudeRepository profissionalDaSaudeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final IEmailService emailService;
 
     @Autowired
     public ProfissionalDaSaudeService(IProfissionalDaSaudeRepository profissionalDaSaudeRepository,
-                                      PasswordEncoder passwordEncoder){
+                                      PasswordEncoder passwordEncoder,
+                                      IEmailService emailService){
         this.profissionalDaSaudeRepository = profissionalDaSaudeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude){
@@ -36,11 +41,16 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
             throw new RuntimeException("Já existe um profissional cadastrado com este username");
         }
 
+        emailService.enviarEmaildeCadastro(
+                profissionalDaSaude.getNome(),
+                profissionalDaSaude.getEmail(),
+                profissionalDaSaude.getUsername(),
+                profissionalDaSaude.getSenha());
+
         profissionalDaSaude.setSenha(passwordEncoder.encode(profissionalDaSaude.getSenha()));
         profissionalDaSaude.setRole(Role.PROFISSIONAL_DA_SAUDE);
         profissionalDaSaude.setStatus(Status.ATIVO);
 
-        // ADICIONAR O ENVIO DO E-MAIL
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
