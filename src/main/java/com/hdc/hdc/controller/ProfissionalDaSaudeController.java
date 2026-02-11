@@ -2,6 +2,7 @@ package com.hdc.hdc.controller;
 
 import com.hdc.hdc.dto.create.ProfissionalDaSaudeCreateDTO;
 import com.hdc.hdc.dto.response.ProfissionalDaSaudeResponseDTO;
+import com.hdc.hdc.dto.update.ProfissionalDaSaudeUpdateDTO;
 import com.hdc.hdc.mapper.ProfissionalDaSaudeMapper;
 import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
@@ -58,6 +59,16 @@ public class ProfissionalDaSaudeController {
         Page<ProfissionalDaSaude> profissionalDaSaudePage = profissionalDaSaudeService.visualizarTodos(pageable);
         List<ProfissionalDaSaudeResponseDTO> profissionalDaSaudeResponseDTOList = profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudePage.getContent());
         return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
+    }
+
+    @PutMapping("/editar/{id_profissional}")
+    public ProfissionalDaSaudeResponseDTO cadastrar(
+            @RequestBody @Valid ProfissionalDaSaudeUpdateDTO profissionalDaSaudeUpdateDTO,
+            @PathVariable Integer id_profissional
+    ){
+        return profissionalDaSaudeMapper.modeltoResponseDTO(
+                profissionalDaSaudeService.editar(
+                        profissionalDaSaudeMapper.updateDTOtoModel(profissionalDaSaudeUpdateDTO), id_profissional));
     }
 
     @PutMapping("/ativar/{id_profissional}")

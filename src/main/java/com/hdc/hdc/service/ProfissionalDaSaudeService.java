@@ -56,6 +56,20 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
     }
 
     @Override
+    public ProfissionalDaSaude editar(ProfissionalDaSaude profissionalDaSaude, Integer id_profissional){
+
+        ProfissionalDaSaude profissionalDaSaudeAtual = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        profissionalDaSaude.setSenha(profissionalDaSaudeAtual.getSenha());
+        profissionalDaSaude.setRole(profissionalDaSaudeAtual.getRole());
+        profissionalDaSaude.setStatus(profissionalDaSaudeAtual.getStatus());
+        profissionalDaSaude.setId(profissionalDaSaudeAtual.getId());
+
+        return profissionalDaSaudeRepository.save(profissionalDaSaude);
+    }
+
+    @Override
     public ProfissionalDaSaude ativar(Integer id_profissional){
 
         ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)

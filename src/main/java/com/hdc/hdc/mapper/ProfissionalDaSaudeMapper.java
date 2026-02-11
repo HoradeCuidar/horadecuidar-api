@@ -2,6 +2,7 @@ package com.hdc.hdc.mapper;
 
 import com.hdc.hdc.dto.create.ProfissionalDaSaudeCreateDTO;
 import com.hdc.hdc.dto.response.ProfissionalDaSaudeResponseDTO;
+import com.hdc.hdc.dto.update.ProfissionalDaSaudeUpdateDTO;
 import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.util.formatter.DataFormatter;
 import com.hdc.hdc.util.formatter.GeneroFormatter;
@@ -18,6 +19,9 @@ public interface ProfissionalDaSaudeMapper {
 
     @Named("createDTOtoModel")
     ProfissionalDaSaude createDTOtoModel(ProfissionalDaSaudeCreateDTO profissionalDaSaudeCreateDTO);
+
+    @Named("uptadeDTOtoModel")
+    ProfissionalDaSaude updateDTOtoModel(ProfissionalDaSaudeUpdateDTO profissionalDaSaudeUpdateDTO);
 
     @Named("modeltoResponseDTO")
     @Mapping(source = "genero", target = "genero", qualifiedByName = "generoToString")
