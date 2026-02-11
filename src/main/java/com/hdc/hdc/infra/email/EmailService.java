@@ -3,6 +3,7 @@ package com.hdc.hdc.infra.email;
 import com.hdc.hdc.infra.email.interfaces.IEmailService;
 import com.hdc.hdc.model.Usuario;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -95,8 +96,7 @@ public class EmailService implements IEmailService {
 
             helper.setText(html, true);
 
-            // adiciona logo inline
-            FileSystemResource image = new FileSystemResource("src/main/resources/static/logo-hdc.png");
+            ClassPathResource image = new ClassPathResource("static/logo-hdc.png");
             helper.addInline("logoImage", image);
 
             mailSender.send(message);
