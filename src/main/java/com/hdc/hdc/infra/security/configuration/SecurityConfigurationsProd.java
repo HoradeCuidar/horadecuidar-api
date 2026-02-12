@@ -44,6 +44,7 @@ public class SecurityConfigurationsProd{
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/editar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/ativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/inativar/{id_profissional}").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/profissional/buscar").hasAnyRole("ADMIN")
                 )
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

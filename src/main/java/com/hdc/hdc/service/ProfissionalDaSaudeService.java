@@ -98,4 +98,9 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         profissionalDaSaude.setStatus(Status.INATIVO);
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
+
+    @Override
+    public Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable){
+        return profissionalDaSaudeRepository.findByNomeContainingIgnoreCase(nome, pageable);
+    }
 }

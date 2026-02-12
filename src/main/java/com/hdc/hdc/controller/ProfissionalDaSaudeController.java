@@ -84,4 +84,19 @@ public class ProfissionalDaSaudeController {
     ){
         return profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudeService.inativar(id_profissional));
     }
+
+    @GetMapping("/buscar")
+    public Page<ProfissionalDaSaudeResponseDTO> buscar(
+            @RequestParam String nome,
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC
+            ) Pageable pageable
+    ) {
+        Page<ProfissionalDaSaude> profissionalDaSaudePage = profissionalDaSaudeService.buscar(nome, pageable);
+        List<ProfissionalDaSaudeResponseDTO> profissionalDaSaudeResponseDTOList = profissionalDaSaudeMapper.modeltoResponseDTO(profissionalDaSaudePage.getContent());
+        return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
+    }
 }
