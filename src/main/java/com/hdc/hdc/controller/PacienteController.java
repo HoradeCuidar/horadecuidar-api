@@ -1,13 +1,16 @@
 package com.hdc.hdc.controller;
 
 import com.hdc.hdc.dto.create.PacienteCreateDto;
-import com.hdc.hdc.model.Paciente;
+import com.hdc.hdc.dto.response.PacienteResponseDto;
 import com.hdc.hdc.service.PacienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,17 +19,58 @@ public class PacienteController {
 
     private final PacienteService pacienteService;
 
-//    public Paciente cadastrar(Paciente paciente) {
-//
-//    public Paciente visualizar(Integer id_profissional) {
-//
-//    public Page<Paciente> visualizarTodos(Pageable pageable) {
-//
-//    public void atualizar(PacienteCreateDto paciente, Integer id) {
-//
-//    public void deletar(Integer id) {
-//
-//    public Paciente ativar(Integer id_profissional) {
-//
-//    public Paciente inativar(Integer id_profissional) {
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<PacienteResponseDto> cadastrar(@RequestBody PacienteCreateDto paciente) {
+        var created = pacienteService.cadastrar(paciente);
+        URI uri = URI.create("/entrie/" + created.id());
+
+        return ResponseEntity.created(uri).body(created);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<PacienteResponseDto> visualizarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(pacienteService.visualizarPorId(id));
+    }
+
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<Page<PacienteResponseDto>> visualizarTodos(
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "limite", defaultValue = "10") Integer limite
+    ) {
+        return ResponseEntity.ok(pacienteService.visualizarTodos(pagina, limite));
+    }
+
+    @GetMapping("/nome")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<Page<PacienteResponseDto>> visualizarPorNome(@RequestParam String nome) {
+        return ResponseEntity.ok(pacienteService.encontrarPorNome(nome));
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public void atualizar(@RequestBody PacienteCreateDto paciente, @PathVariable Long id) {
+        this.pacienteService.atualizar(paciente, id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public void deletar(@PathVariable Long id) {
+        this.pacienteService.deletar(id);
+    }
+
+    @PatchMapping("/status/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<PacienteResponseDto> alterarStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(this.pacienteService.alterarStatus(id));
+    }
 }
