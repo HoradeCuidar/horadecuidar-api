@@ -47,7 +47,7 @@ public record PacienteCreateDto(
     String cidade,
     String numeroDaCasa,
 
-    List<DoencaCreateDto> doencas,
+    List<Long> doencas,
     String observacoes
 ) {
 }

@@ -74,8 +74,11 @@ public class PacienteService implements IPacienteService {
         existente.setCidade(entity.getCidade());
         existente.setNumeroDaCasa(entity.getNumeroDaCasa());
         existente.setObservacoes(entity.getObservacoes());
+
         existente.getDoencas().clear();
-        existente.getDoencas().addAll(entity.getDoencas());
+        if (entity.getDoencas() != null) {
+            existente.getDoencas().addAll(entity.getDoencas());
+        }
 
         this.pacienteRepository.save(existente);
     }
@@ -92,15 +95,16 @@ public class PacienteService implements IPacienteService {
     }
 
     private void validarUnicidade(Paciente paciente) {
-        if(this.pacienteRepository.existsByEmail(paciente.getEmail())) {
+        if (this.pacienteRepository.existsByEmail(paciente.getEmail())) {
             throw new ResourceWithSameNameException("Email", "Já existe um paciente registrado com esse email.");
         }
     }
 
     private void validarUnicidade(String email, Integer id) {
         Paciente existente = this.pacienteRepository.encontrarPorEmail(email);
-        if(!Objects.equals(existente.getId(), id)) {
+        if (!Objects.equals(existente.getId(), id)) {
             throw new ResourceWithSameNameException("Email", "Já existe um paciente registrado com esse email.");
         }
     }
+
 }

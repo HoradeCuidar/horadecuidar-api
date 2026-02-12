@@ -26,9 +26,9 @@ INSERT INTO doencas (id, nome) VALUES
 SELECT setval('doencas_id_seq', (SELECT MAX(id) FROM doencas));
 
 CREATE TABLE paciente_doencas (
-    paciente_id INTEGER NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    paciente_id BIGINT NOT NULL,
     doenca_id BIGINT NOT NULL,
-    PRIMARY KEY (paciente_id, doenca_id),
-    CONSTRAINT fk_paciente_doencas_usuario FOREIGN KEY (paciente_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    CONSTRAINT fk_paciente_doencas_doenca FOREIGN KEY (doenca_id) REFERENCES doencas(id) ON DELETE CASCADE
+    data_diagnostico DATE NOT NULL,
+    observacao TEXT
 );

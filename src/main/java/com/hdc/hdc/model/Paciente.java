@@ -1,5 +1,6 @@
 package com.hdc.hdc.model;
 
+import com.hdc.hdc.model.associacoes.PacienteDoencas;
 import com.hdc.hdc.model.enums.Genero;
 import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -18,9 +20,8 @@ import java.util.List;
 @Entity
 public class Paciente extends Usuario {
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
-    @JoinTable(name = "paciente_doencas", joinColumns = @JoinColumn(name = "paciente_id"), inverseJoinColumns = @JoinColumn(name = "doenca_id"))
-    private List<Doenca> doencas;
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PacienteDoencas> doencas = new ArrayList<>();
 
     @Column(columnDefinition = "text", name = "observacoes")
     private String observacoes;
