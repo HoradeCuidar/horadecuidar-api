@@ -39,4 +39,8 @@ public class ProfissionalDaSaudeImplement implements IProfissionalDaSaudeReposit
     public Page<ProfissionalDaSaude> findAll(Pageable pageable){
         return profissionalDaSaudeRepository.findAll(pageable);
     }
+
+    public Page<ProfissionalDaSaude> findByNomeContainingIgnoreCase(String nome, Pageable pageable){
+        return profissionalDaSaudeRepository.findByNomeContainingIgnoreCase(nome, pageable);
+    }
 }

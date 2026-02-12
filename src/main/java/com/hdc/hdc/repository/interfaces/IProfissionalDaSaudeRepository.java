@@ -13,4 +13,5 @@ public interface IProfissionalDaSaudeRepository {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
     Page<ProfissionalDaSaude> findAll(Pageable pageable);
+    Page<ProfissionalDaSaude> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 }

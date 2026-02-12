@@ -12,4 +12,5 @@ public interface IProfissionalDaSaudeService {
     ProfissionalDaSaude editar(ProfissionalDaSaude profissionalDaSaude, Integer id_profissional);
     ProfissionalDaSaude ativar(Integer id_profissional);
     ProfissionalDaSaude inativar(Integer id_profissional);
+    Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable);
 }
