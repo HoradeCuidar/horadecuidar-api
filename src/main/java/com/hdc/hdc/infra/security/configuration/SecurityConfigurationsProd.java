@@ -45,6 +45,7 @@ public class SecurityConfigurationsProd{
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/ativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/inativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/profissional/buscar").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/profissional/uploadFotoDePerfil/{id_profissional}").hasAnyRole("PROFISSIONAL_DA_SAUDE")
                 )
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
