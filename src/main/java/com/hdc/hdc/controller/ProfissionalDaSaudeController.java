@@ -5,7 +5,7 @@ import com.hdc.hdc.dto.response.ProfissionalDaSaudeResponseDTO;
 import com.hdc.hdc.dto.update.ProfissionalDaSaudeUpdateDTO;
 import com.hdc.hdc.mapper.ProfissionalDaSaudeMapper;
 import com.hdc.hdc.model.ProfissionalDaSaude;
-import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
+import com.hdc.hdc.service.ProfissionalDaSaudeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,11 +21,11 @@ import java.util.List;
 @RequestMapping("api/profissional")
 public class ProfissionalDaSaudeController {
 
-    private final IProfissionalDaSaudeService profissionalDaSaudeService;
+    private final ProfissionalDaSaudeService profissionalDaSaudeService;
     private final ProfissionalDaSaudeMapper profissionalDaSaudeMapper;
 
     @Autowired
-    public ProfissionalDaSaudeController(IProfissionalDaSaudeService profissionalDaSaudeService,
+    public ProfissionalDaSaudeController(ProfissionalDaSaudeService profissionalDaSaudeService,
                                          ProfissionalDaSaudeMapper profissionalDaSaudeMapper){
         this.profissionalDaSaudeService = profissionalDaSaudeService;
         this.profissionalDaSaudeMapper = profissionalDaSaudeMapper;

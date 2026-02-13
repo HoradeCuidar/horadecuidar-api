@@ -3,7 +3,6 @@ package com.hdc.hdc.controller;
 import com.hdc.hdc.dto.auth.AuthDTO;
 import com.hdc.hdc.dto.response.AuthResponseDTO;
 import com.hdc.hdc.service.AuthService;
-import com.hdc.hdc.service.interfaces.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/auth")
 public class AuthController{
 
-    private final IAuthService authService;
+    private final AuthService authService;
 
     @Autowired
     AuthController(AuthService authService){

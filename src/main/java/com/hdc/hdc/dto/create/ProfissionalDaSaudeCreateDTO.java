@@ -2,11 +2,11 @@ package com.hdc.hdc.dto.create;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hdc.hdc.model.enums.Genero;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 

@@ -1,17 +1,14 @@
 package com.hdc.hdc.infra.email;
 
-import com.hdc.hdc.infra.email.interfaces.IEmailService;
-import com.hdc.hdc.model.Usuario;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService implements IEmailService {
+public class EmailService{
 
     private final JavaMailSender mailSender;
 
@@ -20,7 +17,6 @@ public class EmailService implements IEmailService {
     }
 
     @Async
-    @Override
     public void enviarEmaildeCadastro(String nome, String email, String username, String senha) {
 
         try {
