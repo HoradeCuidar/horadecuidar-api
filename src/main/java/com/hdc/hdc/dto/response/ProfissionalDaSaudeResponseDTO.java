@@ -26,4 +26,5 @@ public class ProfissionalDaSaudeResponseDTO {
     private String numeroDaCasa;
     private String genero;
     private String email;
+    private String fotoDePerfil;
 }

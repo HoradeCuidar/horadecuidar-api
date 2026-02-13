@@ -1,5 +1,6 @@
 package com.hdc.hdc.service;
 
+import com.hdc.hdc.infra.bucket.service.R2Service;
 import com.hdc.hdc.infra.email.EmailService;
 import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.model.enums.Role;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class ProfissionalDaSaudeService {
@@ -17,14 +21,17 @@ public class ProfissionalDaSaudeService {
     private final ProfissionalDaSaudeRepository profissionalDaSaudeRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final R2Service r2Service;
 
     @Autowired
     public ProfissionalDaSaudeService(ProfissionalDaSaudeRepository profissionalDaSaudeRepository,
                                       PasswordEncoder passwordEncoder,
-                                      EmailService emailService){
+                                      EmailService emailService,
+                                      R2Service r2Service){
         this.profissionalDaSaudeRepository = profissionalDaSaudeRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.r2Service = r2Service;
     }
 
     public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude){
@@ -95,5 +102,22 @@ public class ProfissionalDaSaudeService {
 
     public Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable){
         return profissionalDaSaudeRepository.findByNomeContainingIgnoreCase(nome, pageable);
+    }
+
+    public String uploadFotoDePerfil(Integer id_profissional, MultipartFile fotoDePerfil) throws IOException {
+
+        ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        String url = r2Service.upload(fotoDePerfil);
+        if(profissionalDaSaude.getFotoDePerfil().isEmpty()){
+            profissionalDaSaude.setFotoDePerfil(url);
+        }else{
+            r2Service.delete(profissionalDaSaude.getFotoDePerfil());
+            profissionalDaSaude.setFotoDePerfil(url);
+        }
+
+        profissionalDaSaudeRepository.save(profissionalDaSaude);
+        return url;
     }
 }
