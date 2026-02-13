@@ -1,12 +1,10 @@
 package com.hdc.hdc.service;
 
-import com.hdc.hdc.infra.email.interfaces.IEmailService;
+import com.hdc.hdc.infra.email.EmailService;
 import com.hdc.hdc.model.ProfissionalDaSaude;
-import com.hdc.hdc.model.Usuario;
 import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
-import com.hdc.hdc.repository.interfaces.IProfissionalDaSaudeRepository;
-import com.hdc.hdc.service.interfaces.IProfissionalDaSaudeService;
+import com.hdc.hdc.repository.ProfissionalDaSaudeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,16 +12,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
+public class ProfissionalDaSaudeService {
 
-    private final IProfissionalDaSaudeRepository profissionalDaSaudeRepository;
+    private final ProfissionalDaSaudeRepository profissionalDaSaudeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final IEmailService emailService;
+    private final EmailService emailService;
 
     @Autowired
-    public ProfissionalDaSaudeService(IProfissionalDaSaudeRepository profissionalDaSaudeRepository,
+    public ProfissionalDaSaudeService(ProfissionalDaSaudeRepository profissionalDaSaudeRepository,
                                       PasswordEncoder passwordEncoder,
-                                      IEmailService emailService){
+                                      EmailService emailService){
         this.profissionalDaSaudeRepository = profissionalDaSaudeRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
@@ -60,12 +58,10 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
     }
 
-    @Override
     public Page<ProfissionalDaSaude> visualizarTodos(Pageable pageable) {
         return profissionalDaSaudeRepository.findAll(pageable);
     }
 
-    @Override
     public ProfissionalDaSaude editar(ProfissionalDaSaude profissionalDaSaude, Integer id_profissional){
 
         ProfissionalDaSaude profissionalDaSaudeAtual = profissionalDaSaudeRepository.findById(id_profissional)
@@ -79,7 +75,6 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    @Override
     public ProfissionalDaSaude ativar(Integer id_profissional){
 
         ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
@@ -89,7 +84,6 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    @Override
     public ProfissionalDaSaude inativar(Integer id_profissional){
 
         ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
@@ -99,7 +93,6 @@ public class ProfissionalDaSaudeService implements IProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    @Override
     public Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable){
         return profissionalDaSaudeRepository.findByNomeContainingIgnoreCase(nome, pageable);
     }

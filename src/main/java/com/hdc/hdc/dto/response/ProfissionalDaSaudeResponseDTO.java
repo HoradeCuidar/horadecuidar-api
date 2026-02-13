@@ -1,14 +1,10 @@
 package com.hdc.hdc.dto.response;
 
-import com.hdc.hdc.model.enums.Genero;
 import com.hdc.hdc.model.enums.Role;
-import com.hdc.hdc.model.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter

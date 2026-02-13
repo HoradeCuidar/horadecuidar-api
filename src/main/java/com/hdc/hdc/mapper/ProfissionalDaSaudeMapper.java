@@ -10,7 +10,6 @@ import com.hdc.hdc.util.formatter.StatusFormatter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
