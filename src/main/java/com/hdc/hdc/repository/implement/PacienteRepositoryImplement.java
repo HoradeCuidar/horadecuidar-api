@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,28 +30,29 @@ public class PacienteRepositoryImplement implements IPacienteRepository {
     }
 
     public Paciente save(Paciente paciente) {
-        pacienteRepository.save(paciente);
-        return pacienteRepository
-                .findByEmail(paciente.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o email informado (no save)."));
+        return pacienteRepository.save(paciente);
     }
 
+    @Transactional(readOnly = true)
     public Paciente encontrarPorId(Long id) {
         return pacienteRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o id informado."));
     }
 
+    @Transactional(readOnly = true)
     public Paciente encontrarPorEmail(String email) {
         return pacienteRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o email informado."));
     }
 
+    @Transactional(readOnly = true)
     public Page<Paciente> encontrarPorNome(String nome, Pageable pageable) {
         return pacienteRepository.findAllByNomeContainingIgnoreCaseAndRole(nome, Role.PACIENTE, pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<Paciente> visualizarTodos(Pageable pageable) {
         return pacienteRepository.findAllWithRelations(pageable);
     }

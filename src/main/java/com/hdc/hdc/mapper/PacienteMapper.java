@@ -19,6 +19,9 @@ public abstract class PacienteMapper {
     @Autowired
     private DoencaRepository doencaRepository;
 
+    @Autowired
+    private DoencaMapper doencaMapper;
+
     public Paciente toEntity(PacienteCreateDto dto) {
         Paciente paciente = this.toEntityParcial(dto);
 
@@ -41,7 +44,8 @@ public abstract class PacienteMapper {
         return paciente;
     }
 
-    public abstract PacienteResponseDto toDto(Paciente entity);
+    @Mapping(target = "doencas", source = "doencas")
+    public abstract PacienteResponseDto toDto(Paciente paciente);
 
     public abstract List<PacienteResponseDto> toDto(List<Paciente> entity);
 
@@ -57,4 +61,12 @@ public abstract class PacienteMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "doencas", ignore = true)
     public abstract Paciente toEntityParcial(PacienteCreateDto dto);
+
+    protected List<Doenca> map(List<PacienteDoencas> lista) {
+        if (lista == null) return null;
+
+        return lista.stream()
+                .map(pd -> doencaMapper.toDto(pd.getDoenca()))
+                .toList();
+    }
 }
