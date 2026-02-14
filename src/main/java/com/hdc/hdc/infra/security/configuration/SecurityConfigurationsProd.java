@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,8 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
 @Profile("prod")
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfigurationsProd{
 
     private final SecurityFilter securityFilter;
@@ -46,13 +48,8 @@ public class SecurityConfigurationsProd{
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/inativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/profissional/buscar").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/profissional/uploadFotoDePerfil/{id_profissional}").hasAnyRole("PROFISSIONAL_DA_SAUDE")
-
-                        .requestMatchers(HttpMethod.GET, "/api/paciente/**").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/paciente/**").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/paciente/**").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/paciente/**").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
+                        .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -21,7 +21,7 @@ public class PacienteController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PacienteResponseDto> cadastrar(@RequestBody PacienteCreateDto paciente) {
         var created = pacienteService.cadastrar(paciente);
         URI uri = URI.create("/paciente/" + created.id());
@@ -31,14 +31,21 @@ public class PacienteController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PacienteResponseDto> visualizarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(pacienteService.visualizarPorId(id));
     }
 
+    @GetMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<PacienteResponseDto> visualizarPorEmail(@RequestParam String email) {
+        return ResponseEntity.ok(pacienteService.visualizarPorEmail(email));
+    }
+
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<Page<PacienteResponseDto>> visualizarTodos(
             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
             @RequestParam(value = "limite", defaultValue = "10") Integer limite
@@ -48,28 +55,28 @@ public class PacienteController {
 
     @GetMapping("/nome")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<Page<PacienteResponseDto>> visualizarPorNome(@RequestParam String nome) {
         return ResponseEntity.ok(pacienteService.encontrarPorNome(nome));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public void atualizar(@RequestBody PacienteCreateDto paciente, @PathVariable Long id) {
         this.pacienteService.atualizar(paciente, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public void deletar(@PathVariable Long id) {
         this.pacienteService.deletar(id);
     }
 
     @PatchMapping("/status/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PacienteResponseDto> alterarStatus(@PathVariable Long id) {
         return ResponseEntity.ok(this.pacienteService.alterarStatus(id));
     }
