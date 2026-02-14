@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -76,7 +75,7 @@ public class PacienteService {
     @Transactional
     public void atualizar(PacienteCreateDto dto, Long id) {
         Paciente existente = this.encontrarPorId(id);
-        validarUnicidade(dto.email(), Math.toIntExact(id));
+        this.validarUnicidade(dto.email(), id);
 
         existente.setNome(dto.nome());
         existente.setEmail(dto.email());
@@ -128,9 +127,9 @@ public class PacienteService {
         }
     }
 
-    private void validarUnicidade(String email, Integer id) {
-        Paciente existente = this.encontrarPorEmail(email);
-        if (!Objects.equals(existente.getId(), id)) {
+    private void validarUnicidade(String email, Long id) {
+        Paciente existente = this.pacienteRepository.findByEmail(email).orElse(null);
+        if (existente != null && !existente.getId().equals(Math.toIntExact(id))) {
             throw new ResourceWithSameNameException("Email", "Já existe um paciente registrado com esse email.");
         }
     }
@@ -140,7 +139,7 @@ public class PacienteService {
     private Paciente encontrarPorId(Long id) {
         return pacienteRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o id informado."));
+                .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
     }
 
     @Transactional(readOnly = true)
