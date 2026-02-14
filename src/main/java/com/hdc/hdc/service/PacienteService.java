@@ -10,7 +10,6 @@ import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
 import com.hdc.hdc.repository.DoencaRepository;
 import com.hdc.hdc.repository.interfaces.IPacienteRepository;
-import com.hdc.hdc.service.interfaces.IPacienteService;
 import com.hdc.hdc.util.exception.ResourceWithSameNameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PacienteService implements IPacienteService {
+public class PacienteService {
 
     private final IPacienteRepository pacienteRepository;
     private final DoencaRepository doencaRepository;

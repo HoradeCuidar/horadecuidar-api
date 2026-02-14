@@ -36,6 +36,13 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteService.visualizarPorId(id));
     }
 
+    @GetMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    public ResponseEntity<PacienteResponseDto> visualizarPorEmail(@RequestParam String email) {
+        return ResponseEntity.ok(pacienteService.visualizarPorEmail(email));
+    }
+
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
