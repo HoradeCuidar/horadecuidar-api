@@ -24,7 +24,7 @@ public class PacienteController {
     @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     public ResponseEntity<PacienteResponseDto> cadastrar(@RequestBody PacienteCreateDto paciente) {
         var created = pacienteService.cadastrar(paciente);
-        URI uri = URI.create("/entrie/" + created.id());
+        URI uri = URI.create("/paciente/" + created.id());
 
         return ResponseEntity.created(uri).body(created);
     }
