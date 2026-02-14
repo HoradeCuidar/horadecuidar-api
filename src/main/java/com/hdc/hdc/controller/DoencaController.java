@@ -22,7 +22,7 @@ public class DoencaController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     public ResponseEntity<Doenca> save(@RequestBody DoencaCreateDto dto) {
         Doenca created = doencaService.save(dto);
         UriComponentsBuilder uri  = ServletUriComponentsBuilder.fromUriString("/api/doencas" + created.getId());
@@ -32,20 +32,20 @@ public class DoencaController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     public ResponseEntity<List<Doenca>> findAll() {
         return ResponseEntity.ok().body(doencaService.getAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Doenca> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(doencaService.getById(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DE_SAUDE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> update(@RequestBody DoencaCreateDto dto, @PathVariable Long id) {
         doencaService.update(dto, id);
@@ -53,7 +53,7 @@ public class DoencaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         doencaService.delete(id);
