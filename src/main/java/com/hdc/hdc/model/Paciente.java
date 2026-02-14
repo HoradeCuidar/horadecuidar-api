@@ -27,21 +27,21 @@ public class Paciente extends Usuario {
     private String observacoes;
 
     public Paciente(Integer id,
-            String nome,
-            String username,
-            String senha,
-            LocalDate dataDeNascimento,
-            Role role,
-            Status status,
-            String telefone,
-            String rua,
-            String bairro,
-            String estado,
-            String cidade,
-            String numeroDaCasa,
-            Genero genero,
-            String email) {
-        super(id, nome, username, senha, dataDeNascimento, role, status, telefone, rua, bairro, estado, cidade,
-                numeroDaCasa, genero, email);
+                    String nome,
+                    String username,
+                    String senha,
+                    LocalDate dataDeNascimento,
+                    Role role,
+                    Status status,
+                    String telefone,
+                    String rua,
+                    String bairro,
+                    String estado,
+                    String cidade,
+                    String numeroDaCasa,
+                    Genero genero,
+                    String email,
+                    String fotoDePerfil){
+        super(id, nome, username, senha, dataDeNascimento, role, status, telefone, rua, bairro, estado, cidade, numeroDaCasa, genero, email, fotoDePerfil);
     }
 }

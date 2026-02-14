@@ -1,6 +1,6 @@
 package com.hdc.hdc.infra.security.service;
 
-import com.hdc.hdc.repository.interfaces.IUsuarioRepository;
+import com.hdc.hdc.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsuarioService implements UserDetailsService {
 
-    private final IUsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
-    public UsuarioService(IUsuarioRepository usuarioRepository){
+    public UsuarioService(UsuarioRepository usuarioRepository){
         this.usuarioRepository = usuarioRepository;
     }
 

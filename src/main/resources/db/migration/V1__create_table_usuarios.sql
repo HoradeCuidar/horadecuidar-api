@@ -13,5 +13,6 @@ CREATE TABLE usuarios(
     cidade VARCHAR(50) NOT NULL,
     numero_da_casa VARCHAR(10) NOT NULL,
     genero VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE
+    email VARCHAR(255) NOT NULL UNIQUE,
+    foto_de_perfil VARCHAR(255)
 );

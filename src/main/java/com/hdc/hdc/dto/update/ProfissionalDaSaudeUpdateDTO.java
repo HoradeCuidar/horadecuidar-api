@@ -1,4 +1,4 @@
-package com.hdc.hdc.dto.create;
+package com.hdc.hdc.dto.update;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hdc.hdc.model.enums.Genero;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfissionalDaSaudeCreateDTO {
+public class ProfissionalDaSaudeUpdateDTO {
 
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
@@ -25,10 +25,6 @@ public class ProfissionalDaSaudeCreateDTO {
             message = "Username não pode conter espaços"
     )
     private String username;
-
-    @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 8, message = "Senha deve ter no mínimo 8 caracteres")
-    private String senha;
 
     @NotNull(message = "Data de nascimento é obrigatória")
     @Past(message = "Data de nascimento deve ser no passado")

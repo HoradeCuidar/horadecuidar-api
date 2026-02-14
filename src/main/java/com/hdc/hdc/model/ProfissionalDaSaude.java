@@ -32,7 +32,8 @@ public class ProfissionalDaSaude extends Usuario{
                                String cidade,
                                String numeroDaCasa,
                                Genero genero,
-                               String email){
-        super(id, nome, username, senha, dataDeNascimento, role, status, telefone, rua, bairro, estado, cidade, numeroDaCasa, genero, email);
+                               String email,
+                               String fotoDePerfil){
+        super(id, nome, username, senha, dataDeNascimento, role, status, telefone, rua, bairro, estado, cidade, numeroDaCasa, genero, email, fotoDePerfil);
     }
 }
