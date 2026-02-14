@@ -9,7 +9,8 @@ import com.hdc.hdc.model.associacoes.PacienteDoencas;
 import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
 import com.hdc.hdc.repository.DoencaRepository;
-import com.hdc.hdc.repository.interfaces.IPacienteRepository;
+import com.hdc.hdc.repository.PacienteRepository;
+import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import com.hdc.hdc.util.exception.ResourceWithSameNameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PacienteService {
 
-    private final IPacienteRepository pacienteRepository;
+    private final PacienteRepository pacienteRepository;
     private final DoencaRepository doencaRepository;
     private final PacienteMapper pacienteMapper;
     private final PasswordEncoder passwordEncoder;
@@ -48,18 +49,18 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorId(Long id) {
-        return this.pacienteMapper.toDto(this.pacienteRepository.encontrarPorId(id));
+        return this.pacienteMapper.toDto(this.encontrarPorId(id));
     }
 
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorEmail(String email) {
-        return this.pacienteMapper.toDto(this.pacienteRepository.encontrarPorEmail(email));
+        return this.pacienteMapper.toDto(this.encontrarPorEmail(email));
     }
 
     @Transactional(readOnly = true)
     public Page<PacienteResponseDto> encontrarPorNome(String nome) {
         Pageable pageable = PageRequest.of(0, 20);
-        var result = this.pacienteRepository.encontrarPorNome(nome, pageable);
+        var result = this.encontrarPorNome(nome, pageable);
 
         return result.map(pacienteMapper::toDto);
     }
@@ -67,14 +68,14 @@ public class PacienteService {
     @Transactional(readOnly = true)
     public Page<PacienteResponseDto> visualizarTodos(Integer pagina, Integer limite) {
         Pageable pageable = PageRequest.of(pagina, limite);
-        var result = this.pacienteRepository.visualizarTodos(pageable);
+        var result = this.visualizarTodos(pageable);
 
         return result.map(pacienteMapper::toDto);
     }
 
     @Transactional
     public void atualizar(PacienteCreateDto dto, Long id) {
-        Paciente existente = pacienteRepository.encontrarPorId(id);
+        Paciente existente = this.encontrarPorId(id);
         validarUnicidade(dto.email(), Math.toIntExact(id));
 
         existente.setNome(dto.nome());
@@ -115,7 +116,7 @@ public class PacienteService {
     }
 
     public PacienteResponseDto alterarStatus(Long id) {
-        Paciente paciente = this.pacienteRepository.encontrarPorId(id);
+        Paciente paciente = this.encontrarPorId(id);
         paciente.setStatus(paciente.getStatus() == Status.ATIVO ? Status.INATIVO : Status.ATIVO);
 
         return this.pacienteMapper.toDto(this.pacienteRepository.save(paciente));
@@ -128,10 +129,34 @@ public class PacienteService {
     }
 
     private void validarUnicidade(String email, Integer id) {
-        Paciente existente = this.pacienteRepository.encontrarPorEmail(email);
+        Paciente existente = this.encontrarPorEmail(email);
         if (!Objects.equals(existente.getId(), id)) {
             throw new ResourceWithSameNameException("Email", "Já existe um paciente registrado com esse email.");
         }
     }
 
+    // Métodos privados recorrentes
+    @Transactional(readOnly = true)
+    private Paciente encontrarPorId(Long id) {
+        return pacienteRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o id informado."));
+    }
+
+    @Transactional(readOnly = true)
+    private Paciente encontrarPorEmail(String email) {
+        return pacienteRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o email informado."));
+    }
+
+    @Transactional(readOnly = true)
+    private Page<Paciente> encontrarPorNome(String nome, Pageable pageable) {
+        return pacienteRepository.findAllByNomeContainingIgnoreCaseAndRole(nome, Role.PACIENTE, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    private Page<Paciente> visualizarTodos(Pageable pageable) {
+        return pacienteRepository.findAllWithRelations(pageable);
+    }
 }
