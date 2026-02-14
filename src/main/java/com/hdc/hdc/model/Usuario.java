@@ -50,22 +50,22 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, length = 20)
     private Status status;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String telefone;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String rua;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String bairro;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String estado;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String cidade;
 
-    @Column(name = "numero_da_casa", nullable = false, length = 10)
+    @Column(name = "numero_da_casa", length = 10)
     private String numeroDaCasa;
 
     @Enumerated(EnumType.STRING)
