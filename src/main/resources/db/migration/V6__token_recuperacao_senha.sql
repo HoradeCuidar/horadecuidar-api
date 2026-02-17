@@ -1,4 +1,4 @@
-CREATE TABLE recuperacao_senha (
+CREATE TABLE token_recuperacao (
     id SERIAL PRIMARY KEY,
     token VARCHAR(244) NOT NULL,
     usuario_id BIGINT NOT NULL,
