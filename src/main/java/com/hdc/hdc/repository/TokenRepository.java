@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface TokenRepository extends JpaRepository<TokenRecuperacao, Long> {
 
     @Modifying
@@ -19,4 +21,6 @@ public interface TokenRepository extends JpaRepository<TokenRecuperacao, Long> {
         AND t.usado = false
     """)
     void invalidateAllByusuario(@Param("user") Usuario usuario);
+
+    Optional<TokenRecuperacao> findByToken(String token);
 }
