@@ -38,6 +38,8 @@ public class SecurityConfigurationsProd{
 
                         // Authorization
                         .requestMatchers(HttpMethod.POST, "/api/auth/logar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/recuperacao-senha").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/resetar-senha").permitAll()
 
                         // Profissional da Saúde
                         .requestMatchers(HttpMethod.POST, "/api/profissional/cadastrar").hasAnyRole("ADMIN")

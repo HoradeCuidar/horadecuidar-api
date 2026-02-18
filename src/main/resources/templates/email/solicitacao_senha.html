@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperação de senha</title>
+</head>
+
+<body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#FFFFFF;">
+
+<table align="center" width="600" cellpadding="0" cellspacing="0"
+       style="background-color:#ffffff; margin-top:40px; border-radius:8px; padding:30px;">
+
+    <!-- Logo -->
+    <tr>
+        <td align="center">
+            <img src="cid:logoImage" width="300" style="margin-bottom:20px;" />
+        </td>
+    </tr>
+
+    <!-- Conteúdo -->
+    <tr>
+        <td>
+
+            <h2 style="color:#6699FF;">
+                Olá <span th:text="${nome}">Nome do usuário</span>,
+            </h2>
+
+            <p style="color:#555; font-size:14px;">
+                Recebemos uma solicitação para redefinir a senha da sua conta no
+                <strong>Hora de Cuidar</strong>.
+            </p>
+
+            <p style="color:#555; font-size:14px;">
+                Se você reconhece essa solicitação, clique no botão abaixo para criar
+                uma nova senha.
+            </p>
+
+            <!-- Botão -->
+            <div style="text-align:center; margin:30px 0;">
+                <a th:href="${resetLink}"
+                   style="background-color:#6699FF; color:#ffffff; padding:12px 25px;
+                          text-decoration:none; border-radius:5px; font-weight:bold;">
+                    Redefinir senha
+                </a>
+            </div>
+
+            <p style="color:#555; font-size:14px;">
+                Este link é válido por <strong><span th:text="${tempoExpiracao}">30 minutos</span></strong>
+                e pode ser utilizado apenas uma vez.
+            </p>
+
+            <p style="color:#555; font-size:14px;">
+                Caso você não tenha solicitado a redefinição de senha, ignore este email.
+                Sua conta permanecerá segura.
+            </p>
+
+            <p style="color:#999; font-size:12px; margin-top:30px;">
+                Atenciosamente,<br/>
+                <strong>Equipe Hora de Cuidar</strong>
+            </p>
+
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>

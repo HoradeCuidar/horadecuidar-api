@@ -50,6 +50,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidTokenException(InvalidTokenException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(InvalidValueException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidValueException(InvalidValueException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
     // Tratamento das demais exceções
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponseDTO>> handleValidationException(MethodArgumentNotValidException e) {
