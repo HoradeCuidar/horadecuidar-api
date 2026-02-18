@@ -86,5 +86,13 @@ public class RecuperacaoSenhaService {
 
         token.setUsado(true);
         tokenRepository.save(token);
+
+        this.emailMontagemService.enviarResetSenha(
+                user.getEmail(),
+                user.getNome(),
+                LocalDateTime.now(),
+                "localhost:5173/login"
+        );
+        log.info("Reset de senha realizado para: {}", user.getUsername());
     }
 }
