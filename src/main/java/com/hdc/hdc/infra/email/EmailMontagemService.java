@@ -13,7 +13,7 @@ public class EmailMontagemService {
     private final EmailTemplateService emailTemplateService;
     private final EmailService emailService;
 
-    // Monta e envia o e-mail de confirmação de cadastro de profissional.
+    // E-mail de confirmacao de cadastro de profissional
     public void enviarConfirmacaoCadastro(String nome, String email, String username, String senha) {
         Map<String, Object> variaveis = new HashMap<>();
         variaveis.put("nome", nome);
@@ -23,17 +23,25 @@ public class EmailMontagemService {
         enviarGeral(email, "Bem-vindo ao Hora de Cuidar", "email/cadastro", variaveis);
     }
 
+    //E-mail de recuperacao de senha
+    public void enviarRecuperacaoSenha(String nome, String email, Integer tempoExpiracao, String resetLink) {
+        Map<String, Object> variaveis = new HashMap<>();
+        variaveis.put("nome", nome);
+        variaveis.put("tempoExpiracao", tempoExpiracao);
+        variaveis.put("resetLink", resetLink);
+
+        enviarGeral(email, "Recuperação de Senha - Hora de Cuidar", "email/solicitacao_senha", variaveis);
+    }
+
     // Metodo generico para orquestrar o processamento do template e o envio.
     private void enviarGeral(String destinatario, String assunto, String template, Map<String, Object> variaveis) {
         // Processa o template HTML com as variáveis
         String html = emailTemplateService.processar(template, variaveis);
 
-        // Define os recursos inline (imagens) comuns a todos os emails
-        // Se necessário, isso pode ser passado como parâmetro tambem
+        // Define os recursos inline comuns a todos os emails
         Map<String, String> recursosInline = new HashMap<>();
         recursosInline.put("logoImage", "static/logo-hdc.png");
 
-        // Delega o envio para o serviço de baixo nível
         emailService.enviarHtml(destinatario, assunto, html, recursosInline);
     }
 }

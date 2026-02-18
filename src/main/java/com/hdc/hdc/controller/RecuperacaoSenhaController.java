@@ -1,6 +1,7 @@
 package com.hdc.hdc.controller;
 
 import com.hdc.hdc.dto.create.ResetPasswordCreateDto;
+import com.hdc.hdc.dto.create.SolicitarRecuperacaoDto;
 import com.hdc.hdc.dto.response.ResetPasswordResponseDto;
 import com.hdc.hdc.service.RecuperacaoSenhaService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class RecuperacaoSenhaController {
 
     @PostMapping("/recuperacao-senha")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<String> recuperacaoSenha(@RequestBody String email) {
-        this.recuperacaoSenhaService.solicitacao(email);
+    public ResponseEntity<Object> recuperacaoSenha(@RequestBody SolicitarRecuperacaoDto email) {
+        this.recuperacaoSenhaService.solicitarRecuperacaoSenha(email);
         return new ResponseEntity<>("Se o email estiver cadastrado, você receberá instruções na sua caixa de email.", HttpStatus.ACCEPTED);
     }
 
