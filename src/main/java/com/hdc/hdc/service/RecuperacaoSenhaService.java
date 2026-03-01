@@ -12,11 +12,9 @@ import com.hdc.hdc.util.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -34,35 +32,39 @@ public class RecuperacaoSenhaService {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${admin.address}")
+    private String adminAddress;
+
     public void solicitarRecuperacaoSenha(SolicitarRecuperacaoDto dto) {
-        try {
-            usuarioRepository.findByEmail(dto.email()).ifPresent(usuario -> {
+        usuarioRepository.findByEmail(dto.email()).ifPresent(usuario -> {
 
-                // invalidar todos os tokens antigos
-                tokenRepository.invalidateAllByusuario(usuario);
+            if(usuario.getEmail().equals(adminAddress)) {
+                log.info("Administrador não pode recuperar senha!");
+                return;
+            }
 
-                TokenRecuperacao token = new TokenRecuperacao();
-                token.setToken(UUID.randomUUID().toString());
-                token.setUsuario(usuario);
-                token.setExpiracao(LocalDateTime.now().plusMinutes(30));
-                token.setUsado(false);
+            // invalidar todos os tokens antigos
+            tokenRepository.invalidateAllByusuario(usuario);
 
-                tokenRepository.save(token);
+            TokenRecuperacao token = new TokenRecuperacao();
+            token.setToken(UUID.randomUUID().toString());
+            token.setUsuario(usuario);
+            token.setExpiracao(LocalDateTime.now().plusMinutes(30));
+            token.setUsado(false);
 
-                String link = frontendUrl +
-                        "/reset-password?token=" + token.getToken();
+            tokenRepository.save(token);
 
-                this.emailMontagemService.enviarRecuperacaoSenha(
-                        usuario.getNome(),
-                        usuario.getEmail(),
-                        30,
-                        link
-                );
-                log.info("Email de recuperacao de senha enviado para {}", dto.email());
-            });
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+            String link = frontendUrl +
+                    "/reset-password?token=" + token.getToken();
+
+            this.emailMontagemService.enviarRecuperacaoSenha(
+                    usuario.getNome(),
+                    usuario.getEmail(),
+                    30,
+                    link
+            );
+            log.info("Email de recuperacao de senha enviado para {}", dto.email());
+        });
     }
 
     @Transactional
