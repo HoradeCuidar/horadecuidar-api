@@ -1,7 +1,7 @@
 package com.hdc.hdc.service;
 
 import com.hdc.hdc.infra.bucket.service.R2Service;
-import com.hdc.hdc.infra.email.EmailService;
+import com.hdc.hdc.infra.email.EmailMontagemService;
 import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.model.enums.Role;
 import com.hdc.hdc.model.enums.Status;
@@ -20,21 +20,21 @@ public class ProfissionalDaSaudeService {
 
     private final ProfissionalDaSaudeRepository profissionalDaSaudeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final EmailMontagemService emailMontagemService;
     private final R2Service r2Service;
 
     @Autowired
     public ProfissionalDaSaudeService(ProfissionalDaSaudeRepository profissionalDaSaudeRepository,
-                                      PasswordEncoder passwordEncoder,
-                                      EmailService emailService,
-                                      R2Service r2Service){
+            PasswordEncoder passwordEncoder,
+            EmailMontagemService emailMontagemService,
+            R2Service r2Service) {
         this.profissionalDaSaudeRepository = profissionalDaSaudeRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
+        this.emailMontagemService = emailMontagemService;
         this.r2Service = r2Service;
     }
 
-    public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude){
+    public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude) {
 
         // PERSONALIZAR DEPOIS
         if (profissionalDaSaudeRepository.existsByEmail(profissionalDaSaude.getEmail())) {
@@ -46,7 +46,7 @@ public class ProfissionalDaSaudeService {
             throw new RuntimeException("Já existe um profissional cadastrado com este username");
         }
 
-        emailService.enviarEmaildeCadastro(
+        emailMontagemService.enviarConfirmacaoCadastro(
                 profissionalDaSaude.getNome(),
                 profissionalDaSaude.getEmail(),
                 profissionalDaSaude.getUsername(),
@@ -59,7 +59,7 @@ public class ProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    public ProfissionalDaSaude visualizar(Integer id_profissional){
+    public ProfissionalDaSaude visualizar(Integer id_profissional) {
 
         return profissionalDaSaudeRepository.findById(id_profissional)
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
@@ -69,7 +69,7 @@ public class ProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.findAll(pageable);
     }
 
-    public ProfissionalDaSaude editar(ProfissionalDaSaude profissionalDaSaude, Integer id_profissional){
+    public ProfissionalDaSaude editar(ProfissionalDaSaude profissionalDaSaude, Integer id_profissional) {
 
         ProfissionalDaSaude profissionalDaSaudeAtual = profissionalDaSaudeRepository.findById(id_profissional)
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
@@ -82,7 +82,7 @@ public class ProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    public ProfissionalDaSaude ativar(Integer id_profissional){
+    public ProfissionalDaSaude ativar(Integer id_profissional) {
 
         ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
@@ -91,7 +91,7 @@ public class ProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    public ProfissionalDaSaude inativar(Integer id_profissional){
+    public ProfissionalDaSaude inativar(Integer id_profissional) {
 
         ProfissionalDaSaude profissionalDaSaude = profissionalDaSaudeRepository.findById(id_profissional)
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
@@ -100,7 +100,7 @@ public class ProfissionalDaSaudeService {
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
     }
 
-    public Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable){
+    public Page<ProfissionalDaSaude> buscar(String nome, Pageable pageable) {
         return profissionalDaSaudeRepository.findByNomeContainingIgnoreCase(nome, pageable);
     }
 
@@ -110,9 +110,9 @@ public class ProfissionalDaSaudeService {
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
 
         String url = r2Service.upload(fotoDePerfil);
-        if(profissionalDaSaude.getFotoDePerfil().isEmpty()){
+        if (profissionalDaSaude.getFotoDePerfil().isEmpty()) {
             profissionalDaSaude.setFotoDePerfil(url);
-        }else{
+        } else {
             r2Service.delete(profissionalDaSaude.getFotoDePerfil());
             profissionalDaSaude.setFotoDePerfil(url);
         }
