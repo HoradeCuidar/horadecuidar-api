@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -22,7 +23,7 @@ public class PacienteController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
-    public ResponseEntity<PacienteResponseDto> cadastrar(@RequestBody PacienteCreateDto paciente) {
+    public ResponseEntity<PacienteResponseDto> cadastrar(@Valid @RequestBody PacienteCreateDto paciente) {
         var created = pacienteService.cadastrar(paciente);
         URI uri = URI.create("/paciente/" + created.id());
 

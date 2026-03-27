@@ -47,6 +47,9 @@ public abstract class PacienteMapper {
     @Mapping(target = "doencas", source = "doencas")
     public abstract PacienteResponseDto toDto(Paciente paciente);
 
+    @Mapping(target = "doencas", source = "doencas")
+    public abstract PacienteResponseDto toDto(PacienteCreateDto paciente);
+
     public abstract List<PacienteResponseDto> toDto(List<Paciente> entity);
 
     protected List<Doenca> mapDoencas(List<Long> ids) {
