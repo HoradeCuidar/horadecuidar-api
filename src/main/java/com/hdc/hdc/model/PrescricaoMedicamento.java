@@ -1,0 +1,46 @@
+package com.hdc.hdc.model;
+
+import com.hdc.hdc.model.associacoes.ItemMedicacao;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PrescricaoMedicamento {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doencas_gen")
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "paciente_id")
+    private Paciente paciente;
+
+    @ManyToOne
+    @JoinColumn(name = "profissional_id")
+    private ProfissionalDaSaude profissional;
+
+    @Column(name = "data_inicio")
+    private Date dataInicio;
+
+    @Column(name = "data_fim")
+    private Date dataFim;
+
+    @Column(name = "observacao", columnDefinition = "text")
+    private String observacao;
+
+    @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemMedicacao> medicacoes;
+
+}
