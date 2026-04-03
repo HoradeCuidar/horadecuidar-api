@@ -20,7 +20,7 @@ import java.util.UUID;
 public class PrescricaoMedicamento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doencas_gen")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne
@@ -39,6 +39,9 @@ public class PrescricaoMedicamento {
 
     @Column(name = "observacao", columnDefinition = "text")
     private String observacao;
+
+    @Column(name = "ativo")
+    private boolean ativo = true;
 
     @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemMedicacao> medicacoes;
