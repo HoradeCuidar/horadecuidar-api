@@ -41,6 +41,9 @@ public class SecurityConfigurationsProd{
                         .requestMatchers(HttpMethod.POST, "/api/auth/recuperacao-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/resetar-senha").permitAll()
 
+                        // Swagger
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**").permitAll()
+
                         // Profissional da Saúde
                         .requestMatchers(HttpMethod.POST, "/api/profissional/cadastrar").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/profissional/visualizar/{id_profissional}").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
