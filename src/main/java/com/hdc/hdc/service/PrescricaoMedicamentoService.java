@@ -14,7 +14,7 @@ import com.hdc.hdc.repository.PacienteRepository;
 import com.hdc.hdc.repository.PrescricaoMedicamentoRepository;
 import com.hdc.hdc.repository.ProfissionalDaSaudeRepository;
 import com.hdc.hdc.repository.RegistroAdesaoMedicamentoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,23 +26,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PrescricaoMedicamentoService {
 
-    @Autowired
-    private PrescricaoMedicamentoRepository prescricaoRepository;
-
-    @Autowired
-    private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private ProfissionalDaSaudeRepository profissionalRepository;
-
-    @Autowired
-    private RegistroAdesaoMedicamentoRepository adesaoRepository;
+    private final PrescricaoMedicamentoRepository prescricaoRepository;
+    private final PacienteRepository pacienteRepository;
+    private final ProfissionalDaSaudeRepository profissionalRepository;
+    private final RegistroAdesaoMedicamentoRepository adesaoRepository;
 
     @Transactional
     public PrescricaoMedicamentoResponseDTO criarPrescricao(Integer pacienteId, PrescricaoMedicamentoRequestDTO dto) {
-        Paciente paciente = pacienteRepository.findById(pacienteId)
+        Paciente paciente = pacienteRepository
+                .findById(pacienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado."));
 
         ProfissionalDaSaude profissional = profissionalRepository.findById(dto.getProfissionalId())
@@ -85,10 +80,6 @@ public class PrescricaoMedicamentoService {
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
-
-        // Se já existe adesão, optamos por criar uma nova versão (ou atualizar direto
-        // se for simples)
-        // Por simplicidade na implementação MVP, vamos apenas atualizar os dados
 
         ProfissionalDaSaude profissional = profissionalRepository.findById(dto.getProfissionalId())
                 .orElseThrow(() -> new IllegalArgumentException("Profissional de saúde não encontrado."));
@@ -168,15 +159,9 @@ public class PrescricaoMedicamentoService {
 
         List<RegistroAdesaoMedicamento> adesoes = adesaoRepository.findByPrescricaoId(prescricaoId);
         int realizacoes = (int) adesoes.stream().filter(a -> a.getStatus() == StatusAdesao.REALIZADO).count();
-        int totalEsperado = adesoes.size(); // Para o MVP, considera-se o número de registros criados pelo agendador ou
-                                            // paciente. Se não há agendador, 0.
+        int totalEsperado = adesoes.size(); // Para o MVP, considera-se o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
 
-        // Em um cenário real, totalEsperado seria calculado baseado na dataInicio,
-        // dataFim, intervaloTipo e intervaloValor do ItemMedicacao.
-        // Como o documento de requisitos menciona isso como ponto aberto, e a modelagem
-        // simples foi aceita, faremos um cálculo simplificado.
-        // Simulando que o total esperado provisório seja no mínimo as realizações
-        // (evita divide by zero).
+        // Simulação que o total esperado provisório seja no mínimo as realizações (evita divide by zero)
         if (totalEsperado == 0)
             totalEsperado = realizacoes > 0 ? realizacoes : 1;
 

@@ -16,6 +16,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     
     Optional<Paciente> findByEmail(String email);
 
+    Optional<Paciente> findById(Integer id);
+
     Page<Paciente> findAllByNomeContainingIgnoreCaseAndRole(String nome, Role role, Pageable pageable);
 
     @Query("select p from Paciente p where p.role = 'PACIENTE'")
