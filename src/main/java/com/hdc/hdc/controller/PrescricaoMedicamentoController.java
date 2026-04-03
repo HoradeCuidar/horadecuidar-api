@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/pacientes/{id}/prescricoes/medicamentos")
+@RequestMapping("/api/pacientes/{id}/prescricoes/medicamentos")
 public class PrescricaoMedicamentoController {
 
     @Autowired
