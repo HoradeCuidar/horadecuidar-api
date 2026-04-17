@@ -1,6 +1,5 @@
 package com.hdc.hdc.service;
 
-import com.hdc.hdc.dto.ItemMedicacaoDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.dto.RelatorioAdesaoDTO;
@@ -10,9 +9,9 @@ import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.model.RegistroAdesaoMedicamento;
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
 import com.hdc.hdc.model.enums.StatusAdesao;
+import com.hdc.hdc.mapper.PrescricaoMedicamentoMapper;
 import com.hdc.hdc.repository.PacienteRepository;
 import com.hdc.hdc.repository.PrescricaoMedicamentoRepository;
-import com.hdc.hdc.repository.ProfissionalDaSaudeRepository;
 import com.hdc.hdc.repository.RegistroAdesaoMedicamentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +29,14 @@ public class PrescricaoMedicamentoService {
 
     private final PrescricaoMedicamentoRepository prescricaoRepository;
     private final PacienteRepository pacienteRepository;
-    private final ProfissionalDaSaudeRepository profissionalRepository;
     private final RegistroAdesaoMedicamentoRepository adesaoRepository;
+    private final PrescricaoMedicamentoMapper mapper;
 
     @Transactional
-    public PrescricaoMedicamentoResponseDTO criarPrescricao(Integer pacienteId, PrescricaoMedicamentoRequestDTO dto) {
+    public PrescricaoMedicamentoResponseDTO criarPrescricao(Integer pacienteId, PrescricaoMedicamentoRequestDTO dto, ProfissionalDaSaude profissional) {
         Paciente paciente = pacienteRepository
                 .findById(pacienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado."));
-
-        ProfissionalDaSaude profissional = profissionalRepository.findById(dto.getProfissionalId())
-                .orElseThrow(() -> new IllegalArgumentException("Profissional de saúde não encontrado."));
 
         PrescricaoMedicamento prescricao = new PrescricaoMedicamento();
         prescricao.setPaciente(paciente);
@@ -51,38 +46,27 @@ public class PrescricaoMedicamentoService {
         prescricao.setObservacao(dto.getObservacao());
         prescricao.setAtivo(true);
 
-        List<ItemMedicacao> itens = dto.getMedicacoes().stream().map(itemDto -> {
-            ItemMedicacao item = new ItemMedicacao();
-            item.setPrescricao(prescricao);
-            item.setNomeMedicamento(itemDto.getNomeMedicamento());
-            item.setDosagemValor(itemDto.getDosagemValor());
-            item.setDosagemUnidade(itemDto.getDosagemUnidade());
-            item.setQuantidadeDoses(itemDto.getQuantidadeDoses());
-            item.setIntervaloValor(itemDto.getIntervaloValor());
-            item.setIntervaloTipo(itemDto.getIntervaloTipo());
-            item.setViaAdministracao(itemDto.getViaAdministracao());
-            item.setObservacao(itemDto.getObservacao());
-            return item;
-        }).collect(Collectors.toList());
+        List<ItemMedicacao> itens = dto.getMedicacoes().stream()
+                .map(itemDto -> mapper.toItemMedicacaoEntity(itemDto, prescricao))
+                .toList();
 
         prescricao.setMedicacoes(itens);
 
         PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
-        return mapToResponseDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public PrescricaoMedicamentoResponseDTO atualizarPrescricao(Integer pacienteId, UUID prescricaoId,
-            PrescricaoMedicamentoRequestDTO dto) {
-        PrescricaoMedicamento prescricao = prescricaoRepository.findById(prescricaoId)
-                .orElseThrow(() -> new IllegalArgumentException("Prescrição não encontrada."));
+    public PrescricaoMedicamentoResponseDTO atualizarPrescricao(
+            Integer pacienteId,
+            UUID prescricaoId,
+            PrescricaoMedicamentoRequestDTO dto,
+            ProfissionalDaSaude profissional) {
+        PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
-
-        ProfissionalDaSaude profissional = profissionalRepository.findById(dto.getProfissionalId())
-                .orElseThrow(() -> new IllegalArgumentException("Profissional de saúde não encontrado."));
 
         prescricao.setProfissional(profissional);
         prescricao.setDataInicio(dto.getDataInicio());
@@ -91,36 +75,24 @@ public class PrescricaoMedicamentoService {
 
         prescricao.getMedicacoes().clear();
 
-        List<ItemMedicacao> novosItens = dto.getMedicacoes().stream().map(itemDto -> {
-            ItemMedicacao item = new ItemMedicacao();
-            item.setPrescricao(prescricao);
-            item.setNomeMedicamento(itemDto.getNomeMedicamento());
-            item.setDosagemValor(itemDto.getDosagemValor());
-            item.setDosagemUnidade(itemDto.getDosagemUnidade());
-            item.setQuantidadeDoses(itemDto.getQuantidadeDoses());
-            item.setIntervaloValor(itemDto.getIntervaloValor());
-            item.setIntervaloTipo(itemDto.getIntervaloTipo());
-            item.setViaAdministracao(itemDto.getViaAdministracao());
-            item.setObservacao(itemDto.getObservacao());
-            return item;
-        }).collect(Collectors.toList());
+        List<ItemMedicacao> novosItens = dto.getMedicacoes().stream()
+                .map(itemDto -> mapper.toItemMedicacaoEntity(itemDto, prescricao))
+                .toList();
 
         prescricao.getMedicacoes().addAll(novosItens);
 
         PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
-        return mapToResponseDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional
     public void deletarPrescricao(Integer pacienteId, UUID prescricaoId) {
-        PrescricaoMedicamento prescricao = prescricaoRepository.findById(prescricaoId)
-                .orElseThrow(() -> new IllegalArgumentException("Prescrição não encontrada."));
+        PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
 
-        // Deleção lógica
         prescricao.setAtivo(false);
         prescricaoRepository.save(prescricao);
     }
@@ -130,8 +102,8 @@ public class PrescricaoMedicamentoService {
         return prescricaoRepository.findByPacienteIdAndAtivoTrue(pacienteId).stream()
                 .filter(p -> p.getDataFim() == null
                         || !p.getDataFim().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(hoje))
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarHistorico(Integer pacienteId) {
@@ -141,17 +113,16 @@ public class PrescricaoMedicamentoService {
                 .stream()
                 .filter(p -> p.getDataFim() != null
                         && p.getDataFim().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(hoje))
-                .collect(Collectors.toList());
+                .toList();
 
         List<PrescricaoMedicamento> historico = new ArrayList<>(inativas);
         historico.addAll(ativasVencidas);
 
-        return historico.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
+        return historico.stream().map(mapper::toResponseDTO).toList();
     }
 
     public RelatorioAdesaoDTO gerarRelatorioAdesao(Integer pacienteId, UUID prescricaoId) {
-        PrescricaoMedicamento prescricao = prescricaoRepository.findById(prescricaoId)
-                .orElseThrow(() -> new IllegalArgumentException("Prescrição não encontrada."));
+        PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
@@ -159,9 +130,10 @@ public class PrescricaoMedicamentoService {
 
         List<RegistroAdesaoMedicamento> adesoes = adesaoRepository.findByPrescricaoId(prescricaoId);
         int realizacoes = (int) adesoes.stream().filter(a -> a.getStatus() == StatusAdesao.REALIZADO).count();
-        int totalEsperado = adesoes.size(); // Para o MVP, considera-se o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
+        // Considerando o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
+        int totalEsperado = adesoes.size();
 
-        // Simulação que o total esperado provisório seja no mínimo as realizações (evita divide by zero)
+        // Total esperado provisório seja no mínimo as realizações (evita divisão por zero)
         if (totalEsperado == 0)
             totalEsperado = realizacoes > 0 ? realizacoes : 1;
 
@@ -176,32 +148,8 @@ public class PrescricaoMedicamentoService {
         return dto;
     }
 
-    private PrescricaoMedicamentoResponseDTO mapToResponseDTO(PrescricaoMedicamento prescricao) {
-        PrescricaoMedicamentoResponseDTO dto = new PrescricaoMedicamentoResponseDTO();
-        dto.setId(prescricao.getId());
-        dto.setPacienteId(prescricao.getPaciente().getId());
-        dto.setProfissionalId(prescricao.getProfissional().getId());
-        dto.setNomeProfissional(prescricao.getProfissional().getNome());
-        dto.setDataInicio(prescricao.getDataInicio());
-        dto.setDataFim(prescricao.getDataFim());
-        dto.setObservacao(prescricao.getObservacao());
-        dto.setAtivo(prescricao.isAtivo());
-
-        List<ItemMedicacaoDTO> itensDto = prescricao.getMedicacoes().stream().map(item -> {
-            ItemMedicacaoDTO itemDto = new ItemMedicacaoDTO();
-            itemDto.setId(item.getId());
-            itemDto.setNomeMedicamento(item.getNomeMedicamento());
-            itemDto.setDosagemValor(item.getDosagemValor());
-            itemDto.setDosagemUnidade(item.getDosagemUnidade());
-            itemDto.setQuantidadeDoses(item.getQuantidadeDoses());
-            itemDto.setIntervaloValor(item.getIntervaloValor());
-            itemDto.setIntervaloTipo(item.getIntervaloTipo());
-            itemDto.setViaAdministracao(item.getViaAdministracao());
-            itemDto.setObservacao(item.getObservacao());
-            return itemDto;
-        }).collect(Collectors.toList());
-
-        dto.setMedicacoes(itensDto);
-        return dto;
+    private PrescricaoMedicamento getPrescricao(UUID prescricaoId) {
+        return prescricaoRepository.findById(prescricaoId)
+                .orElseThrow(() -> new IllegalArgumentException("Prescrição não encontrada."));
     }
 }

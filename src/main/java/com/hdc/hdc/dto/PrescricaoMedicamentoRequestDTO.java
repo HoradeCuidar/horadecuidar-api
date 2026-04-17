@@ -12,9 +12,6 @@ import java.util.UUID;
 @Data
 public class PrescricaoMedicamentoRequestDTO {
 
-    @NotNull(message = "O ID do profissional é obrigatório.")
-    private Integer profissionalId;
-
     @NotNull(message = "A data de início é obrigatória.")
     private Date dataInicio;
 
