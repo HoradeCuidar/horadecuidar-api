@@ -2,19 +2,29 @@ package com.hdc.hdc.mapper;
 
 import com.hdc.hdc.dto.ItemMedicacaoDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
+import com.hdc.hdc.model.Medicamento;
 import com.hdc.hdc.model.PrescricaoMedicamento;
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
-import org.mapstruct.Mapper;
+import com.hdc.hdc.service.MedicamentoService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Component
+@RequiredArgsConstructor
 public class PrescricaoMedicamentoMapper {
+
+    private final MedicamentoService medicamentoService;
 
     public ItemMedicacao toItemMedicacaoEntity(ItemMedicacaoDTO itemDto, PrescricaoMedicamento prescricao) {
         ItemMedicacao item = new ItemMedicacao();
         item.setPrescricao(prescricao);
-        item.setNomeMedicamento(itemDto.getNomeMedicamento());
+
+        Medicamento medicamento = medicamentoService.buscarOuCriar(itemDto.getNomeMedicamento());
+        item.setMedicamento(medicamento);
+        item.setNomeMedicamento(medicamento.getNome());
+
         item.setDosagemValor(itemDto.getDosagemValor());
         item.setDosagemUnidade(itemDto.getDosagemUnidade());
         item.setQuantidadeDoses(itemDto.getQuantidadeDoses());
@@ -22,6 +32,15 @@ public class PrescricaoMedicamentoMapper {
         item.setIntervaloTipo(itemDto.getIntervaloTipo());
         item.setViaAdministracao(itemDto.getViaAdministracao());
         item.setObservacao(itemDto.getObservacao());
+        return item;
+    }
+
+    public ItemMedicacao toItemMedicacaoEntity(String nome, PrescricaoMedicamento prescricao) {
+        ItemMedicacao item = new ItemMedicacao();
+        item.setPrescricao(prescricao);
+        Medicamento medicamento = medicamentoService.buscarOuCriar(nome);
+        item.setMedicamento(medicamento);
+        item.setNomeMedicamento(medicamento.getNome());
         return item;
     }
 
@@ -50,7 +69,6 @@ public class PrescricaoMedicamentoMapper {
 
     public ItemMedicacaoDTO toItemMedicacaoDTO(ItemMedicacao item) {
         ItemMedicacaoDTO itemDto = new ItemMedicacaoDTO();
-        itemDto.setId(item.getId());
         itemDto.setNomeMedicamento(item.getNomeMedicamento());
         itemDto.setDosagemValor(item.getDosagemValor());
         itemDto.setDosagemUnidade(item.getDosagemUnidade());

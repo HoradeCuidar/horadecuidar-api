@@ -1,7 +1,16 @@
 package com.hdc.hdc.model;
 
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
-import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table
+@Table(name = "prescricao_medicamento")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,5 +54,4 @@ public class PrescricaoMedicamento {
 
     @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemMedicacao> medicacoes;
-
 }

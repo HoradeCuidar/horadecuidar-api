@@ -65,9 +65,7 @@ public class PrescricaoMedicamentoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<PrescricaoMedicamentoResponseDTO>> listarPrescricoesAtivas(
-            @PathVariable("id") Integer pacienteId) {
-
+    public ResponseEntity<List<PrescricaoMedicamentoResponseDTO>> listarPrescricoesAtivas(@PathVariable("id") Integer pacienteId) {
         List<PrescricaoMedicamentoResponseDTO> ativas = prescricaoService.listarPrescricoesAtivas(pacienteId);
         return ResponseEntity.ok(ativas);
     }

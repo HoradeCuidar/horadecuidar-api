@@ -3,8 +3,8 @@ package com.hdc.hdc.service;
 import com.hdc.hdc.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.dto.RelatorioAdesaoDTO;
-import com.hdc.hdc.model.Paciente;
 import com.hdc.hdc.model.PrescricaoMedicamento;
+import com.hdc.hdc.model.Paciente;
 import com.hdc.hdc.model.ProfissionalDaSaude;
 import com.hdc.hdc.model.RegistroAdesaoMedicamento;
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
@@ -14,6 +14,7 @@ import com.hdc.hdc.repository.PacienteRepository;
 import com.hdc.hdc.repository.PrescricaoMedicamentoRepository;
 import com.hdc.hdc.repository.RegistroAdesaoMedicamentoRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,11 @@ public class PrescricaoMedicamentoService {
     private final PrescricaoMedicamentoMapper mapper;
 
     @Transactional
-    public PrescricaoMedicamentoResponseDTO criarPrescricao(Integer pacienteId, PrescricaoMedicamentoRequestDTO dto, ProfissionalDaSaude profissional) {
+    public PrescricaoMedicamentoResponseDTO criarPrescricao(
+            Integer pacienteId,
+            PrescricaoMedicamentoRequestDTO dto,
+            ProfissionalDaSaude profissional
+    ) {
         Paciente paciente = pacienteRepository
                 .findById(pacienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado."));
@@ -131,6 +136,12 @@ public class PrescricaoMedicamentoService {
         List<RegistroAdesaoMedicamento> adesoes = adesaoRepository.findByPrescricaoId(prescricaoId);
         int realizacoes = (int) adesoes.stream().filter(a -> a.getStatus() == StatusAdesao.REALIZADO).count();
         // Considerando o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
+        RelatorioAdesaoDTO dto = getRelatorioAdesaoDTO(prescricaoId, adesoes, realizacoes);
+
+        return dto;
+    }
+
+    private static @NonNull RelatorioAdesaoDTO getRelatorioAdesaoDTO(UUID prescricaoId, List<RegistroAdesaoMedicamento> adesoes, int realizacoes) {
         int totalEsperado = adesoes.size();
 
         // Total esperado provisório seja no mínimo as realizações (evita divisão por zero)
@@ -144,7 +155,6 @@ public class PrescricaoMedicamentoService {
         dto.setDosesRealizadas(realizacoes);
         dto.setTotalDosesEsperadas(totalEsperado);
         dto.setPercentualAdesao(percentual);
-
         return dto;
     }
 
