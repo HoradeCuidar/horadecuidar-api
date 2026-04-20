@@ -5,7 +5,7 @@ import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.model.PrescricaoMedicamento;
 import com.hdc.hdc.model.Paciente;
-import com.hdc.hdc.model.ProfissionalDaSaude;
+import com.hdc.hdc.model.Usuario;
 import com.hdc.hdc.model.RegistroAdesaoMedicamento;
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
 import com.hdc.hdc.model.enums.StatusAdesao;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +37,7 @@ public class PrescricaoMedicamentoService {
     public PrescricaoMedicamentoResponseDTO criarPrescricao(
             Integer pacienteId,
             PrescricaoMedicamentoRequestDTO dto,
-            ProfissionalDaSaude profissional
+            Usuario profissional
     ) {
         Paciente paciente = pacienteRepository
                 .findById(pacienteId)
@@ -66,7 +66,7 @@ public class PrescricaoMedicamentoService {
             Integer pacienteId,
             UUID prescricaoId,
             PrescricaoMedicamentoRequestDTO dto,
-            ProfissionalDaSaude profissional) {
+            Usuario profissional) {
         PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
@@ -103,27 +103,17 @@ public class PrescricaoMedicamentoService {
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarPrescricoesAtivas(Integer pacienteId) {
-        LocalDate hoje = LocalDate.now();
-        return prescricaoRepository.findByPacienteIdAndAtivoTrue(pacienteId).stream()
-                .filter(p -> p.getDataFim() == null
-                        || !p.getDataFim().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(hoje))
+        Date hoje = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return prescricaoRepository.findAtivasByPacienteId(pacienteId, hoje).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarHistorico(Integer pacienteId) {
-        LocalDate hoje = LocalDate.now();
-        List<PrescricaoMedicamento> inativas = prescricaoRepository.findByPacienteIdAndAtivoFalse(pacienteId);
-        List<PrescricaoMedicamento> ativasVencidas = prescricaoRepository.findByPacienteIdAndAtivoTrue(pacienteId)
-                .stream()
-                .filter(p -> p.getDataFim() != null
-                        && p.getDataFim().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isBefore(hoje))
+        Date hoje = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return prescricaoRepository.findHistoricoByPacienteId(pacienteId, hoje).stream()
+                .map(mapper::toResponseDTO)
                 .toList();
-
-        List<PrescricaoMedicamento> historico = new ArrayList<>(inativas);
-        historico.addAll(ativasVencidas);
-
-        return historico.stream().map(mapper::toResponseDTO).toList();
     }
 
     public RelatorioAdesaoDTO gerarRelatorioAdesao(Integer pacienteId, UUID prescricaoId) {
@@ -136,9 +126,7 @@ public class PrescricaoMedicamentoService {
         List<RegistroAdesaoMedicamento> adesoes = adesaoRepository.findByPrescricaoId(prescricaoId);
         int realizacoes = (int) adesoes.stream().filter(a -> a.getStatus() == StatusAdesao.REALIZADO).count();
         // Considerando o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
-        RelatorioAdesaoDTO dto = getRelatorioAdesaoDTO(prescricaoId, adesoes, realizacoes);
-
-        return dto;
+        return getRelatorioAdesaoDTO(prescricaoId, adesoes, realizacoes);
     }
 
     private static @NonNull RelatorioAdesaoDTO getRelatorioAdesaoDTO(UUID prescricaoId, List<RegistroAdesaoMedicamento> adesoes, int realizacoes) {

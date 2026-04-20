@@ -3,7 +3,7 @@ package com.hdc.hdc.controller;
 import com.hdc.hdc.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.dto.RelatorioAdesaoDTO;
-import com.hdc.hdc.model.ProfissionalDaSaude;
+import com.hdc.hdc.model.Usuario;
 import com.hdc.hdc.service.PrescricaoMedicamentoService;
 import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
 import jakarta.validation.Valid;
@@ -37,7 +37,7 @@ public class PrescricaoMedicamentoController {
     public ResponseEntity<PrescricaoMedicamentoResponseDTO> criarPrescricao(
             @PathVariable("id") Integer pacienteId,
             @Valid @RequestBody PrescricaoMedicamentoRequestDTO dto,
-            @CurrentUser ProfissionalDaSaude profissional) {
+            @CurrentUser Usuario profissional) {
 
         PrescricaoMedicamentoResponseDTO criada = prescricaoService.criarPrescricao(pacienteId, dto, profissional);
         return ResponseEntity.status(HttpStatus.CREATED).body(criada);
@@ -50,7 +50,7 @@ public class PrescricaoMedicamentoController {
             @PathVariable("id") Integer pacienteId,
             @PathVariable("prescricaoId") UUID prescricaoId,
             @Valid @RequestBody PrescricaoMedicamentoRequestDTO dto,
-            @CurrentUser ProfissionalDaSaude profissional) {
+            @CurrentUser Usuario profissional) {
 
         PrescricaoMedicamentoResponseDTO atualizada = prescricaoService.atualizarPrescricao(pacienteId, prescricaoId, dto, profissional);
         return ResponseEntity.ok(atualizada);

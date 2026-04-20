@@ -38,7 +38,7 @@ public class PrescricaoMedicamento {
 
     @ManyToOne
     @JoinColumn(name = "profissional_id")
-    private ProfissionalDaSaude profissional;
+    private Usuario profissional;
 
     @Column(name = "data_inicio")
     private Date dataInicio;
