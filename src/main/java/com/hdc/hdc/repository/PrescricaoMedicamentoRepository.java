@@ -13,10 +13,20 @@ import java.util.UUID;
 @Repository
 public interface PrescricaoMedicamentoRepository extends JpaRepository<PrescricaoMedicamento, UUID> {
 
-    @Query("SELECT p FROM PrescricaoMedicamento p WHERE p.paciente.id = :pacienteId AND p.ativo = true AND (p.dataFim IS NULL OR p.dataFim >= :dataRef)")
+    @Query("""
+        SELECT p FROM PrescricaoMedicamento p
+        WHERE p.paciente.id = :pacienteId
+                AND p.ativo = true
+                AND (p.dataFim IS NULL OR p.dataFim >= :dataRef)
+        """)
     List<PrescricaoMedicamento> findAtivasByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") Date dataRef);
 
-    @Query("SELECT p FROM PrescricaoMedicamento p WHERE p.paciente.id = :pacienteId AND (p.ativo = false OR (p.ativo = true AND p.dataFim IS NOT NULL AND p.dataFim < :dataRef))")
+    @Query("""
+        SELECT p FROM PrescricaoMedicamento p
+        WHERE p.paciente.id = :pacienteId
+                AND (p.ativo = false
+                    OR (p.ativo = true AND p.dataFim IS NOT NULL AND p.dataFim < :dataRef)
+        )""")
     List<PrescricaoMedicamento> findHistoricoByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") Date dataRef);
 
     List<PrescricaoMedicamento> findByPacienteIdAndAtivoTrue(Integer pacienteId);
