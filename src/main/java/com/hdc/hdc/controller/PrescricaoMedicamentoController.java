@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class PrescricaoMedicamentoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoMedicamentoResponseDTO> criarPrescricao(
             @PathVariable("id") Integer pacienteId,
             @Valid @RequestBody PrescricaoMedicamentoRequestDTO dto,
@@ -43,6 +45,7 @@ public class PrescricaoMedicamentoController {
 
     @PutMapping("/{prescricaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoMedicamentoResponseDTO> atualizarPrescricao(
             @PathVariable("id") Integer pacienteId,
             @PathVariable("prescricaoId") UUID prescricaoId,
@@ -55,6 +58,7 @@ public class PrescricaoMedicamentoController {
 
     @DeleteMapping("/{prescricaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<Void> deletarPrescricao(
             @PathVariable("id") Integer pacienteId,
             @PathVariable("prescricaoId") UUID prescricaoId) {
@@ -65,6 +69,7 @@ public class PrescricaoMedicamentoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<List<PrescricaoMedicamentoResponseDTO>> listarPrescricoesAtivas(@PathVariable("id") Integer pacienteId) {
         List<PrescricaoMedicamentoResponseDTO> ativas = prescricaoService.listarPrescricoesAtivas(pacienteId);
         return ResponseEntity.ok(ativas);
@@ -72,6 +77,7 @@ public class PrescricaoMedicamentoController {
 
     @GetMapping("/historico")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<List<PrescricaoMedicamentoResponseDTO>> listarHistorico(
             @PathVariable("id") Integer pacienteId) {
 
@@ -81,6 +87,7 @@ public class PrescricaoMedicamentoController {
 
     @GetMapping("/{prescricaoId}/relatorio")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<RelatorioAdesaoDTO> gerarRelatorioAdesao(
             @PathVariable("id") Integer pacienteId,
             @PathVariable("prescricaoId") UUID prescricaoId) {
