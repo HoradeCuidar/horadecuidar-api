@@ -2,8 +2,10 @@ package com.hdc.hdc.mapper;
 
 import com.hdc.hdc.dto.ItemMedicacaoDTO;
 import com.hdc.hdc.dto.PrescricaoMedicamentoResponseDTO;
+import com.hdc.hdc.dto.UsuarioDTO;
 import com.hdc.hdc.model.Medicamento;
 import com.hdc.hdc.model.PrescricaoMedicamento;
+import com.hdc.hdc.model.Usuario;
 import com.hdc.hdc.model.associacoes.ItemMedicacao;
 import com.hdc.hdc.service.MedicamentoService;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +49,9 @@ public class PrescricaoMedicamentoMapper {
     public PrescricaoMedicamentoResponseDTO toResponseDTO(PrescricaoMedicamento prescricao) {
         PrescricaoMedicamentoResponseDTO dto = new PrescricaoMedicamentoResponseDTO();
         dto.setId(prescricao.getId());
-        dto.setPacienteId(prescricao.getPaciente().getId());
+        dto.setPacienteId(this.toUsuarioDTO(prescricao.getPaciente()));
         if (prescricao.getProfissional() != null) {
-            dto.setProfissionalId(prescricao.getProfissional().getId());
+            dto.setProfissionalId(this.toUsuarioDTO(prescricao.getProfissional()));
             dto.setNomeProfissional(prescricao.getProfissional().getNome());
         }
         dto.setDataInicio(prescricao.getDataInicio());
@@ -78,5 +80,19 @@ public class PrescricaoMedicamentoMapper {
         itemDto.setViaAdministracao(item.getViaAdministracao());
         itemDto.setObservacao(item.getObservacao());
         return itemDto;
+    }
+
+    private UsuarioDTO toUsuarioDTO(Usuario usuario) {
+        return new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getUsername(),
+                usuario.getRole(),
+                usuario.getStatus(),
+                usuario.getTelefone(),
+                usuario.getGenero(),
+                usuario.getEmail(),
+                usuario.getFotoDePerfil()
+        );
     }
 }

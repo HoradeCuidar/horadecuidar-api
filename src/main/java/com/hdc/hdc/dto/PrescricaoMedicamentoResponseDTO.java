@@ -9,8 +9,8 @@ import java.util.UUID;
 @Data
 public class PrescricaoMedicamentoResponseDTO {
     private UUID id;
-    private Integer pacienteId;
-    private Integer profissionalId;
+    private UsuarioDTO pacienteId;
+    private UsuarioDTO profissionalId;
     private String nomeProfissional;
     private Date dataInicio;
     private Date dataFim;
