@@ -1,8 +1,7 @@
 package com.hdc.hdc.infra.security.filter;
 
 import com.hdc.hdc.infra.security.service.TokenService;
-import com.hdc.hdc.repository.UsuarioRepository;
-import com.hdc.hdc.util.exception.InvalidTokenException;
+import com.hdc.hdc.usuarios.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,6 @@
 package com.hdc.hdc.util.formatter;
 
-import com.hdc.hdc.model.enums.Genero;
+import com.hdc.hdc.usuarios.enums.Genero;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 

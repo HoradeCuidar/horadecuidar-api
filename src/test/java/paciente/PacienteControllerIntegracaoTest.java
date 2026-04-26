@@ -2,11 +2,11 @@ package paciente;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hdc.hdc.HdcApplication;
-import com.hdc.hdc.dto.create.PacienteCreateDto;
-import com.hdc.hdc.dto.response.PacienteResponseDto;
-import com.hdc.hdc.mapper.PacienteMapper;
-import com.hdc.hdc.model.enums.Genero;
-import com.hdc.hdc.service.PacienteService;
+import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
+import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
+import com.hdc.hdc.pacientes.PacienteMapper;
+import com.hdc.hdc.usuarios.enums.Genero;
+import com.hdc.hdc.pacientes.PacienteService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,12 +1,11 @@
 package com.hdc.hdc.infra.security.service;
 
-import com.hdc.hdc.dto.auth.UsuarioRegisterDTO;
-import com.hdc.hdc.model.Administrador;
-import com.hdc.hdc.model.Usuario;
-import com.hdc.hdc.model.enums.Genero;
-import com.hdc.hdc.model.enums.Role;
-import com.hdc.hdc.model.enums.Status;
-import com.hdc.hdc.repository.UsuarioRepository;
+import com.hdc.hdc.auth.autenticacao.dto.UsuarioRegisterDTO;
+import com.hdc.hdc.usuarios.Administrador;
+import com.hdc.hdc.usuarios.enums.Genero;
+import com.hdc.hdc.usuarios.enums.Role;
+import com.hdc.hdc.usuarios.enums.Status;
+import com.hdc.hdc.usuarios.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

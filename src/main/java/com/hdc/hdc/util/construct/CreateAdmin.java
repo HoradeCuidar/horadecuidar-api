@@ -1,8 +1,8 @@
 package com.hdc.hdc.util.construct;
 
-import com.hdc.hdc.dto.auth.UsuarioRegisterDTO;
+import com.hdc.hdc.auth.autenticacao.dto.UsuarioRegisterDTO;
 import com.hdc.hdc.infra.security.service.UsuarioService;
-import com.hdc.hdc.model.enums.Role;
+import com.hdc.hdc.usuarios.enums.Role;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,6 +1,6 @@
 package com.hdc.hdc.util.notations.currenteUser;
 
-import com.hdc.hdc.model.Usuario;
+import com.hdc.hdc.usuarios.Usuario;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
