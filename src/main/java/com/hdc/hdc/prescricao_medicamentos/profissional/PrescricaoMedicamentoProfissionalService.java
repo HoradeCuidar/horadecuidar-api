@@ -1,7 +1,10 @@
-package com.hdc.hdc.prescricao_medicamentos;
+package com.hdc.hdc.prescricao_medicamentos.profissional;
 
 import com.hdc.hdc.adesao_medicamentos.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.pacientes.Paciente;
+import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
+import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoMapper;
+import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoRepository;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
@@ -24,7 +27,7 @@ import java.util.UUID;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class PrescricaoMedicamentoService {
+public class PrescricaoMedicamentoProfissionalService {
 
     private final PrescricaoMedicamentoRepository prescricaoRepository;
     private final PacienteRepository pacienteRepository;

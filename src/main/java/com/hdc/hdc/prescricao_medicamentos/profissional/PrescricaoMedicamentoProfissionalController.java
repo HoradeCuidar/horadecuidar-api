@@ -1,4 +1,4 @@
-package com.hdc.hdc.prescricao_medicamentos;
+package com.hdc.hdc.prescricao_medicamentos.profissional;
 
 import com.hdc.hdc.adesao_medicamentos.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoRequestDTO;
@@ -26,9 +26,9 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/pacientes/{id}/prescricoes/medicamentos")
-public class PrescricaoMedicamentoController {
+public class PrescricaoMedicamentoProfissionalController {
 
-    private final PrescricaoMedicamentoService prescricaoService;
+    private final PrescricaoMedicamentoProfissionalService prescricaoService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
