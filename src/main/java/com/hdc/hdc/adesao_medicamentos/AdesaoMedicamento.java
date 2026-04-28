@@ -1,6 +1,7 @@
 package com.hdc.hdc.adesao_medicamentos;
 
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
+import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,10 @@ public class AdesaoMedicamento {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prescricao_id")
     private PrescricaoMedicamento prescricao;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_medicacao_id")
+    private ItemMedicacao itemMedicacao;
 
     @Column(name = "data_hora_registro")
     private LocalDateTime dataHoraRegistro;
