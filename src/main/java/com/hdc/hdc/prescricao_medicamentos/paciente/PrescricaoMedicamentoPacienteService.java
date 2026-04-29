@@ -2,7 +2,6 @@ package com.hdc.hdc.prescricao_medicamentos.paciente;
 
 import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamento;
 import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamentoRepository;
-import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoRepository;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -64,7 +62,7 @@ public class PrescricaoMedicamentoPacienteService {
                 StatusAdesao statusAtual = null;
                 Long adesaoId = null;
                 if (!registrosHoje.isEmpty()) {
-                    AdesaoMedicamento ultimoRegistro = registrosHoje.get(0);
+                    AdesaoMedicamento ultimoRegistro = registrosHoje.getFirst();
                     statusAtual = ultimoRegistro.getStatus();
                     adesaoId = ultimoRegistro.getId();
                 }
@@ -96,22 +94,17 @@ public class PrescricaoMedicamentoPacienteService {
         ItemMedicacao item = buscarItemMedicacao(request.getItemMedicacaoId());
         PrescricaoMedicamento prescricao = item.getPrescricao();
 
-        // Validar que o item pertence ao paciente
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new InvalidValueException("itemMedicacaoId",
-                    "O item de medicação não pertence a este paciente.");
+            throw new InvalidValueException("itemMedicacaoId", "O item de medicação não pertence a este paciente.");
         }
 
         LocalDate hoje = LocalDate.now();
         LocalDateTime agora = LocalDateTime.now();
 
-        // Validar que a prescrição está ativa e dentro do período
         validarPrescricaoAtiva(prescricao, hoje);
 
-        // Não permitir registro no futuro
         if (agora.toLocalDate().isAfter(hoje)) {
-            throw new InvalidValueException("dataHoraRegistro",
-                    "Não é possível registrar adesão para uma data futura.");
+            throw new InvalidValueException("dataHoraRegistro", "Não é possível registrar adesão para uma data futura.");
         }
 
         // Verificar limite de registros por dia de acordo com a frequência
@@ -124,7 +117,6 @@ public class PrescricaoMedicamentoPacienteService {
                             + dosesEsperadas + " dose(s) esperada(s)).");
         }
 
-        // Criar novo registro
         AdesaoMedicamento adesao = new AdesaoMedicamento();
         adesao.setPrescricao(prescricao);
         adesao.setItemMedicacao(item);
@@ -240,9 +232,7 @@ public class PrescricaoMedicamentoPacienteService {
     //  Métodos auxiliares — lógica de frequência
 
     /**
-     * Determina se um item de medicação deve aparecer hoje com base na
-     * frequência (quantidadeDoses / intervaloValor / intervaloTipo)
-     * e na dataInicio da prescrição.
+     * Determina se um item de medicação deve aparecer hoje com base na frequência (quantidadeDoses / intervaloValor / intervaloTipo) e na dataInicio da prescrição.
      */
     private boolean deveAparecerHoje(ItemMedicacao item, PrescricaoMedicamento prescricao, LocalDate hoje) {
         LocalDate dataInicio = prescricao.getDataInicio()
@@ -260,7 +250,8 @@ public class PrescricaoMedicamentoPacienteService {
         int intervaloValor = item.getIntervaloValor() != null ? item.getIntervaloValor() : 1;
 
         return switch (tipo) {
-            case HORA -> true; // Se o intervalo é por hora, aparece todo dia
+            // Se o intervalo é por hora, aparece o dia inteiro
+            case HORA -> true;
             case DIA -> {
                 long diasDesdeInicio = ChronoUnit.DAYS.between(dataInicio, hoje);
                 yield diasDesdeInicio % intervaloValor == 0;
@@ -279,20 +270,21 @@ public class PrescricaoMedicamentoPacienteService {
     }
 
     /**
-     * Calcula quantas doses são esperadas hoje para um item.
-     * Ex: quantidadeDoses=2, intervaloTipo=DIA → 2 doses por dia.
+     * Calcula quantas doses são esperadas hoje para um item
+     * Ex: quantidadeDoses=2, intervaloTipo=DIA então 2 doses por dia
      */
     private int calcularDosesEsperadasHoje(ItemMedicacao item) {
         Integer doses = item.getQuantidadeDoses();
         return doses != null && doses > 0 ? doses : 1;
     }
 
-    /**
-     * Calcula o total de doses esperadas de todas as prescrições ativas
-     * no período [inicio, fim).
+    /*
+     * Calcula o total de doses esperadas de todas as prescrições ativas no período [inicio, fim) -> relatório de adesão
      */
     private int calcularTotalEsperadoNoPeriodo(
-            List<PrescricaoMedicamento> prescricoes, LocalDate inicio, LocalDate fim) {
+            List<PrescricaoMedicamento> prescricoes,
+            LocalDate inicio, LocalDate fim
+    ) {
         int total = 0;
         LocalDate hoje = LocalDate.now();
 
@@ -335,7 +327,7 @@ public class PrescricaoMedicamentoPacienteService {
     }
 
     /**
-     * Gera uma descrição em linguagem natural da frequência.
+     * Para descrição em linguagem natural da frequência.
      * Ex: "2 vezes ao dia", "1 vez a cada 2 dias", "1 vez por semana"
      */
     private String formatarFrequencia(ItemMedicacao item) {
@@ -358,12 +350,10 @@ public class PrescricaoMedicamentoPacienteService {
         String vezStr = qtdDoses == 1 ? "vez" : "vezes";
 
         if (tipo == IntervaloTipo.HORA) {
-            // Ex: "1 vez a cada 8 horas"
             return qtdDoses + " " + vezStr + " a cada " + intervaloVal + " " + unidadeTempo;
         }
 
         if (intervaloVal == 1) {
-            // Ex: "2 vezes ao dia", "1 vez por semana"
             String preposicao = tipo == IntervaloTipo.DIA ? "ao" : "por";
             return qtdDoses + " " + vezStr + " " + preposicao + " " + unidadeTempo;
         }

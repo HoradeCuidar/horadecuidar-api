@@ -30,12 +30,12 @@ public class PrescricaoMedicamentoPacienteController {
     private final PrescricaoMedicamentoPacienteService service;
 
     /**
-     * Tela inicial — lista os itens de medicação que o paciente deve tomar hoje.
+     * Lista os itens de medicação que o paciente deve tomar hoje.
      * Considera a frequência de cada item para determinar se deve aparecer no dia atual.
      */
     @GetMapping("/hoje")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
     public ResponseEntity<List<ItemMedicacaoDiaDTO>> listarMedicacoesDoDia(
             @PathVariable("id") Integer pacienteId) {
 
@@ -60,11 +60,10 @@ public class PrescricaoMedicamentoPacienteController {
 
     /**
      * Altera um registro de adesão já existente (somente no mesmo dia).
-     * Não permite alteração de registros de dias anteriores.
      */
     @PutMapping("/adesao/{adesaoId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
     public ResponseEntity<RegistroAdesaoResponseDTO> alterarAdesao(
             @PathVariable("id") Integer pacienteId,
             @PathVariable("adesaoId") Long adesaoId,
@@ -75,12 +74,11 @@ public class PrescricaoMedicamentoPacienteController {
     }
 
     /**
-     * Lista todas as prescrições ativas do paciente com itens e frequência
-     * em linguagem natural — sem dados clínicos detalhados.
+     * Lista todas as prescrições ativas do paciente com itens e frequência em linguagem natural
      */
     @GetMapping("/ativas")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE')")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
     public ResponseEntity<List<PrescricaoAtivaPacienteDTO>> listarPrescricoesAtivas(
             @PathVariable("id") Integer pacienteId) {
 
@@ -90,11 +88,10 @@ public class PrescricaoMedicamentoPacienteController {
 
     /**
      * Histórico pessoal de adesão do paciente por semana ou mês.
-     * Indica o período via query parameter: ?periodo=semana ou ?periodo=mes
      */
     @GetMapping("/historico")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
     public ResponseEntity<HistoricoPessoalDTO> consultarHistorico(
             @PathVariable("id") Integer pacienteId,
             @RequestParam(value = "periodo", defaultValue = "semana") String periodo) {

@@ -10,15 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +56,17 @@ public class PrescricaoMedicamentoProfissionalController {
 
         prescricaoService.deletarPrescricao(pacienteId, prescricaoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{prescricaoId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<PrescricaoMedicamentoResponseDTO> alterarStatus(
+            @PathVariable("id") Integer pacienteId,
+            @PathVariable("prescricaoId") UUID prescricaoId) {
+
+        PrescricaoMedicamentoResponseDTO atualizada = prescricaoService.alterarStatus(pacienteId, prescricaoId);
+        return ResponseEntity.ok(atualizada);
     }
 
     @GetMapping

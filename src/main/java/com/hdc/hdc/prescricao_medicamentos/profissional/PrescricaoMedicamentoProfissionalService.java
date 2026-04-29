@@ -99,8 +99,21 @@ public class PrescricaoMedicamentoProfissionalService {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
 
-        prescricao.setAtivo(false);
-        prescricaoRepository.save(prescricao);
+        prescricaoRepository.deleteById(prescricaoId);
+    }
+
+    @Transactional
+    public PrescricaoMedicamentoResponseDTO alterarStatus(Integer pacienteId, UUID prescricaoId) {
+        PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
+
+        if (!prescricao.getPaciente().getId().equals(pacienteId)) {
+            throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
+        }
+
+        prescricao.setAtivo(!prescricao.isAtivo());
+        PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
+
+        return mapper.toResponseDTO(saved);
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarPrescricoesAtivas(Integer pacienteId) {

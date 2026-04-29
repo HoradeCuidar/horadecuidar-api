@@ -32,7 +32,7 @@ public class ItemMedicacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prescricao_id")
     @JsonIgnore
     private PrescricaoMedicamento prescricao;
