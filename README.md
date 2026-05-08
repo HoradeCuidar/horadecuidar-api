@@ -84,6 +84,92 @@ O backend do **Hora de Cuidar (HDC)** é desenvolvido em **Java** utilizando o *
 
 A aplicação é responsável por gerenciar regras de negócio, autenticação, persistência de dados e integração com o banco de dados.
 
+### Modelagem do Sistema
+```mermaid
+  erDiagram
+    direction TB
+    USUARIO {
+      serial id PK ""  
+      string nome  ""  
+      string username UK ""  
+      string senha  ""  
+      date data_de_nascimento  ""  
+      string role  ""  
+      string status  ""  
+      string telefone  ""  
+      string rua  ""  
+      string bairro  ""  
+      string estado  ""  
+      string cidade  ""  
+      string numero_da_casa  ""  
+      string genero  ""  
+      string email UK ""  
+      string foto_de_perfil  ""  
+      text observacoes  ""  
+    }
+
+    PACIENTE_DOENCAS {
+      bigserial id PK ""  
+      bigint paciente_id FK ""  
+      bigint doenca_id FK ""  
+      date data_diagnostico  ""  
+      text observacao  ""  
+    }
+
+    TOKEN_RECUPERACAO {
+      serial id PK ""  
+      string token  ""  
+      bigint usuario_id FK ""  
+      timestamp expiracao  ""  
+      boolean usado  ""  
+    }
+
+    PRESCRICAO_MEDICAMENTO {
+      uuid id PK ""  
+      integer paciente_id FK ""  
+      integer profissional FK ""  
+      datetime data_inicio  ""  
+      datetime data_fim  ""  
+      text observacao  ""  
+      boolean ativo  ""  
+    }
+
+    DOENCAS {
+      bigserial id PK ""  
+      string nome UK ""  
+    }
+
+    ITEM_MEDICACAO {
+      integer id PK ""  
+      integer prescricao_id FK ""  
+      integer medicacao_id FK ""  
+    }
+
+    MEDICACAO {
+      integer id PK ""  
+      string nome  ""  
+      datetime criadoEm  ""  
+    }
+
+    ADESAO_MEDICAMENTO {
+          integer id PK ""
+          uuid prescricao_id FK ""
+          integer item_medicacao_id FK ""
+          datetime momento_registro ""
+          integer status_adesao ""
+          string observacao ""
+    }
+
+    USUARIO||--o{PACIENTE_DOENCAS:"tem"
+    USUARIO||--o{TOKEN_RECUPERACAO:"cria"
+    USUARIO||--o{PRESCRICAO_MEDICAMENTO:"prescreve"
+    DOENCAS||--o{PACIENTE_DOENCAS:"possui"
+    PRESCRICAO_MEDICAMENTO||--o{ITEM_MEDICACAO:"contem"
+    MEDICACAO||--o{ITEM_MEDICACAO:"listada_em"
+    ADESAO_MEDICAMENTO}o--|{PRESCRICAO_MEDICAMENTO:"registra_adesao_a"
+      ADESAO_MEDICAMENTO}o--|{ITEM_MEDICACAO:"monitora_adesao_de"
+```
+
 ### Principais Tecnologias e Ferramentas
 
 - **Spring Boot**: base do projeto, facilitando a configuração e o desenvolvimento da aplicação
