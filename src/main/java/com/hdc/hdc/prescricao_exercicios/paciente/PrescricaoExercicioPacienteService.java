@@ -8,7 +8,6 @@ import com.hdc.hdc.prescricao_exercicios.RealizacaoExercicio;
 import com.hdc.hdc.prescricao_exercicios.RealizacaoExercicioRepository;
 import com.hdc.hdc.prescricao_exercicios.item_exercicio.ItemExercicio;
 import com.hdc.hdc.prescricao_exercicios.item_exercicio.ItemExercicioRepository;
-import com.hdc.hdc.prescricao_exercicios.enums.FrequenciaTipo;
 import com.hdc.hdc.prescricao_exercicios.paciente.dto.ExercicioDiaDTO;
 import com.hdc.hdc.prescricao_exercicios.paciente.dto.RegistroRealizacaoRequestDTO;
 import com.hdc.hdc.prescricao_exercicios.paciente.dto.RegistroRealizacaoResponseDTO;
@@ -23,17 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Serviço com as operações disponíveis para o paciente no módulo de prescrições de exercícios.
- *
- * <p><b>Regras de negócio centrais:</b>
- * <ul>
- *   <li>Um item de exercício aparece na lista do dia apenas se a frequência indicar que deve
- *       ser realizado naquele dia da semana/mês.</li>
- *   <li>Cada item pode ter no máximo um registro de realização por dia.</li>
- *   <li>O paciente pode alterar o registro somente no mesmo dia em que foi criado.</li>
- * </ul>
- */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -44,14 +32,7 @@ public class PrescricaoExercicioPacienteService {
     private final ItemExercicioRepository itemExercicioRepository;
     private final PacienteRepository pacienteRepository;
 
-    // -------------------------------------------------------------------------
-    // Visão diária
-    // -------------------------------------------------------------------------
-
-    /**
-     * Retorna os exercícios que o paciente deve realizar hoje, de acordo com as
-     * frequências prescritas. Inclui o status de realização quando já registrado.
-     */
+    // Listar exercícios do dia
     public List<ExercicioDiaDTO> listarExerciciosDoDia(Integer pacienteId) {
         Date hoje = hoje();
         LocalDate hojeLocal = LocalDate.now();
@@ -71,16 +52,7 @@ public class PrescricaoExercicioPacienteService {
         return resultado;
     }
 
-    // -------------------------------------------------------------------------
-    // Registro de realização
-    // -------------------------------------------------------------------------
-
-    /**
-     * Registra a realização (ou não) de um exercício pelo paciente.
-     *
-     * @throws IllegalArgumentException se já existir registro para o item no dia.
-     * @throws IllegalStateException    se a prescrição associada não estiver ativa.
-     */
+    // Registrar adesão de exercício pelo paciente
     @Transactional
     public RegistroRealizacaoResponseDTO registrarRealizacao(Integer pacienteId, RegistroRealizacaoRequestDTO request) {
         Paciente paciente = getPaciente(pacienteId);
@@ -108,12 +80,8 @@ public class PrescricaoExercicioPacienteService {
         return toResponseDTO(salva);
     }
 
-    /**
-     * Altera um registro de realização existente.
-     * O paciente só pode alterar registros feitos no dia corrente.
-     *
-     * @throws IllegalStateException se o registro não pertencer ao paciente ou não for do dia.
-     */
+    // Altera um registro de realização existente.
+    // O paciente só pode alterar registros feitos no dia corrente.
     @Transactional
     public RegistroRealizacaoResponseDTO alterarRealizacao(Integer pacienteId, Long realizacaoId, RegistroRealizacaoRequestDTO request) {
         RealizacaoExercicio realizacao = realizacaoRepository.findById(realizacaoId)
@@ -138,24 +106,10 @@ public class PrescricaoExercicioPacienteService {
         return toResponseDTO(atualizada);
     }
 
-    // -------------------------------------------------------------------------
-    // Lógica de frequência
-    // -------------------------------------------------------------------------
-
     /**
      * Determina se um item de exercício deve ser realizado no dia informado
      * com base na frequência prescrita.
-     *
-     * <p>Estratégia simplificada:
-     * <ul>
-     *   <li>{@link FrequenciaTipo#DIA}: sempre aparece (exercício diário).</li>
-     *   <li>{@link FrequenciaTipo#SEMANA}: aparece se o número de sessões semanais
-     *       cobrir o dia da semana atual (distribuição uniforme segunda→domingo).</li>
-     *   <li>{@link FrequenciaTipo#MES}: aparece se o número de sessões mensais
-     *       cobrir o dia do mês atual (distribuição uniforme).</li>
-     * </ul>
-     *
-     * <p><b>Nota de esboço:</b> a distribuição é puramente posicional e não leva em conta
+     * A distribuição é puramente posicional e não leva em conta
      * preferências do paciente. Refinamentos futuros poderão permitir que o profissional
      * defina os dias específicos.
      */
@@ -176,9 +130,8 @@ public class PrescricaoExercicioPacienteService {
         };
     }
 
-    // -------------------------------------------------------------------------
-    // Conversores e helpers
-    // -------------------------------------------------------------------------
+    // ----------------------
+    // Conversores e helpers:
 
     private ExercicioDiaDTO toExercicioDiaDTO(ItemExercicio item, PrescricaoExercicio prescricao,
                                               Integer pacienteId, Date hoje) {

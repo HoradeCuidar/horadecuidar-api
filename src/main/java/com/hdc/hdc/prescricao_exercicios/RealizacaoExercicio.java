@@ -21,17 +21,6 @@ import lombok.Setter;
 
 import java.util.Date;
 
-/**
- * Registro de realização de um item de exercício pelo paciente.
- * <p>
- * Regras de negócio:
- * <ul>
- *   <li>Um registro pertence a exatamente um {@link ItemExercicio} e um {@link Paciente}.</li>
- *   <li>Deve haver no máximo um registro por item por dia — validação feita na camada de serviço.</li>
- *   <li>O paciente pode alterar o registro no mesmo dia da criação.</li>
- *   <li>{@code duracaoRealizadaMinutos} é opcional; permite registrar sessões parciais.</li>
- * </ul>
- */
 @Entity
 @Table(name = "realizacao_exercicio")
 @Getter
@@ -56,7 +45,6 @@ public class RealizacaoExercicio {
     @Column(name = "status", nullable = false)
     private StatusRealizacao status;
 
-    /** Duração real da sessão em minutos. Opcional — para registros parciais. */
     @Column(name = "duracao_realizada_minutos")
     private Integer duracaoRealizadaMinutos;
 

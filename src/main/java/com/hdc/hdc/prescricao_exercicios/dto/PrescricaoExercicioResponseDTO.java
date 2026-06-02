@@ -8,9 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * DTO de saída de uma prescrição de exercícios.
- */
 @Data
 public class PrescricaoExercicioResponseDTO {
     private UUID id;

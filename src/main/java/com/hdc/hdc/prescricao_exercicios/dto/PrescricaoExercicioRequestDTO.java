@@ -9,9 +9,6 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
-/**
- * DTO de entrada para criar ou atualizar uma prescrição de exercícios.
- */
 @Data
 public class PrescricaoExercicioRequestDTO {
 

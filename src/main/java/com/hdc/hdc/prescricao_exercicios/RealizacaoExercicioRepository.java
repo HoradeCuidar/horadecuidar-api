@@ -13,9 +13,7 @@ import java.util.Optional;
 @Repository
 public interface RealizacaoExercicioRepository extends JpaRepository<RealizacaoExercicio, Long> {
 
-    /**
-     * Busca o registro de realização de um item em uma data específica para evitar duplicatas.
-     */
+    // Busca o registro de realização de um item em uma data específica para evitar duplicatas.
     @Query("""
         SELECT r FROM RealizacaoExercicio r
         WHERE r.itemExercicio.id = :itemId
@@ -27,9 +25,7 @@ public interface RealizacaoExercicioRepository extends JpaRepository<RealizacaoE
             @Param("pacienteId") Integer pacienteId,
             @Param("data") Date data);
 
-    /**
-     * Retorna todos os registros de um paciente em um intervalo de datas (para histórico).
-     */
+    // Retorna todos os registros de um paciente em um intervalo de datas (para histórico).
     @Query("""
         SELECT r FROM RealizacaoExercicio r
         WHERE r.paciente.id = :pacienteId

@@ -22,18 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Prescrição de atividade física emitida por um profissional de saúde.
- * <p>
- * Regras de negócio:
- * <ul>
- *   <li>Uma prescrição pertence a exatamente um paciente e é emitida por um profissional.</li>
- *   <li>Deve conter ao menos um {@link ItemExercicio}.</li>
- *   <li>A flag {@code ativo} permite desativar sem excluir, preservando histórico.</li>
- *   <li>Quando {@code dataFim} é nula, a prescrição é considerada de prazo indeterminado
- *       enquanto {@code ativo} for {@code true}.</li>
- * </ul>
- */
 @Entity
 @Table(name = "prescricao_exercicio")
 @Getter

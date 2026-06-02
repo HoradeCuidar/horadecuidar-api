@@ -19,11 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Endpoints do módulo de exercícios acessíveis pelo próprio paciente.
- *
- * <p>Base URL: {@code /api/pacientes/{id}/prescricoes/exercicios/paciente}
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/pacientes/{id}/prescricoes/exercicios/paciente")
@@ -31,10 +26,6 @@ public class PrescricaoExercicioPacienteController {
 
     private final PrescricaoExercicioPacienteService service;
 
-    /**
-     * Lista os exercícios prescritos que devem ser realizados hoje,
-     * com o status de realização quando já registrado.
-     */
     @GetMapping("/hoje")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
@@ -45,10 +36,6 @@ public class PrescricaoExercicioPacienteController {
         return ResponseEntity.ok(itens);
     }
 
-    /**
-     * Registra a realização (ou não) de um exercício do dia.
-     * Retorna erro se já existir registro para o mesmo item no dia atual.
-     */
     @PostMapping("/realizacao")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
@@ -60,10 +47,6 @@ public class PrescricaoExercicioPacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
-    /**
-     * Altera um registro de realização existente.
-     * Permitido apenas no mesmo dia em que o registro foi criado.
-     */
     @PutMapping("/realizacao/{realizacaoId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")

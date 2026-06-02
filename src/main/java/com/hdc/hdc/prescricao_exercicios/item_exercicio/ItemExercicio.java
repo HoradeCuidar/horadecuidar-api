@@ -20,18 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Item individual de exercício dentro de uma prescrição.
- * <p>
- * Regras de negócio:
- * <ul>
- *   <li>Um item define um exercício específico com sua frequência e intensidade.</li>
- *   <li>frequenciaValor + frequenciaTipo descrevem quantas vezes por período o exercício deve ser feito
- *       (ex.: 3 vezes por SEMANA).</li>
- *   <li>duracaoValor + unidadeDuracao definem o tempo de cada sessão (ex.: 30 MINUTOS).</li>
- *   <li>series e repeticoes são opcionais — aplicáveis a exercícios de resistência/força.</li>
- * </ul>
- */
 @Entity
 @Table(name = "item_exercicio")
 @Data
@@ -48,7 +36,6 @@ public class ItemExercicio {
     @JsonIgnore
     private PrescricaoExercicio prescricao;
 
-    /** Nome legível do exercício (ex.: "Caminhada", "Musculação — supino"). */
     @Column(name = "nome_exercicio", nullable = false)
     private String nomeExercicio;
 
@@ -56,7 +43,6 @@ public class ItemExercicio {
     @Column(name = "tipo_exercicio", nullable = false)
     private TipoExercicio tipoExercicio;
 
-    /** Quantas vezes por período o exercício deve ser realizado. */
     @Column(name = "frequencia_valor", nullable = false)
     private Integer frequenciaValor;
 
@@ -64,7 +50,6 @@ public class ItemExercicio {
     @Column(name = "frequencia_tipo", nullable = false)
     private FrequenciaTipo frequenciaTipo;
 
-    /** Duração de cada sessão. */
     @Column(name = "duracao_valor", nullable = false)
     private Integer duracaoValor;
 
@@ -72,15 +57,12 @@ public class ItemExercicio {
     @Column(name = "unidade_duracao", nullable = false)
     private UnidadeDuracao unidadeDuracao;
 
-    /** Número de séries — aplicável a exercícios de força/resistência. */
     @Column(name = "series")
     private Integer series;
 
-    /** Número de repetições por série — aplicável a exercícios de força/resistência. */
     @Column(name = "repeticoes")
     private Integer repeticoes;
 
-    /** Intensidade em texto livre (ex.: "moderada", "60–70% FC máx."). */
     @Column(name = "intensidade")
     private String intensidade;
 

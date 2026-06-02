@@ -19,10 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Serviço com as operações de gestão de prescrições de exercícios
- * disponíveis para profissionais de saúde e administradores.
- */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -31,10 +27,6 @@ public class PrescricaoExercicioProfissionalService {
     private final PrescricaoExercicioRepository prescricaoRepository;
     private final PacienteRepository pacienteRepository;
     private final PrescricaoExercicioMapper mapper;
-
-    // -------------------------------------------------------------------------
-    // Operações de escrita
-    // -------------------------------------------------------------------------
 
     @Transactional
     public PrescricaoExercicioResponseDTO criarPrescricao(
@@ -107,10 +99,6 @@ public class PrescricaoExercicioProfissionalService {
         return mapper.toResponseDTO(salva);
     }
 
-    // -------------------------------------------------------------------------
-    // Operações de leitura
-    // -------------------------------------------------------------------------
-
     public List<PrescricaoExercicioResponseDTO> listarPrescricoesAtivas(Integer pacienteId) {
         Date hoje = hoje();
         return prescricaoRepository.findAtivasByPacienteId(pacienteId, hoje).stream()
@@ -124,10 +112,6 @@ public class PrescricaoExercicioProfissionalService {
                 .map(mapper::toResponseDTO)
                 .toList();
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers privados
-    // -------------------------------------------------------------------------
 
     private PrescricaoExercicio getPrescricao(UUID id) {
         return prescricaoRepository.findById(id)

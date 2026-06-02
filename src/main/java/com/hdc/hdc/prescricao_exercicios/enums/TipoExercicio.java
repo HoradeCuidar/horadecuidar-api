@@ -2,10 +2,6 @@ package com.hdc.hdc.prescricao_exercicios.enums;
 
 import lombok.Getter;
 
-/**
- * Categorias amplas de exercício físico.
- * Serve como classificação geral para organizar e filtrar prescrições.
- */
 @Getter
 public enum TipoExercicio {
     AEROBICO("Aeróbico"),

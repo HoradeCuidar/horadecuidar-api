@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * Resposta após o paciente registrar ou atualizar a realização de um exercício.
- */
 @Data
 public class RegistroRealizacaoResponseDTO {
 

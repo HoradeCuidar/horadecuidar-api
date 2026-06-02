@@ -8,10 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * DTO de leitura e escrita para um item de exercício.
- * Usado tanto nas requisições do profissional quanto nas respostas ao paciente.
- */
+// DTO de leitura e escrita para um item de exercício.
 @Data
 public class ItemExercicioDTO {
 
@@ -35,13 +32,8 @@ public class ItemExercicioDTO {
     @NotNull(message = "A unidade de duração é obrigatória.")
     private UnidadeDuracao unidadeDuracao;
 
-    /** Número de séries (opcional — para exercícios de força). */
     private Integer series;
-
-    /** Número de repetições por série (opcional — para exercícios de força). */
     private Integer repeticoes;
-
-    /** Intensidade em texto livre (opcional). Ex.: "moderada", "60–70% FC máx.". */
     private String intensidade;
 
     private String observacao;

@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Mapper responsável pelas conversões entre entidades e DTOs do módulo de prescrições de exercícios.
- */
 @Component
 @RequiredArgsConstructor
 public class PrescricaoExercicioMapper {

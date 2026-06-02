@@ -23,11 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Endpoints de prescrições de exercícios acessíveis por profissionais de saúde e administradores.
- *
- * <p>Base URL: {@code /api/pacientes/{id}/prescricoes/exercicios}
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/pacientes/{id}/prescricoes/exercicios")
@@ -35,7 +30,7 @@ public class PrescricaoExercicioProfissionalController {
 
     private final PrescricaoExercicioProfissionalService prescricaoService;
 
-    /** Cria uma nova prescrição de exercícios para o paciente. */
+    // Cria uma nova prescrição de exercícios para o paciente.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -48,7 +43,7 @@ public class PrescricaoExercicioProfissionalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(criada);
     }
 
-    /** Substitui integralmente o conteúdo de uma prescrição existente. */
+    // Substitui integralmente o conteúdo de uma prescrição existente.
     @PutMapping("/{prescricaoId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -62,7 +57,7 @@ public class PrescricaoExercicioProfissionalController {
         return ResponseEntity.ok(atualizada);
     }
 
-    /** Remove permanentemente uma prescrição (hard delete). */
+    // Remove permanentemente uma prescrição (hard delete).
     @DeleteMapping("/{prescricaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -74,7 +69,7 @@ public class PrescricaoExercicioProfissionalController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Alterna o status ativo/inativo da prescrição (soft deactivation). */
+    // Alterna o status ativo/inativo da prescrição (soft deactivation).
     @PatchMapping("/{prescricaoId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -86,7 +81,7 @@ public class PrescricaoExercicioProfissionalController {
         return ResponseEntity.ok(atualizada);
     }
 
-    /** Lista todas as prescrições de exercícios ativas do paciente. */
+    // Lista todas as prescrições de exercícios ativas do paciente.
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -97,7 +92,7 @@ public class PrescricaoExercicioProfissionalController {
         return ResponseEntity.ok(ativas);
     }
 
-    /** Retorna o histórico completo de prescrições (inativas e encerradas) do paciente. */
+    // Retorna o histórico completo de prescrições (inativas e encerradas) do paciente.
     @GetMapping("/historico")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")

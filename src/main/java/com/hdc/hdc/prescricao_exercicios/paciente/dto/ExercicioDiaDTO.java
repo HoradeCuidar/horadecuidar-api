@@ -8,10 +8,6 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/**
- * Representa um exercício que o paciente deve ou deveria realizar hoje.
- * Inclui o status de realização quando já houver registro no dia.
- */
 @Data
 public class ExercicioDiaDTO {
 
@@ -28,9 +24,6 @@ public class ExercicioDiaDTO {
     private String intensidade;
     private String observacao;
 
-    /** Status de realização do dia atual — null se ainda não registrado. */
     private StatusRealizacao statusHoje;
-
-    /** ID do registro de realização do dia, se existir. */
     private Long realizacaoId;
 }
