@@ -1,6 +1,7 @@
 package com.hdc.hdc.util.exception;
 
 import com.hdc.hdc.util.exception.dto.ErrorResponseDTO;
+import com.hdc.hdc.util.exception.model.InvalidOperationException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponseDTO> handleInvalidTokenException(InvalidTokenException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOperationException(InvalidOperationException ex) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
         ErrorResponseDTO error = new ErrorResponseDTO(
                 ex.getField(),
                 ex.getMessage(),
