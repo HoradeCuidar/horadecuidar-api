@@ -3,6 +3,10 @@ package com.hdc.hdc.profissionais_saude;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeCreateDTO;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeUpdateDTO;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
+import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,6 +72,16 @@ public class ProfissionalDaSaudeController {
         return profissionalDaSaudeMapper.modeltoResponseDTO(
                 profissionalDaSaudeService.editar(
                         profissionalDaSaudeMapper.updateDTOtoModel(profissionalDaSaudeUpdateDTO), id_profissional));
+    }
+
+    @PutMapping("/perfil")
+    @PreAuthorize("hasRole('PROFISSIONAL_DA_SAUDE')")
+    public ProfissionalDaSaudeResponseDTO editarPerfil(
+            @RequestBody @Valid ProfissionalDaSaudeSelfUpdateDTO profissionalDaSaudeSelfUpdateDTO,
+            @CurrentUser Usuario usuarioLogado
+    ){
+        return profissionalDaSaudeMapper.modeltoResponseDTO(
+                profissionalDaSaudeService.editarPerfil(profissionalDaSaudeSelfUpdateDTO, usuarioLogado.getId()));
     }
 
     @PutMapping("/ativar/{id_profissional}")
