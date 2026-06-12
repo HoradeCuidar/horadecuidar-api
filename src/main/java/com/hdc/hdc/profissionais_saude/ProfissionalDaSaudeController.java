@@ -99,10 +99,10 @@ public class ProfissionalDaSaudeController {
         return new PageImpl<>(profissionalDaSaudeResponseDTOList, pageable, profissionalDaSaudePage.getTotalElements());
     }
 
-    @PostMapping("/uploadFotoDePerfil/{id_profissional}")
-    public String upload(
-            @PathVariable Integer id_profissional,
-            @RequestParam("file") MultipartFile file) throws IOException {
-        return profissionalDaSaudeService.uploadFotoDePerfil(id_profissional, file);
-    }
+//    @PostMapping("/uploadFotoDePerfil/{id_profissional}")
+//    public String upload(
+//            @PathVariable Integer id_profissional,
+//            @RequestParam("file") MultipartFile file) throws IOException {
+//        return profissionalDaSaudeService.uploadFotoDePerfil(id_profissional, file);
+//    }
 }
