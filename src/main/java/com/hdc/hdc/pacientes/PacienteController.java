@@ -2,6 +2,9 @@ package com.hdc.hdc.pacientes;
 
 import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
 import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
+import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
+import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -65,6 +68,17 @@ public class PacienteController {
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public void atualizar(@RequestBody PacienteCreateDto paciente, @PathVariable Long id) {
         this.pacienteService.atualizar(paciente, id);
+    }
+
+    @PutMapping("/perfil")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<PacienteResponseDto> atualizarPerfil(
+            @Valid @RequestBody PacienteSelfUpdateDto dto,
+            @CurrentUser Usuario usuarioLogado
+    ) {
+        PacienteResponseDto updated = pacienteService.atualizarPerfil(dto, usuarioLogado.getId());
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
