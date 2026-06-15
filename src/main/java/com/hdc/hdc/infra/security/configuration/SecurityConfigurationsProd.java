@@ -49,6 +49,7 @@ public class SecurityConfigurationsProd{
                         .requestMatchers(HttpMethod.GET, "/api/profissional/visualizar/{id_profissional}").hasAnyRole("PROFISSIONAL_DA_SAUDE", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/profissional/visualizarTodos").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/editar/{id_profissional}").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/profissional/perfil").hasAnyRole("PROFISSIONAL_DA_SAUDE")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/ativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profissional/inativar/{id_profissional}").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/profissional/buscar").hasAnyRole("ADMIN")

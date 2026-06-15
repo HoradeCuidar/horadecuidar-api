@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
 
 @Service
 public class ProfissionalDaSaudeService {
@@ -78,6 +79,29 @@ public class ProfissionalDaSaudeService {
         profissionalDaSaude.setId(profissionalDaSaudeAtual.getId());
 
         return profissionalDaSaudeRepository.save(profissionalDaSaude);
+    }
+
+    public ProfissionalDaSaude editarPerfil(ProfissionalDaSaudeSelfUpdateDTO dto, Integer id_profissional) {
+        ProfissionalDaSaude profissionalDaSaudeAtual = profissionalDaSaudeRepository.findById(id_profissional)
+                .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
+
+        if (!profissionalDaSaudeAtual.getEmail().equalsIgnoreCase(dto.getEmail()) 
+                && profissionalDaSaudeRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Já existe um profissional cadastrado com este e-mail");
+        }
+
+        profissionalDaSaudeAtual.setNome(dto.getNome());
+        profissionalDaSaudeAtual.setEmail(dto.getEmail());
+        profissionalDaSaudeAtual.setTelefone(dto.getTelefone());
+        profissionalDaSaudeAtual.setGenero(dto.getGenero());
+        profissionalDaSaudeAtual.setDataDeNascimento(dto.getDataDeNascimento());
+        profissionalDaSaudeAtual.setRua(dto.getRua());
+        profissionalDaSaudeAtual.setBairro(dto.getBairro());
+        profissionalDaSaudeAtual.setEstado(dto.getEstado());
+        profissionalDaSaudeAtual.setCidade(dto.getCidade());
+        profissionalDaSaudeAtual.setNumeroDaCasa(dto.getNumeroDaCasa());
+
+        return profissionalDaSaudeRepository.save(profissionalDaSaudeAtual);
     }
 
     public ProfissionalDaSaude ativar(Integer id_profissional) {

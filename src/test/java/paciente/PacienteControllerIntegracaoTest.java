@@ -29,6 +29,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
+import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.usuarios.enums.Role;
+import com.hdc.hdc.usuarios.enums.Status;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @SpringBootTest(classes = HdcApplication.class)
 @AutoConfigureMockMvc
@@ -273,5 +279,44 @@ class PacienteControllerIntegracaoTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.status").value("INATIVO"));
+        }
+
+        @Test
+        void shouldUpdateOwnProfileSuccessfully() throws Exception {
+                PacienteSelfUpdateDto dto = new PacienteSelfUpdateDto(
+                                "João Silva Editado",
+                                "joao.editado@email.com",
+                                "11999999999",
+                                Genero.MASCULINO,
+                                LocalDate.of(1990, 5, 20),
+                                "Rua Editada",
+                                "Bairro Editado",
+                                "SP",
+                                "São Paulo",
+                                "123"
+                );
+
+                PacienteResponseDto responseDto = new PacienteResponseDto(
+                                1, "João Silva Editado", "joao.editado@email.com", "joao.silva", "1990-05-20", Role.PACIENTE,
+                                "ATIVO", "11999999999", "Rua Editada", "Bairro Editado", "SP", "São Paulo", "123",
+                                "MASCULINO", Collections.emptyList(), "");
+
+                Usuario mockUsuario = new Usuario();
+                mockUsuario.setId(1);
+                mockUsuario.setUsername("joao.silva");
+                mockUsuario.setRole(Role.PACIENTE);
+                mockUsuario.setStatus(Status.ATIVO);
+
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUsuario, null, mockUsuario.getAuthorities());
+
+                Mockito.when(pacienteService.atualizarPerfil(Mockito.any(PacienteSelfUpdateDto.class), Mockito.eq(1)))
+                                .thenReturn(responseDto);
+
+                mockMvc.perform(put("/api/paciente/perfil").with(csrf()).with(authentication(auth))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.nome").value("João Silva Editado"))
+                                .andExpect(jsonPath("$.email").value("joao.editado@email.com"));
         }
 }

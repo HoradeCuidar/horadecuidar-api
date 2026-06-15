@@ -2,6 +2,7 @@ package com.hdc.hdc.pacientes;
 
 import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
 import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
+import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
 import com.hdc.hdc.doencas.Doenca;
 import com.hdc.hdc.pacientes.associacoes.PacienteDoencas;
 import com.hdc.hdc.usuarios.enums.Role;
@@ -104,6 +105,28 @@ public class PacienteService {
             existente.getDoencas().addAll(novasRelacoes);
         }
         log.info("Atualinzado paciente, processo finalizado.");
+    }
+
+    @Transactional
+    public PacienteResponseDto atualizarPerfil(PacienteSelfUpdateDto dto, Integer id) {
+        Paciente existente = this.pacienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
+
+        this.validarUnicidade(dto.email(), id.longValue());
+
+        existente.setNome(dto.nome());
+        existente.setEmail(dto.email());
+        existente.setTelefone(dto.telefone());
+        existente.setGenero(dto.genero());
+        existente.setRua(dto.rua());
+        existente.setBairro(dto.bairro());
+        existente.setEstado(dto.estado());
+        existente.setCidade(dto.cidade());
+        existente.setNumeroDaCasa(dto.numeroDaCasa());
+        existente.setDataDeNascimento(dto.dataDeNascimento());
+
+        log.info("Atualizado perfil do paciente com id: " + id);
+        return this.pacienteMapper.toDto(this.pacienteRepository.save(existente));
     }
 
 
