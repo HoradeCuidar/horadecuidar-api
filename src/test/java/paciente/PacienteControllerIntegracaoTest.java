@@ -76,7 +76,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "João Silva", "joao@email.com", "joao.silva", "1990-05-20", null,
                                 "ATIVO", "11999999999", "Rua A", "Centro", "SP", "São Paulo", "123",
-                                "MASCULINO", Collections.emptyList(), "");
+                                "MASCULINO", Collections.emptyList(), "", "");
 
                 Mockito.when(pacienteService.cadastrar(Mockito.any(PacienteCreateDto.class)))
                                 .thenReturn(responseDto);
@@ -112,7 +112,8 @@ class PacienteControllerIntegracaoTest {
                                 "456",
                                 "FEMININO",
                                 Collections.emptyList(),
-                                "Nenhuma");
+                                "Nenhuma",
+                        "foto_de_perfil_url");
 
                 Mockito.when(pacienteService.visualizarPorId(idBuscado))
                                 .thenReturn(responseDto);
@@ -171,7 +172,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "Maria Silva", emailBuscado, "maria.silva", "1995-08-15", null,
                                 "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma");
+                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
 
                 Mockito.when(pacienteService.visualizarPorEmail(emailBuscado))
                                 .thenReturn(responseDto);
@@ -191,7 +192,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
                                 "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma");
+                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
                 org.springframework.data.domain.Page<PacienteResponseDto> page = new org.springframework.data.domain.PageImpl<>(
                                 java.util.List.of(responseDto));
 
@@ -215,7 +216,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
                                 "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma");
+                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
                 org.springframework.data.domain.Page<PacienteResponseDto> page = new org.springframework.data.domain.PageImpl<>(
                                 java.util.List.of(responseDto));
 
@@ -270,7 +271,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
                                 "INATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma");
+                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
 
                 Mockito.when(pacienteService.alterarStatus(idAlterar))
                                 .thenReturn(responseDto);
@@ -299,7 +300,7 @@ class PacienteControllerIntegracaoTest {
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "João Silva Editado", "joao.editado@email.com", "joao.silva", "1990-05-20", Role.PACIENTE,
                                 "ATIVO", "11999999999", "Rua Editada", "Bairro Editado", "SP", "São Paulo", "123",
-                                "MASCULINO", Collections.emptyList(), "");
+                                "MASCULINO", Collections.emptyList(), "", "foto_de_perfil_url");
 
                 Usuario mockUsuario = new Usuario();
                 mockUsuario.setId(1);
