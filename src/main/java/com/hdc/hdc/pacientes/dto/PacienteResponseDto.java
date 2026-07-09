@@ -21,6 +21,7 @@ public record PacienteResponseDto(
     String numeroDaCasa,
     String genero,
     List<Doenca> doencas,
-    String observacoes
+    String observacoes,
+    String fotoDePerfil
 ) {
 }
