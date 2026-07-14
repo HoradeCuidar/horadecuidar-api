@@ -4,7 +4,6 @@ import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_exercicios.PrescricaoExercicio;
 import com.hdc.hdc.prescricao_exercicios.PrescricaoExercicioRepository;
-import com.hdc.hdc.prescricao_exercicios.RealizacaoExercicio;
 import com.hdc.hdc.prescricao_exercicios.RealizacaoExercicioRepository;
 import com.hdc.hdc.prescricao_exercicios.item_exercicio.ItemExercicio;
 import com.hdc.hdc.prescricao_exercicios.item_exercicio.ItemExercicioRepository;
