@@ -7,9 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 
 public record AvaliacaoFisicaRequestDTO(
-        @NotNull(message = "O participante relacionado deve ser informado.")
-        Integer pacienteId,
-
         @NotNull(message = "A realização de atividades físicas do participante deve ser informada.")
         boolean realizaAtividadeFisica,
         String atividadeRealizada,

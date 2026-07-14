@@ -5,7 +5,7 @@ import com.hdc.hdc.prescricao_exercicios.enums.FlexibilidadeFisica;
 import com.hdc.hdc.prescricao_exercicios.enums.NivelAssimetria;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record AvaliacaoFisicaResponseDTO (
@@ -25,7 +25,7 @@ public record AvaliacaoFisicaResponseDTO (
         String queixas,
         String observacoesMusculoEsqueleticas,
         String orientacoesGerais,
-        Date dataRegistro,
-        Date dataAtualizacao
+        LocalDate dataRegistro,
+        LocalDate dataAtualizacao
 ) {
 }

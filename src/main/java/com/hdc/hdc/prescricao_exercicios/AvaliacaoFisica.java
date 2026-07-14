@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -75,8 +75,8 @@ public class AvaliacaoFisica {
     private String orientacoesGerais;
 
     @Column(name = "data_registro", nullable = false)
-    private Date dataRegistro;
+    private LocalDate dataRegistro;
 
     @Column(name = "data_atualizacao")
-    private Date dataAtualizacao;
+    private LocalDate dataAtualizacao;
 }
