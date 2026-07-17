@@ -4,14 +4,17 @@ import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.avaliacao_fisica.enums.FlexibilidadeFisica;
 import com.hdc.hdc.avaliacao_fisica.enums.NivelAssimetria;
 import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.orientacao_funcional.tag.TagFuncional;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "avaliacao_fisica")
@@ -22,8 +25,8 @@ import java.util.UUID;
 public class AvaliacaoFisica {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "paciente_id", nullable = false)
@@ -46,20 +49,20 @@ public class AvaliacaoFisica {
     @Column(name = "flexibilidade")
     private FlexibilidadeFisica flexibilidade;
 
-    @Column(name = "forca_palmar_direita", columnDefinition = "varchar(10)")
-    private String forcaPalmarDireita;
+    @Column(name = "forca_palmar_direita", precision = 5, scale = 2)
+    private BigDecimal forcaPalmarDireita;
 
-    @Column(name = "forca_palmar_esquerda", columnDefinition = "varchar(10)")
-    private String forcaPalmarEsquerda;
+    @Column(name = "forca_palmar_esquerda", precision = 5, scale = 2)
+    private BigDecimal forcaPalmarEsquerda;
 
     @Column(name = "assimetria_palmar", columnDefinition = "varchar(10)")
     private NivelAssimetria assimetriaPalmar;
 
-    @Column(name = "forca_joelho_direita", columnDefinition = "varchar(10)")
-    private String forcaJoelhoDireita;
+    @Column(name = "forca_joelho_direita", precision = 5, scale = 2)
+    private BigDecimal forcaJoelhoDireita;
 
-    @Column(name = "forca_joelho_esquerda", columnDefinition = "varchar(10)")
-    private String forcaJoelhoEsquerda;
+    @Column(name = "forca_joelho_esquerda", precision = 5, scale = 2)
+    private BigDecimal forcaJoelhoEsquerda;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "assimetria_joelho")
@@ -74,9 +77,18 @@ public class AvaliacaoFisica {
     @Column(name = "orientacoes", columnDefinition = "text")
     private String orientacoesGerais;
 
+    @ManyToMany
+    @JoinTable(
+            name = "avaliacao_indicacao_tag",
+            joinColumns = @JoinColumn(name = "avaliacao_fisica_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_funcional_id")
+    )
+    private List<TagFuncional> indicacoesFuncionais = new ArrayList<>();
+
     @Column(name = "data_registro", nullable = false)
-    private LocalDate dataRegistro;
+    private LocalDateTime dataRegistro;
 
     @Column(name = "data_atualizacao")
-    private LocalDate dataAtualizacao;
+    private LocalDateTime dataAtualizacao;
 }
+

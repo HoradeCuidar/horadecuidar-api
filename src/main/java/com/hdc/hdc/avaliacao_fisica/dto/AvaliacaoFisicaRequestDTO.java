@@ -6,6 +6,9 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public record AvaliacaoFisicaRequestDTO(
         @NotNull(message = "A realização de atividades físicas do participante deve ser informada.")
         boolean realizaAtividadeFisica,
@@ -16,16 +19,19 @@ public record AvaliacaoFisicaRequestDTO(
         @NotNull(message = "O nível de flexibilidade do participante deve ser informada.")
         FlexibilidadeFisica flexibilidade,
 
-        String forcaPalmarDireita,
-        String forcaPalmarEsquerda,
+        BigDecimal forcaPalmarDireita,
+        BigDecimal forcaPalmarEsquerda,
         NivelAssimetria assimetriaPalmar,
 
-        String forcaJoelhoDireita,
-        String forcaJoelhoEsquerda,
+        BigDecimal forcaJoelhoDireita,
+        BigDecimal forcaJoelhoEsquerda,
         NivelAssimetria assimetriaJoelho,
 
         String queixas,
         String observacoesMusculoEsqueleticas,
-        String orientacoesGerais
+        String orientacoesGerais,
+
+        List<Long> indicacoesFuncionaisIds
 ) {
 }
+

@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/pacientes/{id}/avaliacoes-fisicas")
@@ -48,7 +46,7 @@ public class AvaliacaoFisicaController {
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE','PACIENTE')")
     public ResponseEntity<AvaliacaoFisicaResponseDTO> buscarPorId(
             @PathVariable("id") Integer pacienteId,
-            @PathVariable("avaliacaoId") UUID avaliacaoId) {
+            @PathVariable("avaliacaoId") Long avaliacaoId) {
 
         AvaliacaoFisicaResponseDTO avaliacao = avaliacaoFisicaService.buscarPorId(pacienteId, avaliacaoId);
         return ResponseEntity.ok(avaliacao);
@@ -59,7 +57,7 @@ public class AvaliacaoFisicaController {
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<AvaliacaoFisicaResponseDTO> atualizarAvaliacao(
             @PathVariable("id") Integer pacienteId,
-            @PathVariable("avaliacaoId") UUID avaliacaoId,
+            @PathVariable("avaliacaoId") Long avaliacaoId,
             @Valid @RequestBody AvaliacaoFisicaRequestDTO dto,
             @CurrentUser Usuario profissional) {
 
