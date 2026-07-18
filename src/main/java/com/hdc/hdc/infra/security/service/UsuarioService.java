@@ -2,10 +2,13 @@ package com.hdc.hdc.infra.security.service;
 
 import com.hdc.hdc.auth.autenticacao.dto.UsuarioRegisterDTO;
 import com.hdc.hdc.usuarios.Administrador;
+import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.usuarios.dto.UsuarioDTO;
 import com.hdc.hdc.usuarios.enums.Genero;
 import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.usuarios.enums.Status;
 import com.hdc.hdc.usuarios.UsuarioRepository;
+import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -54,5 +57,26 @@ public class UsuarioService implements UserDetailsService {
         } else {
             throw new UnsupportedOperationException("Registration for this role is not implemented here.");
         }
+    }
+
+    public UsuarioDTO buscarPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("ID", "Usuário não encontrado com o id informado."));
+
+        return this.toDTO(usuario);
+    }
+
+    private UsuarioDTO toDTO(Usuario usuario) {
+        return new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getUsername(),
+                usuario.getRole(),
+                usuario.getStatus(),
+                usuario.getTelefone(),
+                usuario.getGenero(),
+                usuario.getEmail(),
+                usuario.getFotoDePerfil()
+        );
     }
 }
