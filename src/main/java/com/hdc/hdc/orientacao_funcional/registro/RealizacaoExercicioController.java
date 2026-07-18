@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/paciente/{pacienteId}/realizacao-funcional/")
+@RequestMapping("/api/paciente/{pacienteId}/realizacao-funcional")
 public class RealizacaoExercicioController {
 
     private final RealizacaoExercicioService realizacaoExercicioService;
