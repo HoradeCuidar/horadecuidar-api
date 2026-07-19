@@ -3,11 +3,16 @@ package com.hdc.hdc.orientacao_funcional.orientacao;
 import com.hdc.hdc.infra.bucket.service.R2Service;
 import com.hdc.hdc.orientacao_funcional.orientacao.dto.OrientacaoFuncionalRequestDTO;
 import com.hdc.hdc.orientacao_funcional.orientacao.dto.OrientacaoFuncionalResponseDTO;
+import com.hdc.hdc.orientacao_funcional.registro.RealizacaoExercicioRepository;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncional;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncionalRepository;
 import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.util.exception.EntityInUseException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrientacaoFuncionalService {
@@ -28,6 +34,7 @@ public class OrientacaoFuncionalService {
     private final R2Service r2Service;
     private final TagFuncionalRepository tagFuncionalRepository;
     private final OrientacaoFuncionalRepository orientacaoFuncionalRepository;
+    private final RealizacaoExercicioRepository realizacaoExercicioRepository;
     private final OrientacaoFuncionalMapper mapper;
 
     @Transactional
@@ -105,6 +112,16 @@ public class OrientacaoFuncionalService {
 
     public OrientacaoFuncionalResponseDTO buscarPorId(Long id) {
         return mapper.toDto(buscarEntidadePorId(id));
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        try {
+            orientacaoFuncionalRepository.deleteById(id);
+            orientacaoFuncionalRepository.flush();
+        } catch (DataIntegrityViolationException ex) {log.info("Orientação funcional não pode ser deletada - integridade referencial");
+            throw new EntityInUseException("Orientação Funcional");
+        }
     }
 
     private OrientacaoFuncional buscarEntidadePorId(Long id) {

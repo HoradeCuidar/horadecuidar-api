@@ -101,4 +101,17 @@ public class OrientacaoFuncionalController {
     ) {
         return ResponseEntity.ok(orientacaoFuncionalService.alterarStatus(id, ativo));
     }
+
+    /*
+     * Deletar prescrição se não houver registros relacionados
+     */
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<OrientacaoFuncionalResponseDTO> deletarOrientacao(
+            @PathVariable Long id
+    ) {
+        orientacaoFuncionalService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
 }
