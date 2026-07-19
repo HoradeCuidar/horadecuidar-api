@@ -13,8 +13,11 @@ import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamentoRepository;
+import com.hdc.hdc.util.exception.EntityInUseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PrescricaoMedicamentoProfissionalService {
@@ -98,8 +102,13 @@ public class PrescricaoMedicamentoProfissionalService {
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
-
-        prescricaoRepository.deleteById(prescricaoId);
+        try {
+            prescricaoRepository.deleteById(prescricaoId);
+            prescricaoRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            log.info("Orientação medicamentosa não pode ser deletada - integridade referencial");
+            throw new EntityInUseException("Orientação Medicamentosa");
+        }
     }
 
     @Transactional
