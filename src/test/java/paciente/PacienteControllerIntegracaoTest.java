@@ -95,7 +95,7 @@ class PacienteControllerIntegracaoTest {
         @WithMockUser(roles = "ADMIN")
         void shouldReturnUserById() throws Exception {
                 // Teste de visualização de paciente por ID
-                Long idBuscado = 1L;
+                Integer idBuscado = 1;
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1,
                                 "Maria Silva",
@@ -129,7 +129,7 @@ class PacienteControllerIntegracaoTest {
         @WithMockUser(roles = "ADMIN")
         void shouldReturn404WhenUserNotFound() throws Exception {
                 // Teste de visualização de paciente por ID quando o paciente não é encontrado
-                Long idInexistente = 999L;
+                Integer idInexistente = 999;
                 Mockito.when(pacienteService.visualizarPorId(idInexistente))
                                 .thenThrow(new com.hdc.hdc.util.exception.ResourceNotFoundException(
                                                 "Paciente não encontrado"));
@@ -235,7 +235,7 @@ class PacienteControllerIntegracaoTest {
         @WithMockUser(roles = "ADMIN")
         void shouldUpdateUserSuccessfully() throws Exception {
                 // Teste de atualização de paciente
-                Long idAtualizar = 1L;
+                Integer idAtualizar = 1;
                 PacienteCreateDto dto = new PacienteCreateDto(
                                 "João Silva Atualizado", "joao.silva", "senha12345",
                                 LocalDate.of(1990, 5, 20), "11999999999", Genero.MASCULINO,
@@ -255,7 +255,7 @@ class PacienteControllerIntegracaoTest {
         @WithMockUser(roles = "ADMIN")
         void shouldDeleteUserSuccessfully() throws Exception {
                 // Teste de deleção de paciente
-                Long idDeletar = 1L;
+                Integer idDeletar = 1;
 
                 Mockito.doNothing().when(pacienteService).deletar(idDeletar);
 
@@ -267,7 +267,7 @@ class PacienteControllerIntegracaoTest {
         @WithMockUser(roles = "ADMIN")
         void shouldChangeUserStatusSuccessfully() throws Exception {
                 // Teste de alteração de status de paciente
-                Long idAlterar = 1L;
+                Integer idAlterar = 1;
                 PacienteResponseDto responseDto = new PacienteResponseDto(
                                 1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
                                 "INATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
