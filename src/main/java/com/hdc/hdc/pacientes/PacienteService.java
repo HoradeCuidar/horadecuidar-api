@@ -5,6 +5,7 @@ import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
 import com.hdc.hdc.doencas.Doenca;
 import com.hdc.hdc.pacientes.associacoes.PacienteDoencas;
+import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.usuarios.enums.Status;
 import com.hdc.hdc.doencas.DoencaRepository;
@@ -45,13 +46,23 @@ public class PacienteService {
     }
 
     @Transactional(readOnly = true)
-    public PacienteResponseDto visualizarPorId(Long id) {
+    public PacienteResponseDto visualizarPorId(Integer id) {
         return this.pacienteMapper.toDto(this.encontrarPorId(id));
     }
 
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorEmail(String email) {
         return this.pacienteMapper.toDto(this.encontrarPorEmail(email));
+    }
+    
+    @Transactional
+    public PacienteResponseDto visualizarPerfil(Integer usuarioId) {
+        return this.pacienteMapper.toDto(this.encontrarPorId(usuarioId));
+    }
+
+    @Transactional(readOnly = true)
+    public PacienteResponseDto visualizarPorEmail(Usuario usuario) {
+        return this.pacienteMapper.toDto(encontrarPorId(usuario.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -71,8 +82,8 @@ public class PacienteService {
     }
 
     @Transactional
-    public void atualizar(PacienteCreateDto dto, Long id) {
-        Paciente existente = this.encontrarPorId(id);
+    public void atualizar(PacienteCreateDto dto, Integer id) {
+        Paciente existente = encontrarPorId(id);
         this.validarUnicidade(dto.email(), id);
 
         existente.setNome(dto.nome());
@@ -112,7 +123,7 @@ public class PacienteService {
         Paciente existente = this.pacienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
 
-        this.validarUnicidade(dto.email(), id.longValue());
+        this.validarUnicidade(dto.email(), id);
 
         existente.setNome(dto.nome());
         existente.setEmail(dto.email());
@@ -125,16 +136,16 @@ public class PacienteService {
         existente.setNumeroDaCasa(dto.numeroDaCasa());
         existente.setDataDeNascimento(dto.dataDeNascimento());
 
-        log.info("Atualizado perfil do paciente com id: " + id);
+        log.info("Atualizado perfil do paciente com id: {}", id);
         return this.pacienteMapper.toDto(this.pacienteRepository.save(existente));
     }
 
 
-    public void deletar(Long id) {
+    public void deletar(Integer id) {
         this.pacienteRepository.deleteById(id);
     }
 
-    public PacienteResponseDto alterarStatus(Long id) {
+    public PacienteResponseDto alterarStatus(Integer id) {
         Paciente paciente = this.encontrarPorId(id);
         paciente.setStatus(paciente.getStatus() == Status.ATIVO ? Status.INATIVO : Status.ATIVO);
 
@@ -147,7 +158,7 @@ public class PacienteService {
         }
     }
 
-    private void validarUnicidade(String email, Long id) {
+    private void validarUnicidade(String email, Integer id) {
         Paciente existente = this.pacienteRepository.findByEmail(email).orElse(null);
         if (existente != null && !existente.getId().equals(Math.toIntExact(id))) {
             throw new ResourceWithSameNameException("Email", "Já existe um paciente registrado com esse email.");
@@ -155,26 +166,22 @@ public class PacienteService {
     }
 
     // Métodos privados recorrentes
-    @Transactional(readOnly = true)
-    private Paciente encontrarPorId(Long id) {
+    private Paciente encontrarPorId(Integer id) {
         return pacienteRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
     }
 
-    @Transactional(readOnly = true)
     private Paciente encontrarPorEmail(String email) {
         return pacienteRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email", "Paciente não encontrado com o email informado."));
     }
 
-    @Transactional(readOnly = true)
     private Page<Paciente> encontrarPorNome(String nome, Pageable pageable) {
         return pacienteRepository.findAllByNomeContainingIgnoreCaseAndRole(nome, Role.PACIENTE, pageable);
     }
 
-    @Transactional(readOnly = true)
     private Page<Paciente> visualizarTodos(Pageable pageable) {
         return pacienteRepository.findAllWithRelations(pageable);
     }

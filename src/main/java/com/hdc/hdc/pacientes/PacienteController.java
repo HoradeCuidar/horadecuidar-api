@@ -22,6 +22,13 @@ public class PacienteController {
 
     private final PacienteService pacienteService;
 
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('PACIENTE')")
+    public ResponseEntity<PacienteResponseDto> perfil(@CurrentUser Usuario usuario) {
+        return ResponseEntity.ok(pacienteService.visualizarPerfil(usuario.getId()));
+    }
+
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
@@ -35,7 +42,7 @@ public class PacienteController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
-    public ResponseEntity<PacienteResponseDto> visualizarPorId(@PathVariable Long id) {
+    public ResponseEntity<PacienteResponseDto> visualizarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(pacienteService.visualizarPorId(id));
     }
 
@@ -66,7 +73,7 @@ public class PacienteController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
-    public void atualizar(@RequestBody PacienteCreateDto paciente, @PathVariable Long id) {
+    public void atualizar(@RequestBody PacienteCreateDto paciente, @PathVariable Integer id) {
         this.pacienteService.atualizar(paciente, id);
     }
 
@@ -84,14 +91,14 @@ public class PacienteController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
-    public void deletar(@PathVariable Long id) {
+    public void deletar(@PathVariable Integer id) {
         this.pacienteService.deletar(id);
     }
 
     @PatchMapping("/status/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
-    public ResponseEntity<PacienteResponseDto> alterarStatus(@PathVariable Long id) {
+    public ResponseEntity<PacienteResponseDto> alterarStatus(@PathVariable Integer id) {
         return ResponseEntity.ok(this.pacienteService.alterarStatus(id));
     }
 }
