@@ -87,6 +87,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(EntityInUseException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEntityInUseException(EntityInUseException ex) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
     // Tratamento das demais exceções
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponseDTO>> handleValidationException(MethodArgumentNotValidException e) {
