@@ -1,53 +1,81 @@
 package com.hdc.hdc.adesao_medicamentos;
 
+import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AdesaoMedicamentoRepository extends JpaRepository<AdesaoMedicamento, Long> {
+public interface OcorrenciaMedicamentoRepository extends JpaRepository<OcorrenciaMedicamento, Long> {
 
-    List<AdesaoMedicamento> findByPrescricaoId(UUID prescricaoId);
+    List<OcorrenciaMedicamento> findByPrescricaoId(UUID prescricaoId);
 
     boolean existsByPrescricaoId(UUID prescricaoId);
 
     @Query("""
-        SELECT a FROM AdesaoMedicamento a
+        SELECT a FROM OcorrenciaMedicamento a
         WHERE a.itemMedicacao.id = :itemMedicacaoId
               AND a.dataHoraRegistro >= :inicioDia
               AND a.dataHoraRegistro < :fimDia
         """)
-    List<AdesaoMedicamento> findByItemMedicacaoIdAndDia(
+    List<OcorrenciaMedicamento> findByItemMedicacaoIdAndDia(
             @Param("itemMedicacaoId") Long itemMedicacaoId,
             @Param("inicioDia") LocalDateTime inicioDia,
             @Param("fimDia") LocalDateTime fimDia);
 
     @Query("""
-        SELECT a FROM AdesaoMedicamento a
+        SELECT a FROM OcorrenciaMedicamento a
         WHERE a.itemMedicacao.id = :itemMedicacaoId
               AND a.dataHoraRegistro >= :inicioDia
               AND a.dataHoraRegistro < :fimDia
         ORDER BY a.dataHoraRegistro DESC
         """)
-    Optional<AdesaoMedicamento> findUltimaByItemMedicacaoIdAndDia(
+    Optional<OcorrenciaMedicamento> findUltimaByItemMedicacaoIdAndDia(
             @Param("itemMedicacaoId") Long itemMedicacaoId,
             @Param("inicioDia") LocalDateTime inicioDia,
             @Param("fimDia") LocalDateTime fimDia);
 
     @Query("""
-        SELECT a FROM AdesaoMedicamento a
+        SELECT a FROM OcorrenciaMedicamento a
         WHERE a.prescricao.paciente.id = :pacienteId
               AND a.dataHoraRegistro >= :inicio
               AND a.dataHoraRegistro < :fim
         """)
-    List<AdesaoMedicamento> findByPacienteIdAndPeriodo(
+    List<OcorrenciaMedicamento> findByPacienteIdAndPeriodo(
             @Param("pacienteId") Integer pacienteId,
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim);
+
+    List<OcorrenciaMedicamento>
+    findByPrescricaoIdAndDataPrevistaGreaterThanEqualAndStatus(
+            UUID prescricaoId,
+            LocalDate dataPrevista,
+            StatusAdesao status
+    );
+
+    boolean existsByItemMedicacaoIdAndDataPrevistaAndOrdemNoDia(
+            UUID itemMedicacaoId,
+            LocalDate dataPrevista,
+            Integer ordemNoDia
+    );
+
+    @Query("""
+    select o
+    from OcorrenciaMedicamento o
+    where o.prescricao.id = :prescricaoId
+      and o.dataPrevista >= :dataInicial
+      and o.status = :status
+    """)
+    List<OcorrenciaMedicamento> buscarOcorrenciasFuturas(
+            @Param("prescricaoId") UUID prescricaoId,
+            @Param("dataInicial") LocalDate dataInicial,
+            @Param("status") StatusAdesao status
+    );
 }

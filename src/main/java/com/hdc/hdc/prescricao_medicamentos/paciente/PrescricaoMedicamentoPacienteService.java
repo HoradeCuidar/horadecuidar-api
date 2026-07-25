@@ -1,7 +1,7 @@
 package com.hdc.hdc.prescricao_medicamentos.paciente;
 
-import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamento;
-import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamentoRepository;
+import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamento;
+import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoRepository;
@@ -36,7 +36,7 @@ import java.util.Locale;
 public class PrescricaoMedicamentoPacienteService {
 
     private final PrescricaoMedicamentoRepository prescricaoRepository;
-    private final AdesaoMedicamentoRepository adesaoRepository;
+    private final OcorrenciaMedicamentoRepository adesaoRepository;
     private final PacienteRepository pacienteRepository;
     private final ItemMedicacaoRepository itemMedicacaoRepository;
 
@@ -57,12 +57,12 @@ public class PrescricaoMedicamentoPacienteService {
                 if (!deveAparecerHoje(item, prescricao, hoje)) continue;
 
                 int dosesEsperadas = calcularDosesEsperadasHoje(item);
-                List<AdesaoMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
+                List<OcorrenciaMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
 
                 StatusAdesao statusAtual = null;
                 Long adesaoId = null;
                 if (!registrosHoje.isEmpty()) {
-                    AdesaoMedicamento ultimoRegistro = registrosHoje.getFirst();
+                    OcorrenciaMedicamento ultimoRegistro = registrosHoje.getFirst();
                     statusAtual = ultimoRegistro.getStatus();
                     adesaoId = ultimoRegistro.getId();
                 }
@@ -109,7 +109,7 @@ public class PrescricaoMedicamentoPacienteService {
 
         // Verificar limite de registros por dia de acordo com a frequência
         int dosesEsperadas = calcularDosesEsperadasHoje(item);
-        List<AdesaoMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
+        List<OcorrenciaMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
 
         if (registrosHoje.size() >= dosesEsperadas) {
             throw new InvalidValueException("itemMedicacaoId",
@@ -117,14 +117,14 @@ public class PrescricaoMedicamentoPacienteService {
                             + dosesEsperadas + " dose(s) esperada(s)).");
         }
 
-        AdesaoMedicamento adesao = new AdesaoMedicamento();
+        OcorrenciaMedicamento adesao = new OcorrenciaMedicamento();
         adesao.setPrescricao(prescricao);
         adesao.setItemMedicacao(item);
         adesao.setDataHoraRegistro(agora);
         adesao.setStatus(request.getStatus());
         adesao.setObservacao(request.getObservacao());
 
-        AdesaoMedicamento salvo = adesaoRepository.save(adesao);
+        OcorrenciaMedicamento salvo = adesaoRepository.save(adesao);
 
         return toRegistroAdesaoResponseDTO(salvo);
     }
@@ -134,7 +134,7 @@ public class PrescricaoMedicamentoPacienteService {
             Integer pacienteId, Long adesaoId, RegistroAdesaoRequestDTO request) {
         validarPaciente(pacienteId);
 
-        AdesaoMedicamento adesao = adesaoRepository.findById(adesaoId)
+        OcorrenciaMedicamento adesao = adesaoRepository.findById(adesaoId)
                 .orElseThrow(() -> new ResourceNotFoundException("adesaoId",
                         "Registro de adesão não encontrado."));
 
@@ -156,7 +156,7 @@ public class PrescricaoMedicamentoPacienteService {
         adesao.setObservacao(request.getObservacao());
         adesao.setDataHoraRegistro(LocalDateTime.now());
 
-        AdesaoMedicamento salvo = adesaoRepository.save(adesao);
+        OcorrenciaMedicamento salvo = adesaoRepository.save(adesao);
         return toRegistroAdesaoResponseDTO(salvo);
     }
 
@@ -196,7 +196,7 @@ public class PrescricaoMedicamentoPacienteService {
         LocalDateTime fimDateTime = fim.atStartOfDay();
 
         // Buscar todas as adesões do paciente no período
-        List<AdesaoMedicamento> adesoes =
+        List<OcorrenciaMedicamento> adesoes =
                 adesaoRepository.findByPacienteIdAndPeriodo(pacienteId, inicioDateTime, fimDateTime);
 
         // Calcular total de itens esperados no período
@@ -235,14 +235,12 @@ public class PrescricaoMedicamentoPacienteService {
      * Determina se um item de medicação deve aparecer hoje com base na frequência (quantidadeDoses / intervaloValor / intervaloTipo) e na dataInicio da prescrição.
      */
     private boolean deveAparecerHoje(ItemMedicacao item, PrescricaoMedicamento prescricao, LocalDate hoje) {
-        LocalDate dataInicio = prescricao.getDataInicio()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dataInicio = prescricao.getDataInicio();
 
         if (hoje.isBefore(dataInicio)) return false;
 
         if (prescricao.getDataFim() != null) {
-            LocalDate dataFim = prescricao.getDataFim()
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate dataFim = prescricao.getDataFim();
             if (hoje.isAfter(dataFim)) return false;
         }
 
@@ -382,8 +380,7 @@ public class PrescricaoMedicamentoPacienteService {
                     "A prescrição não está ativa.");
         }
 
-        LocalDate dataInicio = prescricao.getDataInicio()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dataInicio = prescricao.getDataInicio();
 
         if (hoje.isBefore(dataInicio)) {
             throw new InvalidValueException("prescricao",
@@ -391,8 +388,7 @@ public class PrescricaoMedicamentoPacienteService {
         }
 
         if (prescricao.getDataFim() != null) {
-            LocalDate dataFim = prescricao.getDataFim()
-                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate dataFim = prescricao.getDataFim();
             if (hoje.isAfter(dataFim)) {
                 throw new InvalidValueException("prescricao",
                         "O período da prescrição já encerrou.");
@@ -400,7 +396,7 @@ public class PrescricaoMedicamentoPacienteService {
         }
     }
 
-    private List<AdesaoMedicamento> buscarRegistrosDoDia(Long itemMedicacaoId, LocalDate dia) {
+    private List<OcorrenciaMedicamento> buscarRegistrosDoDia(Long itemMedicacaoId, LocalDate dia) {
         LocalDateTime inicioDia = dia.atStartOfDay();
         LocalDateTime fimDia = dia.plusDays(1).atStartOfDay();
         return adesaoRepository.findByItemMedicacaoIdAndDia(itemMedicacaoId, inicioDia, fimDia);
@@ -436,7 +432,7 @@ public class PrescricaoMedicamentoPacienteService {
                 .build();
     }
 
-    private RegistroAdesaoResponseDTO toRegistroAdesaoResponseDTO(AdesaoMedicamento adesao) {
+    private RegistroAdesaoResponseDTO toRegistroAdesaoResponseDTO(OcorrenciaMedicamento adesao) {
         return RegistroAdesaoResponseDTO.builder()
                 .id(adesao.getId())
                 .itemMedicacaoId(adesao.getItemMedicacao().getId())

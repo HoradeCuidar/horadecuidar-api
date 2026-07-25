@@ -6,16 +6,16 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class PrescricaoMedicamentoRequestDTO {
 
     @NotNull(message = "A data de início é obrigatória.")
-    private Date dataInicio;
+    private LocalDate dataInicio;
 
-    private Date dataFim;
+    private LocalDate dataFim;
 
     private String observacao;
 
