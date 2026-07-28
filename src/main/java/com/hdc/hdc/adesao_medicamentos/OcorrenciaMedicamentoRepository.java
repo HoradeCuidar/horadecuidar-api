@@ -60,10 +60,11 @@ public interface OcorrenciaMedicamentoRepository extends JpaRepository<Ocorrenci
             StatusAdesao status
     );
 
-    boolean existsByItemMedicacaoIdAndDataPrevistaAndOrdemNoDia(
-            UUID itemMedicacaoId,
+    boolean existsByItemMedicacaoIdAndDataPrevistaAndOrdemNoDiaAndStatusNot(
+            Long itemMedicacaoId,
             LocalDate dataPrevista,
-            Integer ordemNoDia
+            Integer ordemNoDia,
+            StatusAdesao status
     );
 
     @Query("""

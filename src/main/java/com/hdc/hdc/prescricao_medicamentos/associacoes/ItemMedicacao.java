@@ -68,4 +68,7 @@ public class ItemMedicacao {
     @Column(name = "observacao", columnDefinition = "text")
     private String observacao;
 
+    @Column(name = "ativo")
+    private boolean ativo = true;
+
 }

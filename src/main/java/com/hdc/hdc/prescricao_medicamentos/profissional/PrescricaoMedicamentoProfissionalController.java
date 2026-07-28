@@ -38,12 +38,11 @@ public class PrescricaoMedicamentoProfissionalController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoMedicamentoResponseDTO> atualizarPrescricao(
-            @PathVariable("id") Integer pacienteId,
             @PathVariable("prescricaoId") UUID prescricaoId,
             @Valid @RequestBody PrescricaoMedicamentoRequestDTO dto,
             @CurrentUser Usuario profissional) {
 
-        PrescricaoMedicamentoResponseDTO atualizada = prescricaoService.atualizarPrescricao(pacienteId, prescricaoId, dto, profissional);
+        PrescricaoMedicamentoResponseDTO atualizada = prescricaoService.atualizarPrescricao(prescricaoId, dto, profissional);
         return ResponseEntity.ok(atualizada);
     }
 

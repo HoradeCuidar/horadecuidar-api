@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS registro_adesao_medicamento CASCADE;
 
-CREATE TABLE ocorrencia_medicacao (
+CREATE TABLE ocorrencia_medicamento (
     id BIGSERIAL PRIMARY KEY,
     prescricao_id UUID NOT NULL,
     item_medicacao_id BIGINT NOT NULL,
@@ -12,3 +12,5 @@ CREATE TABLE ocorrencia_medicacao (
     CONSTRAINT fk_adesao_prescricao FOREIGN KEY (prescricao_id) REFERENCES prescricao_medicamento(id),
     CONSTRAINT fk_adesao_item FOREIGN KEY (item_medicacao_id) REFERENCES item_medicacao(id)
 );
+
+ALTER TABLE item_medicacao ADD ativo BOOLEAN;

@@ -22,11 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,10 +41,9 @@ public class PrescricaoMedicamentoPacienteService {
     public List<ItemMedicacaoDiaDTO> listarMedicacoesDoDia(Integer pacienteId) {
         validarPaciente(pacienteId);
         LocalDate hoje = LocalDate.now();
-        Date dataRef = Date.from(hoje.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         List<PrescricaoMedicamento> prescricoesAtivas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, dataRef);
+                prescricaoRepository.findAtivasByPacienteId(pacienteId, hoje);
 
         List<ItemMedicacaoDiaDTO> itensDoDia = new ArrayList<>();
 
@@ -162,10 +159,8 @@ public class PrescricaoMedicamentoPacienteService {
 
     public List<PrescricaoAtivaPacienteDTO> listarPrescricoesAtivas(Integer pacienteId) {
         validarPaciente(pacienteId);
-        Date dataRef = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
         List<PrescricaoMedicamento> ativas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, dataRef);
+                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now());
 
         return ativas.stream()
                 .map(this::toPrescricaoAtivaPacienteDTO)
@@ -200,9 +195,8 @@ public class PrescricaoMedicamentoPacienteService {
                 adesaoRepository.findByPacienteIdAndPeriodo(pacienteId, inicioDateTime, fimDateTime);
 
         // Calcular total de itens esperados no período
-        Date dataRef = Date.from(hoje.atStartOfDay(ZoneId.systemDefault()).toInstant());
         List<PrescricaoMedicamento> prescricoesAtivas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, dataRef);
+                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now());
 
         int totalEsperado = calcularTotalEsperadoNoPeriodo(prescricoesAtivas, inicio, fim);
 
