@@ -33,5 +33,7 @@ public class ItemMedicacaoDTO {
     @NotNull(message = "A via de administração é obrigatória.")
     private ViaAdministracao viaAdministracao;
 
+    private boolean ativo;
+
     private String observacao;
 }

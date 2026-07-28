@@ -70,5 +70,4 @@ public class ItemMedicacao {
 
     @Column(name = "ativo")
     private boolean ativo = true;
-
 }
