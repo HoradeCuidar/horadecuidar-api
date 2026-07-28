@@ -19,6 +19,10 @@ public interface OcorrenciaMedicamentoRepository extends JpaRepository<Ocorrenci
 
     boolean existsByPrescricaoId(UUID prescricaoId);
 
+    boolean existsByPrescricaoIdAndStatusIn(UUID prescricaoId, List<StatusAdesao> statuses);
+
+    void deleteByPrescricaoId(UUID prescricaoId);
+
     @Query("""
         SELECT a FROM OcorrenciaMedicamento a
         WHERE a.itemMedicacao.id = :itemMedicacaoId

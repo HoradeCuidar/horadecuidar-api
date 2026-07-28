@@ -19,7 +19,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,13 +106,16 @@ public class PrescricaoMedicamentoProfissionalService {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
 
-        try {
-            prescricaoRepository.deleteById(prescricaoId);
-            prescricaoRepository.flush();
-        } catch (DataIntegrityViolationException _) {
-            log.info("Orientação medicamentosa não pode ser deletada - integridade referencial");
-            throw new EntityInUseException("Orientação Medicamentosa");
+        boolean possuiAdesao = ocorrenciaMedicamentoRepository.existsByPrescricaoIdAndStatusIn(
+                prescricaoId, List.of(StatusAdesao.REALIZADO, StatusAdesao.NAO_REALIZADO)
+        );
+
+        if (possuiAdesao) {
+            throw new EntityInUseException("Prescrição de Medicamento");
         }
+
+        ocorrenciaMedicamentoRepository.deleteByPrescricaoId(prescricaoId);
+        prescricaoRepository.deleteById(prescricaoId);
     }
 
     @Transactional
