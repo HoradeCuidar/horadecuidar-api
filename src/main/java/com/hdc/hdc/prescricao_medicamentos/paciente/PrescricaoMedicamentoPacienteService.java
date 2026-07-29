@@ -85,45 +85,28 @@ public class PrescricaoMedicamentoPacienteService {
     }
 
     @Transactional
-    public RegistroAdesaoResponseDTO registrarAdesao(Integer pacienteId, RegistroAdesaoRequestDTO request) {
+    public RegistroAdesaoResponseDTO registrarAdesao(
+            Integer pacienteId,
+            RegistroAdesaoRequestDTO request
+    ) {
         validarPaciente(pacienteId);
-
-        ItemMedicacao item = buscarItemMedicacao(request.getItemMedicacaoId());
-        PrescricaoMedicamento prescricao = item.getPrescricao();
-
-        if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new InvalidValueException("itemMedicacaoId", "O item de medicação não pertence a este paciente.");
-        }
+        validarRequestRegistro(request);
 
         LocalDate hoje = LocalDate.now();
-        LocalDateTime agora = LocalDateTime.now();
 
-        validarPrescricaoAtiva(prescricao, hoje);
+        OcorrenciaMedicamento ocorrencia = adesaoRepository
+                                                .findById(request.getOcorrenciaId())
+                                                .orElseThrow(() -> new ResourceNotFoundException("Ocorrência de medicamento não encontrada."));
 
-        if (agora.toLocalDate().isAfter(hoje)) {
-            throw new InvalidValueException("dataHoraRegistro", "Não é possível registrar adesão para uma data futura.");
-        }
+        validarPertencimentoAoPaciente(ocorrencia, pacienteId);
+        validarOcorrenciaParaRegistro(ocorrencia, hoje);
 
-        // Verificar limite de registros por dia de acordo com a frequência
-        int dosesEsperadas = calcularDosesEsperadasHoje(item);
-        List<OcorrenciaMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
+        ocorrencia.setStatus(request.getStatus());
+        ocorrencia.setDataHoraRegistro(LocalDateTime.now());
+        ocorrencia.setObservacao(request.getObservacao());
 
-        if (registrosHoje.size() >= dosesEsperadas) {
-            throw new InvalidValueException("itemMedicacaoId",
-                    "O limite de registros de adesão para este item hoje já foi atingido ("
-                            + dosesEsperadas + " dose(s) esperada(s)).");
-        }
-
-        OcorrenciaMedicamento adesao = new OcorrenciaMedicamento();
-        adesao.setPrescricao(prescricao);
-        adesao.setItemMedicacao(item);
-        adesao.setDataHoraRegistro(agora);
-        adesao.setStatus(request.getStatus());
-        adesao.setObservacao(request.getObservacao());
-
-        OcorrenciaMedicamento salvo = adesaoRepository.save(adesao);
-
-        return toRegistroAdesaoResponseDTO(salvo);
+        OcorrenciaMedicamento salva = adesaoRepository.save(ocorrencia);
+        return toRegistroAdesaoResponseDTO(salva);
     }
 
     @Transactional
@@ -131,22 +114,21 @@ public class PrescricaoMedicamentoPacienteService {
             Integer pacienteId, Long adesaoId, RegistroAdesaoRequestDTO request) {
         validarPaciente(pacienteId);
 
-        OcorrenciaMedicamento adesao = adesaoRepository.findById(adesaoId)
-                .orElseThrow(() -> new ResourceNotFoundException("adesaoId",
-                        "Registro de adesão não encontrado."));
-
-        // Validar que pertence ao paciente
-        if (!adesao.getPrescricao().getPaciente().getId().equals(pacienteId)) {
-            throw new InvalidValueException("adesaoId",
-                    "O registro de adesão não pertence a este paciente.");
+        if (request.getStatus() != StatusAdesao.REALIZADO && request.getStatus() != StatusAdesao.NAO_REALIZADO) {
+            throw new InvalidValueException("status", "O status da adesão deve ser REALIZADO ou NAO_REALIZADO.");
         }
 
-        // Só pode alterar registros do mesmo dia
+        OcorrenciaMedicamento adesao = adesaoRepository.findById(adesaoId)
+                .orElseThrow(() -> new ResourceNotFoundException("adesaoId", "Registro de adesão não encontrado."));
+
+        if (!adesao.getPrescricao().getPaciente().getId().equals(pacienteId)) {
+            throw new InvalidValueException("adesaoId", "O registro de adesão não pertence a este paciente.");
+        }
+
         LocalDate hoje = LocalDate.now();
-        LocalDate dataRegistro = adesao.getDataHoraRegistro().toLocalDate();
-        if (!dataRegistro.equals(hoje)) {
-            throw new InvalidValueException("adesaoId",
-                    "Não é possível alterar um registro de adesão de dias anteriores.");
+        LocalDate dataRegistro = adesao.getDataPrevista() != null ? adesao.getDataPrevista() : adesao.getDataHoraRegistro().toLocalDate();
+        if (dataRegistro.isBefore(hoje.minusDays(3))) {
+            throw new InvalidValueException("adesaoId", "Não é possível alterar um registro de adesão de mais de 3 dias atrás.");
         }
 
         adesao.setStatus(request.getStatus());
@@ -362,6 +344,70 @@ public class PrescricaoMedicamentoPacienteService {
                         "Paciente não encontrado."));
     }
 
+    private void validarPertencimentoAoPaciente(
+            OcorrenciaMedicamento ocorrencia,
+            Integer pacienteId
+    ) {
+        Integer pacienteDaOcorrencia =
+                ocorrencia.getPrescricao()
+                        .getPaciente()
+                        .getId();
+
+        if (!pacienteDaOcorrencia.equals(pacienteId)) {
+            throw new InvalidValueException(
+                    "ocorrenciaId",
+                    "A ocorrência não pertence a este paciente."
+            );
+        }
+    }
+
+    private void validarOcorrenciaParaRegistro(
+            OcorrenciaMedicamento ocorrencia,
+            LocalDate hoje
+    ) {
+        if (ocorrencia.getStatus() == StatusAdesao.CANCELADO) {
+            throw new InvalidValueException(
+                    "ocorrenciaId",
+                    "Não é possível registrar uma ocorrência cancelada."
+            );
+        }
+
+        LocalDate dataPrevista = ocorrencia.getDataPrevista();
+
+        if (dataPrevista.isAfter(hoje)) {
+            throw new InvalidValueException(
+                    "ocorrenciaId",
+                    "Não é possível registrar uma ocorrência futura."
+            );
+        }
+
+        if (dataPrevista.isBefore(hoje.minusDays(3))) {
+            throw new InvalidValueException(
+                    "ocorrenciaId",
+                    "Não é possível registrar uma ocorrência de mais de 3 dias atrás."
+            );
+        }
+    }
+
+    private void validarRequestRegistro(
+            RegistroAdesaoRequestDTO request
+    ) {
+        if (request.getOcorrenciaId() == null) {
+            throw new InvalidValueException(
+                    "ocorrenciaId",
+                    "A ocorrência de medicamento deve ser informada."
+            );
+        }
+
+        if (request.getStatus() != StatusAdesao.REALIZADO
+                && request.getStatus() != StatusAdesao.NAO_REALIZADO) {
+            throw new InvalidValueException(
+                    "status",
+                    "O status deve ser REALIZADO ou NAO_REALIZADO."
+            );
+        }
+    }
+
     private ItemMedicacao buscarItemMedicacao(Long itemId) {
         return itemMedicacaoRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("itemMedicacaoId",
@@ -431,6 +477,8 @@ public class PrescricaoMedicamentoPacienteService {
                 .id(adesao.getId())
                 .itemMedicacaoId(adesao.getItemMedicacao().getId())
                 .nomeMedicamento(adesao.getItemMedicacao().getNomeMedicamento())
+                .ordemNoDia(adesao.getOrdemNoDia())
+                .dataPrevista(adesao.getDataPrevista())
                 .status(adesao.getStatus())
                 .observacao(adesao.getObservacao())
                 .dataHoraRegistro(adesao.getDataHoraRegistro())

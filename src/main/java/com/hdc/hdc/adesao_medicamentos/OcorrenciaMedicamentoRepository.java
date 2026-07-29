@@ -23,6 +23,23 @@ public interface OcorrenciaMedicamentoRepository extends JpaRepository<Ocorrenci
 
     void deleteByPrescricaoId(UUID prescricaoId);
 
+    Optional<OcorrenciaMedicamento> findByItemMedicacaoIdAndDataPrevistaAndOrdemNoDia(
+            Long itemMedicacaoId,
+            LocalDate dataPrevista,
+            Integer ordemNoDia
+    );
+
+    List<OcorrenciaMedicamento> findByItemMedicacaoIdAndDataPrevistaAndStatusOrderByOrdemNoDiaAsc(
+            Long itemMedicacaoId,
+            LocalDate dataPrevista,
+            StatusAdesao status
+    );
+
+    List<OcorrenciaMedicamento> findByItemMedicacaoIdAndDataPrevistaOrderByOrdemNoDiaAsc(
+            Long itemMedicacaoId,
+            LocalDate dataPrevista
+    );
+
     @Query("""
         SELECT a FROM OcorrenciaMedicamento a
         WHERE a.itemMedicacao.id = :itemMedicacaoId
