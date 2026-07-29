@@ -1,4 +1,4 @@
-package com.hdc.hdc.adesao_medicamentos;
+package com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos;
 
 import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 import org.springframework.data.jpa.repository.JpaRepository;

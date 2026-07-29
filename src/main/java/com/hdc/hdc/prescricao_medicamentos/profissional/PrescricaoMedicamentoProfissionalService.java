@@ -1,8 +1,8 @@
 package com.hdc.hdc.prescricao_medicamentos.profissional;
 
-import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamento;
-import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamentoValidationService;
-import com.hdc.hdc.adesao_medicamentos.dto.RelatorioAdesaoDTO;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoValidationService;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoMapper;
@@ -13,7 +13,7 @@ import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.pacientes.PacienteRepository;
-import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamentoRepository;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.util.exception.EntityInUseException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

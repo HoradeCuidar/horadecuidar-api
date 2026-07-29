@@ -1,6 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.profissional;
 
-import com.hdc.hdc.adesao_medicamentos.dto.RelatorioAdesaoDTO;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.usuarios.Usuario;

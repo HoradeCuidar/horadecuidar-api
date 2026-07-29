@@ -1,6 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.paciente.dto;
 
-import com.hdc.hdc.adesao_medicamentos.dto.OcorrenciaMedicamentoResponseDTO;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.OcorrenciaMedicamentoResponseDTO;
 
 import java.time.LocalDate;
 import java.util.List;

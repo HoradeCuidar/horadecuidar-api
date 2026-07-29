@@ -1,4 +1,4 @@
-package com.hdc.hdc.adesao_medicamentos.dto;
+package com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto;
 
 import lombok.Data;
 import java.util.UUID;
