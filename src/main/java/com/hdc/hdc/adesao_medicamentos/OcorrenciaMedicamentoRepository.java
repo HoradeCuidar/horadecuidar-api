@@ -17,6 +17,8 @@ public interface OcorrenciaMedicamentoRepository extends JpaRepository<Ocorrenci
 
     List<OcorrenciaMedicamento> findByPrescricaoId(UUID prescricaoId);
 
+    List<OcorrenciaMedicamento> findAllByDataPrevista(LocalDate dataPrevista);
+
     boolean existsByPrescricaoId(UUID prescricaoId);
 
     boolean existsByPrescricaoIdAndStatusIn(UUID prescricaoId, List<StatusAdesao> statuses);

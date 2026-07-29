@@ -2,8 +2,10 @@ package com.hdc.hdc.prescricao_medicamentos.paciente;
 
 import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamento;
 import com.hdc.hdc.adesao_medicamentos.OcorrenciaMedicamentoRepository;
+import com.hdc.hdc.adesao_medicamentos.dto.OcorrenciaMedicamentoResponseDTO;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
+import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoMapper;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoRepository;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacaoRepository;
@@ -34,54 +36,28 @@ import java.util.Locale;
 public class PrescricaoMedicamentoPacienteService {
 
     private final PrescricaoMedicamentoRepository prescricaoRepository;
+    private final PrescricaoMedicamentoMapper prescricaoMapper;
     private final OcorrenciaMedicamentoRepository adesaoRepository;
     private final PacienteRepository pacienteRepository;
     private final ItemMedicacaoRepository itemMedicacaoRepository;
 
-    public List<ItemMedicacaoDiaDTO> listarMedicacoesDoDia(Integer pacienteId) {
-        validarPaciente(pacienteId);
-        LocalDate hoje = LocalDate.now();
+    public ItemMedicacaoDiaDTO listarMedicacoesDoDia(LocalDate data) {
+        List<OcorrenciaMedicamento> ocorrenciasDia = adesaoRepository.findAllByDataPrevista(data);
+        List<OcorrenciaMedicamentoResponseDTO> ocorrencias = new ArrayList<>();
 
-        List<PrescricaoMedicamento> prescricoesAtivas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, hoje);
-
-        List<ItemMedicacaoDiaDTO> itensDoDia = new ArrayList<>();
-
-        for (PrescricaoMedicamento prescricao : prescricoesAtivas) {
-            if (prescricao.getMedicacoes() == null) continue;
-
-            for (ItemMedicacao item : prescricao.getMedicacoes()) {
-                if (!deveAparecerHoje(item, prescricao, hoje)) continue;
-
-                int dosesEsperadas = calcularDosesEsperadasHoje(item);
-                List<OcorrenciaMedicamento> registrosHoje = buscarRegistrosDoDia(item.getId(), hoje);
-
-                StatusAdesao statusAtual = null;
-                Long adesaoId = null;
-                if (!registrosHoje.isEmpty()) {
-                    OcorrenciaMedicamento ultimoRegistro = registrosHoje.getFirst();
-                    statusAtual = ultimoRegistro.getStatus();
-                    adesaoId = ultimoRegistro.getId();
-                }
-
-                itensDoDia.add(ItemMedicacaoDiaDTO.builder()
-                        .itemId(item.getId())
-                        .prescricaoId(prescricao.getId())
-                        .nomeMedicamento(item.getNomeMedicamento())
-                        .dosagemFormatada(formatarDosagem(item))
-                        .frequencia(formatarFrequencia(item))
-                        .viaAdministracao(item.getViaAdministracao() != null
-                                ? item.getViaAdministracao().getName() : null)
-                        .observacao(item.getObservacao())
-                        .statusAdesaoHoje(statusAtual)
-                        .adesaoId(adesaoId)
-                        .dosesEsperadasHoje(dosesEsperadas)
-                        .dosesRegistradasHoje(registrosHoje.size())
-                        .build());
-            }
+        for (OcorrenciaMedicamento ocorrencia : ocorrenciasDia) {
+            ocorrencias.add( new OcorrenciaMedicamentoResponseDTO(
+                    ocorrencia.getId(),
+                    ocorrencia.getPrescricao().getId(),
+                    prescricaoMapper.toItemMedicacaoDTO(ocorrencia.getItemMedicacao()),
+                    ocorrencia.getDataPrevista(),
+                    ocorrencia.getOrdemNoDia(),
+                    ocorrencia.getDataHoraRegistro(),
+                    ocorrencia.getObservacao()
+            ));
         }
 
-        return itensDoDia;
+        return new ItemMedicacaoDiaDTO(data, ocorrencias);
     }
 
     @Transactional
