@@ -1,7 +1,6 @@
 package com.hdc.hdc.relatorio.adesao;
 
-import com.hdc.hdc.relatorio.adesao.dto.DadosResumoAdesaoMedicamento;
-import com.hdc.hdc.relatorio.adesao.dto.ResumoMedicamentoDTO;
+import com.hdc.hdc.relatorio.adesao.dto.*;
 import com.hdc.hdc.util.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +55,91 @@ public class RelatorioAdesaoMedicamentoService {
                 dados.realizado(),
                 dados.naoRealizado(),
                 dados.semRegistro(),
+                percentual
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public EvolucaoAdesaoMedicamentoDTO obterEvolucaoSemanal(
+            Integer pacienteId,
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        validarPeriodo(dataInicial, dataFinal);
+
+        LocalDate ultimaDataConcluida =
+                LocalDate.now().minusDays(1);
+
+        LocalDate dataFinalConsiderada =
+                dataFinal.isAfter(ultimaDataConcluida)
+                        ? ultimaDataConcluida
+                        : dataFinal;
+
+        if (dataInicial.isAfter(dataFinalConsiderada)) {
+            return new EvolucaoAdesaoMedicamentoDTO(
+                    dataInicial,
+                    dataFinalConsiderada,
+                    "SEMANAL",
+                    List.of()
+            );
+        }
+
+        List<DadosEvolucaoSemanalMedicamento> dados =
+                repository.buscarEvolucaoSemanal(
+                        pacienteId,
+                        dataInicial,
+                        dataFinalConsiderada
+                );
+
+        List<PeriodoEvolucaoMedicamentoDTO> periodos =
+                dados.stream()
+                        .map(dado -> montarPeriodo(
+                                dado,
+                                dataInicial,
+                                dataFinalConsiderada
+                        ))
+                        .toList();
+
+        return new EvolucaoAdesaoMedicamentoDTO(
+                dataInicial,
+                dataFinalConsiderada,
+                "SEMANAL",
+                periodos
+        );
+    }
+
+    private PeriodoEvolucaoMedicamentoDTO montarPeriodo(
+            DadosEvolucaoSemanalMedicamento dado,
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        LocalDate inicioSemana = dado.inicioSemana();
+        LocalDate fimSemana = inicioSemana.plusDays(6);
+
+        LocalDate inicioConsiderado =
+                inicioSemana.isBefore(dataInicial)
+                        ? dataInicial
+                        : inicioSemana;
+
+        LocalDate fimConsiderado =
+                fimSemana.isAfter(dataFinal)
+                        ? dataFinal
+                        : fimSemana;
+
+        BigDecimal percentual = calcularPercentual(
+                dado.realizado(),
+                dado.esperado()
+        );
+
+        return new PeriodoEvolucaoMedicamentoDTO(
+                inicioSemana,
+                fimSemana,
+                inicioConsiderado,
+                fimConsiderado,
+                dado.esperado(),
+                dado.realizado(),
+                dado.naoRealizado(),
+                dado.semRegistro(),
                 percentual
         );
     }

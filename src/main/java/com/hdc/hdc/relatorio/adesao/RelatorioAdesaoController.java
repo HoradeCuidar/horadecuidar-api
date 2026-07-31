@@ -18,7 +18,8 @@ import java.time.LocalDate;
 public class RelatorioAdesaoController {
     
     private final RelatorioAdesaoMedicamentoService medicamentoService;
-    
+
+    // Relatório resumido de adesão de medicação do paciente
     @GetMapping("/resumo")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE')")
@@ -36,25 +37,23 @@ public class RelatorioAdesaoController {
         );
     }
 
-    /*
-    * consulta utilizada pelo gráfico.
-    * Ela poderá agrupar por:
-        dia;
-        semana;
-        mês.
-    * */
+    // Relatório de adesão semanal do paciente.
     @GetMapping("/evolucao")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<Object> evolucao(
             @PathVariable Integer pacienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal,
-            @PathVariable("agrupamento") AgrupamentoRelatorio agrupamento
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal
             ) {
-        return null;
+        return ResponseEntity.ok(
+                medicamentoService.obterEvolucaoSemanal(
+                        pacienteId,
+                        dataInicial,
+                        dataFinal
+                )
+        );
     }
-
 
     /*
      * Esse endpoint alimentará a tabela detalhada e deverá ser paginado.
