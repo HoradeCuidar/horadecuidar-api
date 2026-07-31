@@ -1,5 +1,6 @@
 package com.hdc.hdc.relatorio.adesao;
 
+import com.hdc.hdc.relatorio.adesao.dto.DadosDetalhamentoDiarioMedicamento;
 import com.hdc.hdc.relatorio.adesao.dto.DadosEvolucaoSemanalMedicamento;
 import com.hdc.hdc.relatorio.adesao.dto.DadosResumoAdesaoMedicamento;
 import lombok.RequiredArgsConstructor;
@@ -126,6 +127,84 @@ public class RelatorioAdesaoMedicamentoRepository {
                                 resultado.getLong("realizado"),
                                 resultado.getLong("nao_realizado"),
                                 resultado.getLong("sem_registro")
+                        )
+        );
+    }
+
+    public List<DadosDetalhamentoDiarioMedicamento> buscarDetalhamentoDiario(
+            Integer pacienteId,
+            LocalDate dataInicial,
+            LocalDate dataFinal,
+            int pagina,
+            int tamanho
+    ) {
+        String sql = """
+            WITH detalhamento AS (
+                SELECT
+                    o.data_prevista AS data,
+
+                    COUNT(*) AS esperado,
+
+                    COUNT(*) FILTER (
+                        WHERE o.status = 'REALIZADO'
+                    ) AS realizado,
+
+                    COUNT(*) FILTER (
+                        WHERE o.status = 'NAO_REALIZADO'
+                    ) AS nao_realizado,
+
+                    COUNT(*) FILTER (
+                        WHERE o.status = 'PENDENTE'
+                    ) AS sem_registro
+
+                FROM ocorrencia_medicamento o
+
+                INNER JOIN prescricao_medicamento p
+                    ON p.id = o.prescricao_id
+
+                WHERE p.paciente_id = :pacienteId
+                  AND o.data_prevista BETWEEN :dataInicial AND :dataFinal
+                  AND o.status <> 'CANCELADO'
+
+                GROUP BY o.data_prevista
+            )
+            SELECT
+                data,
+                esperado,
+                realizado,
+                nao_realizado,
+                sem_registro,
+                COUNT(*) OVER () AS total_elementos
+
+            FROM detalhamento
+
+            ORDER BY data DESC
+
+            LIMIT :tamanho
+            OFFSET :deslocamento
+            """;
+
+        int deslocamento = pagina * tamanho;
+
+        MapSqlParameterSource parametros =
+                new MapSqlParameterSource()
+                        .addValue("pacienteId", pacienteId)
+                        .addValue("dataInicial", dataInicial)
+                        .addValue("dataFinal", dataFinal)
+                        .addValue("tamanho", tamanho)
+                        .addValue("deslocamento", deslocamento);
+
+        return jdbcTemplate.query(
+                sql,
+                parametros,
+                (resultado, numeroLinha) ->
+                        new DadosDetalhamentoDiarioMedicamento(
+                                resultado.getDate("data").toLocalDate(),
+                                resultado.getLong("esperado"),
+                                resultado.getLong("realizado"),
+                                resultado.getLong("nao_realizado"),
+                                resultado.getLong("sem_registro"),
+                                resultado.getLong("total_elementos")
                         )
         );
     }

@@ -1,9 +1,8 @@
 package com.hdc.hdc.relatorio.adesao;
 
-import com.hdc.hdc.relatorio.adesao.dto.DetalhamentoDiarioDTO;
+import com.hdc.hdc.relatorio.adesao.dto.DetalhamentoAdesaoMedicamentoResponseDTO;
 import com.hdc.hdc.relatorio.adesao.dto.ResumoMedicamentoDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,32 +57,17 @@ public class RelatorioAdesaoController {
     /*
      * Esse endpoint alimentará a tabela detalhada e deverá ser paginado.
      * Cada linha pode representar um medicamento em determinada data:
-        {
-          "conteudo": [
-            {
-              "data": "2026-07-10",
-              "medicamento": "Losartana",
-              "esperado": 2,
-              "realizado": 1,
-              "naoRealizado": 1,
-              "semRegistro": 0,
-              "percentualAdesao": 50.0
-            }
-          ],
-          "pagina": 0,
-          "totalPaginas": 2
-        }
     */
     @GetMapping("/detalhamento")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE')")
-    public ResponseEntity<Page<DetalhamentoDiarioDTO>> detalhamento(
+    public ResponseEntity<DetalhamentoAdesaoMedicamentoResponseDTO> detalhamento(
             @PathVariable Integer pacienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal,
-            @PathVariable("pagina") Integer pagina,
-            @PathVariable("tamanho") Integer tamanho
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "limite", defaultValue = "10") Integer tamanho
     ) {
-        return null;
+        return ResponseEntity.ok(medicamentoService.obterDetalhamento(pacienteId, dataInicial, dataFinal, pagina, tamanho));
     }
 }

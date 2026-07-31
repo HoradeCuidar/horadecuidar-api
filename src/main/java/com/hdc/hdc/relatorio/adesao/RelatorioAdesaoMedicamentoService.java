@@ -1,14 +1,22 @@
 package com.hdc.hdc.relatorio.adesao;
 
+import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.relatorio.adesao.dto.*;
 import com.hdc.hdc.util.exception.InvalidValueException;
+import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +24,7 @@ import java.util.List;
 public class RelatorioAdesaoMedicamentoService {
 
     private final RelatorioAdesaoMedicamentoRepository repository;
+    private final PacienteRepository pacienteRepository;
 
     @Transactional(readOnly = true)
     public ResumoMedicamentoDTO obterResumo(
@@ -25,7 +34,7 @@ public class RelatorioAdesaoMedicamentoService {
     ) {
         validarPeriodo(dataInicial, dataFinal);
 
-        LocalDate ontem = LocalDate.now().minusDays(1);
+        LocalDate ontem = LocalDate.now(ZoneId.systemDefault()).minusDays(1);
         LocalDate dataFinalConsiderada =
                 dataFinal.isAfter(ontem) ? ontem : dataFinal;
 
@@ -68,7 +77,7 @@ public class RelatorioAdesaoMedicamentoService {
         validarPeriodo(dataInicial, dataFinal);
 
         LocalDate ultimaDataConcluida =
-                LocalDate.now().minusDays(1);
+                LocalDate.now(ZoneId.systemDefault()).minusDays(1);
 
         LocalDate dataFinalConsiderada =
                 dataFinal.isAfter(ultimaDataConcluida)
@@ -100,6 +109,8 @@ public class RelatorioAdesaoMedicamentoService {
                         ))
                         .toList();
 
+        // Preenchimento de semanas ausentes se necessário futuramente.
+
         return new EvolucaoAdesaoMedicamentoDTO(
                 dataInicial,
                 dataFinalConsiderada,
@@ -108,6 +119,50 @@ public class RelatorioAdesaoMedicamentoService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public DetalhamentoAdesaoMedicamentoResponseDTO obterDetalhamento(
+            Integer pacienteId,
+            LocalDate dataInicial,
+            LocalDate dataFinal,
+            int pagina,
+            int tamanho
+    ) {
+        validarPaciente(pacienteId);
+        validarPeriodo(dataInicial, dataFinal);
+
+        LocalDate ultimaDataConcluida = LocalDate.now(ZoneId.systemDefault()).minusDays(1);
+
+        LocalDate dataFinalConsiderada =
+                dataFinal.isAfter(ultimaDataConcluida)
+                        ? ultimaDataConcluida
+                        : dataFinal;
+
+        if (dataInicial.isAfter(dataFinalConsiderada)) {
+            return new DetalhamentoAdesaoMedicamentoResponseDTO(
+                    dataInicial,
+                    dataFinalConsiderada,
+                    toPageDetalhamentoMedicacao(new ArrayList<>(), tamanho)
+            );
+        }
+
+        List<DadosDetalhamentoDiarioMedicamento> dados =
+                repository.buscarDetalhamentoDiario(
+                        pacienteId,
+                        dataInicial,
+                        dataFinalConsiderada,
+                        pagina,
+                        tamanho
+                );
+
+        return new DetalhamentoAdesaoMedicamentoResponseDTO(
+                dataInicial,
+                dataFinalConsiderada,
+                toPageDetalhamentoMedicacao(dados, tamanho));
+    }
+
+    /*
+    * Métodos auxiliares de verificação ou construção
+    * */
     private PeriodoEvolucaoMedicamentoDTO montarPeriodo(
             DadosEvolucaoSemanalMedicamento dado,
             LocalDate dataInicial,
@@ -193,5 +248,49 @@ public class RelatorioAdesaoMedicamentoService {
                 0,
                 null
         );
+    }
+
+    private DetalhamentoDiarioMedicamentoDTO toDetalhamentoDTO(
+            DadosDetalhamentoDiarioMedicamento dados
+    ) {
+        return new DetalhamentoDiarioMedicamentoDTO(
+                dados.data(),
+                "MEDICAMENTO",
+                dados.esperado(),
+                dados.realizado(),
+                dados.naoRealizado(),
+                dados.semRegistro(),
+                calcularPercentual(
+                        dados.realizado(),
+                        dados.esperado()
+                )
+        );
+    }
+
+    private void validarPaciente(Integer pacienteId) {
+        if (pacienteRepository.findById(pacienteId).isEmpty()) {
+            throw new ResourceNotFoundException("pacienteId", "Paciente não encontrado.");
+        }
+    }
+
+    private Page<DetalhamentoDiarioMedicamentoDTO> toPageDetalhamentoMedicacao(List<DadosDetalhamentoDiarioMedicamento> dados, Integer tamanho) {
+        long totalElementos = dados.isEmpty()
+                ? 0
+                : dados.getFirst().totalElementos();
+
+        int totalPaginas = totalElementos == 0
+                ? 0
+                : (int) Math.ceil(
+                (double) totalElementos / tamanho
+        );
+
+        Pageable pageable = PageRequest.of(totalPaginas, tamanho);
+
+        List<DetalhamentoDiarioMedicamentoDTO> conteudo =
+                dados.stream()
+                        .map(this::toDetalhamentoDTO)
+                        .toList();
+
+        return new PageImpl<>(conteudo, pageable, dados.size());
     }
 }
