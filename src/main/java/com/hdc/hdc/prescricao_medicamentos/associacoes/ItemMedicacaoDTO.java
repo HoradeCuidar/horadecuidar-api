@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class ItemMedicacaoDTO {
 
+    private Long id;
+
     @NotBlank(message = "O nome do medicamento é obrigatório.")
     private String nomeMedicamento;
 
@@ -30,6 +32,8 @@ public class ItemMedicacaoDTO {
 
     @NotNull(message = "A via de administração é obrigatória.")
     private ViaAdministracao viaAdministracao;
+
+    private boolean ativo;
 
     private String observacao;
 }

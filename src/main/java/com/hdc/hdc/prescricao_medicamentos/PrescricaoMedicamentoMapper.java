@@ -70,6 +70,7 @@ public class PrescricaoMedicamentoMapper {
 
     public ItemMedicacaoDTO toItemMedicacaoDTO(ItemMedicacao item) {
         ItemMedicacaoDTO itemDto = new ItemMedicacaoDTO();
+        itemDto.setId(item.getId());
         itemDto.setNomeMedicamento(item.getNomeMedicamento());
         itemDto.setDosagemValor(item.getDosagemValor());
         itemDto.setDosagemUnidade(item.getDosagemUnidade());
@@ -78,6 +79,7 @@ public class PrescricaoMedicamentoMapper {
         itemDto.setIntervaloTipo(item.getIntervaloTipo());
         itemDto.setViaAdministracao(item.getViaAdministracao());
         itemDto.setObservacao(item.getObservacao());
+        itemDto.setAtivo(item.isAtivo());
         return itemDto;
     }
 

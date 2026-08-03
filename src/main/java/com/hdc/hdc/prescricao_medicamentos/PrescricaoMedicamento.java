@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -43,10 +44,10 @@ public class PrescricaoMedicamento {
     private Usuario profissional;
 
     @Column(name = "data_inicio")
-    private Date dataInicio;
+    private LocalDate dataInicio;
 
     @Column(name = "data_fim")
-    private Date dataFim;
+    private LocalDate dataFim;
 
     @Column(name = "observacao", columnDefinition = "text")
     private String observacao;

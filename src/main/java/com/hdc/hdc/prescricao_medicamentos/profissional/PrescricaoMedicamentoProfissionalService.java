@@ -1,6 +1,8 @@
 package com.hdc.hdc.prescricao_medicamentos.profissional;
 
-import com.hdc.hdc.adesao_medicamentos.dto.RelatorioAdesaoDTO;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoValidationService;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.RelatorioAdesaoDTO;
 import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamentoMapper;
@@ -9,21 +11,18 @@ import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoRequestDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoResponseDTO;
 import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 import com.hdc.hdc.usuarios.Usuario;
-import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.pacientes.PacienteRepository;
-import com.hdc.hdc.adesao_medicamentos.AdesaoMedicamentoRepository;
+import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.util.exception.EntityInUseException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +34,8 @@ public class PrescricaoMedicamentoProfissionalService {
 
     private final PrescricaoMedicamentoRepository prescricaoRepository;
     private final PacienteRepository pacienteRepository;
-    private final AdesaoMedicamentoRepository adesaoRepository;
+    private final OcorrenciaMedicamentoRepository ocorrenciaMedicamentoRepository;
+    private final OcorrenciaMedicamentoValidationService ocorrenciaService;
     private final PrescricaoMedicamentoMapper mapper;
 
     @Transactional
@@ -62,37 +62,40 @@ public class PrescricaoMedicamentoProfissionalService {
 
         prescricao.setMedicacoes(itens);
 
-        PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
-        return mapper.toResponseDTO(saved);
+        PrescricaoMedicamento salva = prescricaoRepository.save(prescricao);
+        prescricaoRepository.flush();
+
+        ocorrenciaService.geradorOcorrencias(prescricao);
+
+        return mapper.toResponseDTO(salva);
     }
 
     @Transactional
     public PrescricaoMedicamentoResponseDTO atualizarPrescricao(
-            Integer pacienteId,
             UUID prescricaoId,
-            PrescricaoMedicamentoRequestDTO dto,
-            Usuario profissional) {
-        PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
+            PrescricaoMedicamentoRequestDTO request,
+            Usuario profissional
+    ) {
+        ocorrenciaService.validarPeriodo(request.getDataInicio(), request.getDataFim());
 
-        if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
-        }
+        PrescricaoMedicamento prescricao = prescricaoRepository
+                .findById(prescricaoId)
+                .orElseThrow(() -> new EntityNotFoundException("Prescrição de medicamento não encontrada."));
 
-        prescricao.setProfissional(profissional);
-        prescricao.setDataInicio(dto.getDataInicio());
-        prescricao.setDataFim(dto.getDataFim());
-        prescricao.setObservacao(dto.getObservacao());
+        LocalDate hoje = LocalDate.now();
 
-        prescricao.getMedicacoes().clear();
+        ocorrenciaService.cancelarOcorrenciasFuturasPendentes(prescricaoId, hoje);
 
-        List<ItemMedicacao> novosItens = dto.getMedicacoes().stream()
-                .map(itemDto -> mapper.toItemMedicacaoEntity(itemDto, prescricao))
-                .toList();
+        ocorrenciaService.atualizarDadosDaPrescricao(prescricao, request, profissional);
 
-        prescricao.getMedicacoes().addAll(novosItens);
+        ocorrenciaService.sincronizarItens(prescricao, request.getMedicacoes());
 
-        PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
-        return mapper.toResponseDTO(saved);
+        PrescricaoMedicamento prescricaoSalva =
+                prescricaoRepository.save(prescricao);
+
+        ocorrenciaService.geradorOcorrencias(prescricaoSalva);
+
+        return mapper.toResponseDTO(prescricaoSalva);
     }
 
     @Transactional
@@ -102,13 +105,17 @@ public class PrescricaoMedicamentoProfissionalService {
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
-        try {
-            prescricaoRepository.deleteById(prescricaoId);
-            prescricaoRepository.flush();
-        } catch (DataIntegrityViolationException ex) {
-            log.info("Orientação medicamentosa não pode ser deletada - integridade referencial");
-            throw new EntityInUseException("Orientação Medicamentosa");
+
+        boolean possuiAdesao = ocorrenciaMedicamentoRepository.existsByPrescricaoIdAndStatusIn(
+                prescricaoId, List.of(StatusAdesao.REALIZADO, StatusAdesao.NAO_REALIZADO)
+        );
+
+        if (possuiAdesao) {
+            throw new EntityInUseException("Prescrição de Medicamento");
         }
+
+        ocorrenciaMedicamentoRepository.deleteByPrescricaoId(prescricaoId);
+        prescricaoRepository.deleteById(prescricaoId);
     }
 
     @Transactional
@@ -120,21 +127,26 @@ public class PrescricaoMedicamentoProfissionalService {
         }
 
         prescricao.setAtivo(!prescricao.isAtivo());
-        PrescricaoMedicamento saved = prescricaoRepository.save(prescricao);
+        PrescricaoMedicamento salvo = prescricaoRepository.save(prescricao);
+        prescricaoRepository.flush();
 
-        return mapper.toResponseDTO(saved);
+        if (salvo.isAtivo()) {
+            ocorrenciaService.reativarOcorrencias(salvo);
+        } else {
+            ocorrenciaService.cancelarOcorrencias(salvo);
+        }
+
+        return mapper.toResponseDTO(salvo);
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarPrescricoesAtivas(Integer pacienteId) {
-        Date hoje = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        return prescricaoRepository.findAtivasByPacienteId(pacienteId, hoje).stream()
+        return prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now()).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarHistorico(Integer pacienteId) {
-        Date hoje = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        return prescricaoRepository.findHistoricoByPacienteId(pacienteId, hoje).stream()
+        return prescricaoRepository.findHistoricoByPacienteId(pacienteId, LocalDate.now()).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
@@ -146,13 +158,13 @@ public class PrescricaoMedicamentoProfissionalService {
             throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
         }
 
-        List<AdesaoMedicamento> adesoes = adesaoRepository.findByPrescricaoId(prescricaoId);
+        List<OcorrenciaMedicamento> adesoes = ocorrenciaMedicamentoRepository.findByPrescricaoId(prescricaoId);
         int realizacoes = (int) adesoes.stream().filter(a -> a.getStatus() == StatusAdesao.REALIZADO).count();
         // Considerando o número de registros criados pelo agendador ou paciente. Se não há agendador, 0.
         return getRelatorioAdesaoDTO(prescricaoId, adesoes, realizacoes);
     }
 
-    private static @NonNull RelatorioAdesaoDTO getRelatorioAdesaoDTO(UUID prescricaoId, List<AdesaoMedicamento> adesoes, int realizacoes) {
+    private static @NonNull RelatorioAdesaoDTO getRelatorioAdesaoDTO(UUID prescricaoId, List<OcorrenciaMedicamento> adesoes, int realizacoes) {
         int totalEsperado = adesoes.size();
 
         // Total esperado provisório seja no mínimo as realizações (evita divisão por zero)

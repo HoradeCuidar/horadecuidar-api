@@ -3,6 +3,7 @@ package com.hdc.hdc.prescricao_medicamentos.paciente.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -12,8 +13,8 @@ import java.util.UUID;
 public class PrescricaoAtivaPacienteDTO {
     private UUID id;
     private String nomeProfissional;
-    private Date dataInicio;
-    private Date dataFim;
+    private LocalDate dataInicio;
+    private LocalDate dataFim;
     private List<ItemResumidoDTO> itens;
 
     @Data
