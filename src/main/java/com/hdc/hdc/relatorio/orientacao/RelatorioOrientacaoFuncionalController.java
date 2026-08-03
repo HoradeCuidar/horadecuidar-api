@@ -1,6 +1,6 @@
 package com.hdc.hdc.relatorio.orientacao;
 
-import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentOrientacaoFuncionalResponseDTO;
+import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentoOrientacaoFuncionalResponseDTO;
 import com.hdc.hdc.relatorio.orientacao.dto.ResumoFuncionalDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,7 +38,7 @@ public class RelatorioOrientacaoFuncionalController {
     @GetMapping("/detalhamento")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE')")
-    public ResponseEntity<DetalhamentOrientacaoFuncionalResponseDTO> detalhamento(
+    public ResponseEntity<DetalhamentoOrientacaoFuncionalResponseDTO> detalhamento(
             @PathVariable Integer pacienteId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal,
