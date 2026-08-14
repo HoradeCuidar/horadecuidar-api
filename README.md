@@ -88,86 +88,171 @@ A aplicação é responsável por gerenciar regras de negócio, autenticação, 
 ```mermaid
   erDiagram
     direction TB
+
     USUARIO {
-      serial id PK ""  
-      string nome  ""  
-      string username UK ""  
-      string senha  ""  
-      date data_de_nascimento  ""  
-      string role  ""  
-      string status  ""  
-      string telefone  ""  
-      string rua  ""  
-      string bairro  ""  
-      string estado  ""  
-      string cidade  ""  
-      string numero_da_casa  ""  
-      string genero  ""  
-      string email UK ""  
-      string foto_de_perfil  ""  
-      text observacoes  ""  
-    }
-
-    PACIENTE_DOENCAS {
-      bigserial id PK ""  
-      bigint paciente_id FK ""  
-      bigint doenca_id FK ""  
-      date data_diagnostico  ""  
-      text observacao  ""  
-    }
-
-    TOKEN_RECUPERACAO {
-      serial id PK ""  
-      string token  ""  
-      bigint usuario_id FK ""  
-      timestamp expiracao  ""  
-      boolean usado  ""  
-    }
-
-    PRESCRICAO_MEDICAMENTO {
-      uuid id PK ""  
-      integer paciente_id FK ""  
-      integer profissional FK ""  
-      datetime data_inicio  ""  
-      datetime data_fim  ""  
-      text observacao  ""  
-      boolean ativo  ""  
+      serial id PK
+      string nome
+      string username UK
+      string senha
+      date data_de_nascimento
+      string role
+      string status
+      string telefone
+      string rua
+      string bairro
+      string estado
+      string cidade
+      string numero_da_casa
+      string genero
+      string email UK
+      string foto_de_perfil
+      text observacoes
     }
 
     DOENCAS {
-      bigserial id PK ""  
-      string nome UK ""  
+      bigserial id PK
+      string nome UK
+    }
+
+    PACIENTE_DOENCAS {
+      bigserial id PK
+      integer paciente_id FK
+      bigint doenca_id FK
+      date data_diagnostico
+      text observacao
+    }
+
+    TOKEN_RECUPERACAO {
+      serial id PK
+      string token
+      integer usuario_id FK
+      timestamp expiracao
+      boolean usado
+    }
+
+    PRESCRICAO_MEDICAMENTO {
+      uuid id PK
+      integer paciente_id FK
+      integer profissional_id FK
+      date data_inicio
+      date data_fim
+      text observacao
+      boolean ativo
+    }
+
+    MEDICAMENTOS {
+      serial id PK
+      string nome UK
+      timestamp criado_em
     }
 
     ITEM_MEDICACAO {
-      integer id PK ""  
-      integer prescricao_id FK ""  
-      integer medicacao_id FK ""  
+      bigserial id PK
+      uuid prescricao_id FK
+      integer medicamento_id FK
+      string nome_medicamento
+      double dosagem_valor
+      string dosagem_unidade
+      integer quantidade_doses
+      integer intervalo_valor
+      string intervalo_tipo
+      string via_administracao
+      text observacao
+      boolean ativo
     }
 
-    MEDICACAO {
-      integer id PK ""  
-      string nome  ""  
-      datetime criadoEm  ""  
+    OCORRENCIA_MEDICAMENTO {
+      bigserial id PK
+      uuid prescricao_id FK
+      bigint item_medicacao_id FK
+      date data_prevista
+      integer ordem_no_dia
+      string status
+      timestamp data_hora_registro
+      text observacao
     }
 
-    ADESAO_MEDICAMENTO {
-          integer id PK ""
-          uuid prescricao_id FK ""
-          integer item_medicacao_id FK ""
-          datetime momento_registro ""
-          integer status_adesao ""
-          string observacao ""
+    TAG_FUNCIONAL {
+      bigserial id PK
+      string nome UK
+      text descricao
     }
 
-    USUARIO||--o{PACIENTE_DOENCAS:"tem"
-    USUARIO||--o{TOKEN_RECUPERACAO:"cria"
-    USUARIO||--o{PRESCRICAO_MEDICAMENTO:"prescreve"
-    DOENCAS||--o{PACIENTE_DOENCAS:"possui"
-    PRESCRICAO_MEDICAMENTO||--o{ITEM_MEDICACAO:"contem"
-    MEDICACAO||--o{ITEM_MEDICACAO:"listada_em"
-    ADESAO_MEDICAMENTO}o--|{PRESCRICAO_MEDICAMENTO:"registra_adesao_a"
-      ADESAO_MEDICAMENTO}o--|{ITEM_MEDICACAO:"monitora_adesao_de"
+    ORIENTACAO_FUNCIONAL {
+      bigserial id PK
+      integer responsavel_id FK
+      string nome
+      text descricao
+      text finalidade
+      string url_imagem
+      boolean ativo
+      timestamp data_criacao
+      timestamp data_atualizacao
+    }
+
+    AVALIACAO_FISICA {
+      bigserial id PK
+      integer paciente_id FK
+      integer profissional_id FK
+      boolean realiza_atividade
+      text atividade_realizada
+      integer frequencia_semanal
+      string flexibilidade
+      decimal forca_palmar_direita
+      decimal forca_palmar_esquerda
+      string assimetria_palmar
+      decimal forca_joelho_direita
+      decimal forca_joelho_esquerda
+      string assimetria_joelho
+      text queixas
+      text observacoes
+      text orientacoes
+      timestamp data_registro
+      timestamp data_atualizacao
+    }
+
+    REALIZACAO_EXERCICIO {
+      bigserial id PK
+      bigint orientacao_funcional_id FK
+      integer paciente_id FK
+      string status
+      integer duracao_realizada_minutos
+      string sensacao_final
+      text observacao
+      timestamp data_registro
+    }
+
+    RESUMO_ADESAO_PACIENTE {
+      bigserial id PK
+      integer paciente_id FK
+      date periodo_inicio
+      date periodo_fim
+      integer esperado
+      integer realizado
+      integer nao_realizado
+      integer sem_registro
+      decimal percentual
+      string classificacao
+      timestamp calculado_em
+    }
+
+    USUARIO ||--o{ PACIENTE_DOENCAS : "tem"
+    DOENCAS ||--o{ PACIENTE_DOENCAS : "possui"
+    USUARIO ||--o{ TOKEN_RECUPERACAO : "cria"
+    USUARIO ||--o{ PRESCRICAO_MEDICAMENTO : "prescreve"
+    USUARIO ||--o{ PRESCRICAO_MEDICAMENTO : "recebe"
+    PRESCRICAO_MEDICAMENTO ||--o{ ITEM_MEDICACAO : "contem"
+    MEDICAMENTOS ||--o{ ITEM_MEDICACAO : "listada_em"
+    PRESCRICAO_MEDICAMENTO ||--o{ OCORRENCIA_MEDICAMENTO : "gera"
+    ITEM_MEDICACAO ||--o{ OCORRENCIA_MEDICAMENTO : "monitora"
+    USUARIO ||--o{ AVALIACAO_FISICA : "submete"
+    USUARIO ||--o{ AVALIACAO_FISICA : "avalia"
+    AVALIACAO_FISICA }|--|{ TAG_FUNCIONAL : "indica"
+    USUARIO ||--o{ ORIENTACAO_FUNCIONAL : "cadastra"
+    ORIENTACAO_FUNCIONAL }|--|{ TAG_FUNCIONAL : "possui_tag"
+    ORIENTACAO_FUNCIONAL ||--o{ REALIZACAO_EXERCICIO : "orienta"
+    USUARIO ||--o{ REALIZACAO_EXERCICIO : "executa"
+    USUARIO ||--o{ RESUMO_ADESAO_PACIENTE : "possui_resumo"
 ```
 
 ### Principais Tecnologias e Ferramentas
