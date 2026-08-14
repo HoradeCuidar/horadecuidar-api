@@ -1,7 +1,7 @@
 package com.hdc.hdc.infra.security.filter;
 
 import com.hdc.hdc.infra.security.service.TokenService;
-import com.hdc.hdc.repository.interfaces.IUsuarioRepository;
+import com.hdc.hdc.usuarios.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +19,11 @@ import java.io.IOException;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final IUsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
     public SecurityFilter(TokenService tokenService,
-                          IUsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository) {
         this.tokenService = tokenService;
         this.usuarioRepository = usuarioRepository;
     }
@@ -33,10 +33,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         if(token != null) {
             var username = tokenService.validateToken(token);
-            UserDetails user = usuarioRepository.findByUsername(username);
-
-            var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (username != null && !username.isEmpty()) {
+                UserDetails user = usuarioRepository.findByUsername(username);
+                if (user != null) {
+                    var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            }
         }
         filterChain.doFilter(request, response);
     }

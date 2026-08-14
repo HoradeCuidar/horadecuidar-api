@@ -1,0 +1,35 @@
+package com.hdc.hdc.profissionais_saude;
+
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeCreateDTO;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeUpdateDTO;
+import com.hdc.hdc.util.formatter.DataFormatter;
+import com.hdc.hdc.util.formatter.GeneroFormatter;
+import com.hdc.hdc.util.formatter.StatusFormatter;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = { DataFormatter.class, GeneroFormatter.class, StatusFormatter.class})
+public interface ProfissionalDaSaudeMapper {
+
+    @Named("createDTOtoModel")
+    ProfissionalDaSaude createDTOtoModel(ProfissionalDaSaudeCreateDTO profissionalDaSaudeCreateDTO);
+
+    @Named("uptadeDTOtoModel")
+    ProfissionalDaSaude updateDTOtoModel(ProfissionalDaSaudeUpdateDTO profissionalDaSaudeUpdateDTO);
+
+    @Named("modeltoResponseDTO")
+    @Mapping(source = "genero", target = "genero", qualifiedByName = "generoToString")
+    @Mapping(source = "dataDeNascimento", target = "dataDeNascimento", qualifiedByName = "toStringDate")
+    @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
+    ProfissionalDaSaudeResponseDTO modeltoResponseDTO(ProfissionalDaSaude profissionalDaSaude);
+
+    @Named("modeltoResponseDTO")
+    @Mapping(source = "genero", target = "genero", qualifiedByName = "generoToString")
+    @Mapping(source = "dataDeNascimento", target = "dataDeNascimento", qualifiedByName = "toStringDate")
+    @Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
+    List<ProfissionalDaSaudeResponseDTO> modeltoResponseDTO(List<ProfissionalDaSaude> profissionalDaSaude);
+}
