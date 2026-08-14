@@ -1,10 +1,10 @@
 package com.hdc.hdc.avaliacao_fisica.dto;
 
-import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import com.hdc.hdc.avaliacao_fisica.enums.FlexibilidadeFisica;
 import com.hdc.hdc.avaliacao_fisica.enums.NivelAssimetria;
-import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncionalDTO;
+import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

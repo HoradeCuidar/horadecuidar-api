@@ -1,0 +1,57 @@
+package com.hdc.hdc.prescricao_nutricional;
+
+import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
+import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.enums.StatusPrescricao;
+import com.hdc.hdc.prescricao_nutricional.refeicao.Refeicao;
+import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PrescricaoNutricionalService {
+
+    private final PrescricaoNutricionalRepository prescricaoNutricionalRepository;
+    private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
+
+    @Autowired
+    PrescricaoNutricionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
+                                 PrescricaoNutricionalMapper prescricaoNutricionalMapper){
+        this.prescricaoNutricionalRepository = prescricaoNutricionalRepository;
+        this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
+    }
+
+    @Transactional
+    public PrescricaoNutricionalResponseDTO cadastrar(PrescricaoNutricional prescricaoNutricional) {
+
+        validarDatas(prescricaoNutricional);
+
+        vincularEntidades(prescricaoNutricional);
+        prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
+
+        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
+    }
+
+    private void validarDatas(PrescricaoNutricional prescricaoNutricional) {
+
+        if (prescricaoNutricional.getDataInicio().isAfter(prescricaoNutricional.getDataFim())) {
+            throw new IllegalArgumentException(
+                    "A data de início não pode ser posterior à data final."
+            );
+        }
+    }
+
+    private void vincularEntidades(PrescricaoNutricional prescricao) {
+
+        for (Refeicao refeicao : prescricao.getRefeicoes()) {
+            refeicao.setPrescricao(prescricao);
+            for (OpcaoRefeicao opcao : refeicao.getOpcoes()) {
+                opcao.setRefeicao(refeicao);
+                for (AlimentoPrescrito alimento : opcao.getAlimentos()) {
+                    alimento.setOpcao(opcao);
+                }
+            }
+        }
+    }
+}

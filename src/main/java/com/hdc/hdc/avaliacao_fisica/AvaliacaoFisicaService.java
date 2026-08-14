@@ -1,13 +1,13 @@
 package com.hdc.hdc.avaliacao_fisica;
 
-import com.hdc.hdc.pacientes.Paciente;
-import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.avaliacao_fisica.dto.AvaliacaoFisicaRequestDTO;
 import com.hdc.hdc.avaliacao_fisica.dto.AvaliacaoFisicaResponseDTO;
-import com.hdc.hdc.usuarios.Usuario;
-import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncional;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncionalRepository;
+import com.hdc.hdc.pacientes.Paciente;
+import com.hdc.hdc.pacientes.PacienteRepository;
+import com.hdc.hdc.usuarios.Usuario;
+import com.hdc.hdc.usuarios.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

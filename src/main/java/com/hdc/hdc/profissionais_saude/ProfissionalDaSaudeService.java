@@ -2,6 +2,7 @@ package com.hdc.hdc.profissionais_saude;
 
 import com.hdc.hdc.infra.bucket.service.R2Service;
 import com.hdc.hdc.infra.email.EmailMontagemService;
+import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
 import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.usuarios.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
 
 @Service
 public class ProfissionalDaSaudeService {

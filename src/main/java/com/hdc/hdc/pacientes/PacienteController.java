@@ -5,6 +5,7 @@ import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
 import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 
 @RestController

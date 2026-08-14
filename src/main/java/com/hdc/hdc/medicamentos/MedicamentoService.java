@@ -1,10 +1,10 @@
 package com.hdc.hdc.medicamentos;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
