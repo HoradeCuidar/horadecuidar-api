@@ -3,11 +3,13 @@ package com.hdc.hdc.prescricao_medicamentos.paciente;
 import com.hdc.hdc.prescricao_medicamentos.paciente.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,13 +23,13 @@ public class PrescricaoMedicamentoPacienteController {
      * Lista os itens de medicação que o paciente deve tomar hoje.
      * Considera a frequência de cada item para determinar se deve aparecer no dia atual.
      */
-    @GetMapping("/hoje")
+    @GetMapping("/ocorrencias-medicamentos")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
-    public ResponseEntity<List<ItemMedicacaoDiaDTO>> listarMedicacoesDoDia(
-            @PathVariable("id") Integer pacienteId) {
+    public ResponseEntity<ItemMedicacaoDiaDTO> listarMedicacoesDoDia(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
 
-        List<ItemMedicacaoDiaDTO> itens = service.listarMedicacoesDoDia(pacienteId);
+        ItemMedicacaoDiaDTO itens = service.listarMedicacoesDoDia(data);
         return ResponseEntity.ok(itens);
     }
 

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public interface PrescricaoMedicamentoRepository extends JpaRepository<Prescrica
                 AND p.ativo = true
                 AND (p.dataFim IS NULL OR p.dataFim >= :dataRef)
         """)
-    List<PrescricaoMedicamento> findAtivasByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") Date dataRef);
+    List<PrescricaoMedicamento> findAtivasByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") LocalDate dataRef);
 
     @Query("""
         SELECT p FROM PrescricaoMedicamento p
@@ -26,7 +26,7 @@ public interface PrescricaoMedicamentoRepository extends JpaRepository<Prescrica
                 AND (p.ativo = false
                     OR (p.ativo = true AND p.dataFim IS NOT NULL AND p.dataFim < :dataRef)
         )""")
-    List<PrescricaoMedicamento> findHistoricoByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") Date dataRef);
+    List<PrescricaoMedicamento> findHistoricoByPacienteId(@Param("pacienteId") Integer pacienteId, @Param("dataRef") LocalDate dataRef);
 
     List<PrescricaoMedicamento> findByPacienteIdAndAtivoTrue(Integer pacienteId);
 
