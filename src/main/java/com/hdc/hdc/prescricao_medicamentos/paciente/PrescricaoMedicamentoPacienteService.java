@@ -45,6 +45,7 @@ public class PrescricaoMedicamentoPacienteService {
             ocorrencias.add( new OcorrenciaMedicamentoResponseDTO(
                     ocorrencia.getId(),
                     ocorrencia.getPrescricao().getId(),
+                    ocorrencia.getStatus(),
                     prescricaoMapper.toItemMedicacaoDTO(ocorrencia.getItemMedicacao()),
                     ocorrencia.getDataPrevista(),
                     ocorrencia.getOrdemNoDia(),
