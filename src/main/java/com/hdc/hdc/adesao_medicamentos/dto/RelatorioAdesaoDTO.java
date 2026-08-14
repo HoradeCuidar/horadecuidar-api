@@ -1,6 +1,7 @@
 package com.hdc.hdc.adesao_medicamentos.dto;
 
 import lombok.Data;
+
 import java.util.UUID;
 
 @Data

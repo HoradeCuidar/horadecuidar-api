@@ -2,12 +2,12 @@ package com.hdc.hdc.adesao_medicamentos;
 
 import com.hdc.hdc.prescricao_medicamentos.PrescricaoMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
+import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 
 import java.time.LocalDateTime;
 

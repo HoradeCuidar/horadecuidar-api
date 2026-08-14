@@ -1,7 +1,7 @@
 package com.hdc.hdc.pacientes;
 
-import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.pacientes.associacoes.PacienteDoencas;
+import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.usuarios.enums.Genero;
 import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.usuarios.enums.Status;

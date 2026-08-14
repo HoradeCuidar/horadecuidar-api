@@ -1,11 +1,11 @@
 package com.hdc.hdc.pacientes;
 
-import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
-import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import com.hdc.hdc.doencas.Doenca;
 import com.hdc.hdc.doencas.DoencaMapper;
-import com.hdc.hdc.pacientes.associacoes.PacienteDoencas;
 import com.hdc.hdc.doencas.DoencaRepository;
+import com.hdc.hdc.pacientes.associacoes.PacienteDoencas;
+import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
+import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,6 @@
 package com.hdc.hdc.doencas;
 
 import com.hdc.hdc.doencas.dto.DoencaCreateDto;
-import com.hdc.hdc.doencas.Doenca;
 import org.mapstruct.Mapper;
 
 import java.util.List;
