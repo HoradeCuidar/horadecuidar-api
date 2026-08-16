@@ -1,5 +1,6 @@
 package com.hdc.hdc.pacientes.dto;
 
+import com.hdc.hdc.adesao.classificacao.ClassificacaoAdesao;
 import com.hdc.hdc.doencas.Doenca;
 import com.hdc.hdc.usuarios.enums.Role;
 
@@ -10,6 +11,7 @@ public record PacienteResponseDto(
     String nome,
     String email,
     String username,
+    ClassificacaoAdesao classificacao,
     String dataDeNascimento,
     Role role,
     String status,

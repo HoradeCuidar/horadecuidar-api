@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -32,6 +33,7 @@ public class PacienteService {
     private final DoencaRepository doencaRepository;
     private final PacienteMapper pacienteMapper;
     private final PasswordEncoder passwordEncoder;
+    private final com.hdc.hdc.adesao.classificacao.repositories.ResumoAdesaoPacienteRepository resumoAdesaoPacienteRepository;
 
     @Transactional
     public PacienteResponseDto cadastrar(PacienteCreateDto paciente) {
@@ -46,23 +48,32 @@ public class PacienteService {
     }
 
     @Transactional(readOnly = true)
-    public PacienteResponseDto visualizarPorId(Integer id) {
-        return this.pacienteMapper.toDto(this.encontrarPorId(id));
+    public PacienteResponseDto visualizarPorId(Integer pacienteId) {
+        Paciente paciente = this.encontrarPaciente(pacienteId);
+        var base = this.pacienteMapper.toDto(paciente);
+        var resumo = resumoAdesaoPacienteRepository.findByPacienteId(pacienteId);
+        return buildWithClassificacao(base, resumo.orElse(null));
     }
 
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorEmail(String email) {
-        return this.pacienteMapper.toDto(this.encontrarPorEmail(email));
+        Paciente paciente = this.encontrarPorEmail(email);
+        var base = this.pacienteMapper.toDto(paciente);
+        var resumo = resumoAdesaoPacienteRepository.findByPacienteId(paciente.getId());
+        return buildWithClassificacao(base, resumo.orElse(null));
     }
     
     @Transactional
-    public PacienteResponseDto visualizarPerfil(Integer usuarioId) {
-        return this.pacienteMapper.toDto(this.encontrarPorId(usuarioId));
+    public PacienteResponseDto visualizarPerfil(Integer pacienteId) {
+        Paciente paciente = this.encontrarPaciente(pacienteId);
+        var base = this.pacienteMapper.toDto(paciente);
+        var resumo = resumoAdesaoPacienteRepository.findByPacienteId(pacienteId);
+        return buildWithClassificacao(base, resumo.orElse(null));
     }
 
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorEmail(Usuario usuario) {
-        return this.pacienteMapper.toDto(encontrarPorId(usuario.getId()));
+        return this.pacienteMapper.toDto(this.encontrarPaciente(usuario.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -78,12 +89,24 @@ public class PacienteService {
         Pageable pageable = PageRequest.of(pagina, limite);
         var result = this.visualizarTodos(pageable);
 
-        return result.map(pacienteMapper::toDto);
+        // obter resumos em lote para evitar N+1
+        var pacientes = result.getContent();
+        var ids = pacientes.stream().map(Paciente::getId).toList();
+        var resumos = resumoAdesaoPacienteRepository.findByPacienteIdIn(ids);
+
+        return result.map(p -> {
+            var base = pacienteMapper.toDto(p);
+            var resumo = resumos.stream()
+                    .filter(r -> r.getPaciente() != null && r.getPaciente().getId().equals(p.getId()))
+                    .max((a, b) -> a.getCalculadoEm().compareTo(b.getCalculadoEm()))
+                    .orElse(null);
+            return buildWithClassificacao(base, resumo);
+        });
     }
 
     @Transactional
     public void atualizar(PacienteCreateDto dto, Integer id) {
-        Paciente existente = encontrarPorId(id);
+        Paciente existente = encontrarPaciente(id);
         this.validarUnicidade(dto.email(), id);
 
         existente.setNome(dto.nome());
@@ -108,20 +131,20 @@ public class PacienteService {
                         pd.setPaciente(existente);
                         pd.setDoenca(doenca);
                         pd.setDoenca(doenca);
-                        pd.setDataDiagnostico(LocalDate.now());
+                        pd.setDataDiagnostico(LocalDate.now(ZoneId.of("America/Sao_Paulo")));
                         return pd;
                     })
                     .toList();
 
             existente.getDoencas().addAll(novasRelacoes);
         }
-        log.info("Atualinzado paciente, processo finalizado.");
+        log.info("Atualizando paciente, processo finalizado.");
     }
 
     @Transactional
     public PacienteResponseDto atualizarPerfil(PacienteSelfUpdateDto dto, Integer id) {
         Paciente existente = this.pacienteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
+                .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com id informado."));
 
         this.validarUnicidade(dto.email(), id);
 
@@ -146,7 +169,7 @@ public class PacienteService {
     }
 
     public PacienteResponseDto alterarStatus(Integer id) {
-        Paciente paciente = this.encontrarPorId(id);
+        Paciente paciente = this.encontrarPaciente(id);
         paciente.setStatus(paciente.getStatus() == Status.ATIVO ? Status.INATIVO : Status.ATIVO);
 
         return this.pacienteMapper.toDto(this.pacienteRepository.save(paciente));
@@ -166,10 +189,36 @@ public class PacienteService {
     }
 
     // Métodos privados recorrentes
-    private Paciente encontrarPorId(Integer id) {
+    private Paciente encontrarPaciente(Integer id) {
         return pacienteRepository
-                .findById(id)
+                .findByIdProjection(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ID", "Paciente não encontrado com o id informado."));
+    }
+
+    private PacienteResponseDto buildWithClassificacao(PacienteResponseDto base, com.hdc.hdc.adesao.classificacao.ResumoAdesaoPaciente resumo) {
+        com.hdc.hdc.adesao.classificacao.ClassificacaoAdesao classificacao = null;
+        if (resumo != null) classificacao = resumo.getClassificacao();
+
+        return new PacienteResponseDto(
+                base.id(),
+                base.nome(),
+                base.email(),
+                base.username(),
+                classificacao,
+                base.dataDeNascimento(),
+                base.role(),
+                base.status(),
+                base.telefone(),
+                base.rua(),
+                base.bairro(),
+                base.estado(),
+                base.cidade(),
+                base.numeroDaCasa(),
+                base.genero(),
+                base.doencas(),
+                base.observacoes(),
+                base.fotoDePerfil()
+        );
     }
 
     private Paciente encontrarPorEmail(String email) {

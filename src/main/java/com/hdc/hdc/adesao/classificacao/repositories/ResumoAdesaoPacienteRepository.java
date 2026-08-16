@@ -12,4 +12,5 @@ public interface ResumoAdesaoPacienteRepository extends JpaRepository<ResumoAdes
     Optional<ResumoAdesaoPaciente> findByPacienteId(Integer pacienteId);
 
     List<ResumoAdesaoPaciente> findByClassificacao(ClassificacaoAdesao classificacao);
+    List<ResumoAdesaoPaciente> findByPacienteIdIn(List<Integer> pacienteIds);
 }
