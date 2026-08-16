@@ -1,5 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.profissional;
 
+import com.hdc.hdc.adesao.classificacao.CalculadoraClassificacaoAdesao;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoValidationService;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.RelatorioAdesaoDTO;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +39,8 @@ public class PrescricaoMedicamentoProfissionalService {
     private final OcorrenciaMedicamentoRepository ocorrenciaMedicamentoRepository;
     private final OcorrenciaMedicamentoValidationService ocorrenciaService;
     private final PrescricaoMedicamentoMapper mapper;
+
+    private final CalculadoraClassificacaoAdesao calculadoraClassificacaoAdesao;
 
     @Transactional
     public PrescricaoMedicamentoResponseDTO criarPrescricao(
@@ -66,6 +70,7 @@ public class PrescricaoMedicamentoProfissionalService {
         prescricaoRepository.flush();
 
         ocorrenciaService.geradorOcorrencias(prescricao);
+        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
 
         return mapper.toResponseDTO(salva);
     }
@@ -82,7 +87,7 @@ public class PrescricaoMedicamentoProfissionalService {
                 .findById(prescricaoId)
                 .orElseThrow(() -> new EntityNotFoundException("Prescrição de medicamento não encontrada."));
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
 
         ocorrenciaService.cancelarOcorrenciasFuturasPendentes(prescricaoId, hoje);
 
@@ -90,10 +95,11 @@ public class PrescricaoMedicamentoProfissionalService {
 
         ocorrenciaService.sincronizarItens(prescricao, request.getMedicacoes());
 
-        PrescricaoMedicamento prescricaoSalva =
-                prescricaoRepository.save(prescricao);
+        PrescricaoMedicamento prescricaoSalva = prescricaoRepository.save(prescricao);
+        prescricaoRepository.flush();
 
         ocorrenciaService.geradorOcorrencias(prescricaoSalva);
+        calculadoraClassificacaoAdesao.recalcular(prescricaoSalva.getPaciente().getId());
 
         return mapper.toResponseDTO(prescricaoSalva);
     }
@@ -114,6 +120,7 @@ public class PrescricaoMedicamentoProfissionalService {
             throw new EntityInUseException("Prescrição de Medicamento");
         }
 
+        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
         ocorrenciaMedicamentoRepository.deleteByPrescricaoId(prescricaoId);
         prescricaoRepository.deleteById(prescricaoId);
     }
@@ -136,17 +143,19 @@ public class PrescricaoMedicamentoProfissionalService {
             ocorrenciaService.cancelarOcorrencias(salvo);
         }
 
+        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
+
         return mapper.toResponseDTO(salvo);
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarPrescricoesAtivas(Integer pacienteId) {
-        return prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now()).stream()
+        return prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now(ZoneId.systemDefault())).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
 
     public List<PrescricaoMedicamentoResponseDTO> listarHistorico(Integer pacienteId) {
-        return prescricaoRepository.findHistoricoByPacienteId(pacienteId, LocalDate.now()).stream()
+        return prescricaoRepository.findHistoricoByPacienteId(pacienteId, LocalDate.now(ZoneId.systemDefault())).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
