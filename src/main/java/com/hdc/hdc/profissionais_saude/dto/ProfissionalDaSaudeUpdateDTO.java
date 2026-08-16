@@ -31,6 +31,8 @@ public class ProfissionalDaSaudeUpdateDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataDeNascimento;
 
+    private Integer idade;
+
     @NotBlank(message = "Telefone é obrigatório")
     @Pattern(
             regexp = "^\\d{10,11}$",

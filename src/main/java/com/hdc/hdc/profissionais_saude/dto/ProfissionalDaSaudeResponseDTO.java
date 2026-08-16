@@ -16,6 +16,7 @@ public class ProfissionalDaSaudeResponseDTO {
     private String nome;
     private String username;
     private String dataDeNascimento;
+    private Integer idade;
     private Role role;
     private String status;
     private String telefone;

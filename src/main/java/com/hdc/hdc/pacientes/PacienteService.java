@@ -198,6 +198,7 @@ public class PacienteService {
                 base.username(),
                 classificacao,
                 base.dataDeNascimento(),
+                base.idade(),
                 base.role(),
                 base.status(),
                 base.telefone(),

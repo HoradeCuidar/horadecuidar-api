@@ -13,6 +13,7 @@ public record PacienteResponseDto(
     String username,
     ClassificacaoAdesao classificacao,
     String dataDeNascimento,
+    Integer idade,
     Role role,
     String status,
     String telefone,
