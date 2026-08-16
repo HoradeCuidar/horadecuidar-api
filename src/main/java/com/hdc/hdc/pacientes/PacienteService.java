@@ -63,14 +63,6 @@ public class PacienteService {
         return buildWithClassificacao(base, resumo.orElse(null));
     }
     
-    @Transactional
-    public PacienteResponseDto visualizarPerfil(Integer pacienteId) {
-        Paciente paciente = this.encontrarPaciente(pacienteId);
-        var base = this.pacienteMapper.toDto(paciente);
-        var resumo = resumoAdesaoPacienteRepository.findByPacienteId(pacienteId);
-        return buildWithClassificacao(base, resumo.orElse(null));
-    }
-
     @Transactional(readOnly = true)
     public PacienteResponseDto visualizarPorEmail(Usuario usuario) {
         return this.pacienteMapper.toDto(this.encontrarPaciente(usuario.getId()));
