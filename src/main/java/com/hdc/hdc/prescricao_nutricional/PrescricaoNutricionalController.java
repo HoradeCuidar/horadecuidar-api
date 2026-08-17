@@ -2,6 +2,7 @@ package com.hdc.hdc.prescricao_nutricional;
 
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
 import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
 import jakarta.validation.Valid;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/nutricional")
@@ -46,6 +49,15 @@ public class PrescricaoNutricionalController {
     public ResponseEntity<PrescricaoNutricionalResponseDTO> visualizar(@PathVariable Integer id_prescricao) {
 
         PrescricaoNutricionalResponseDTO response = prescricaoNutricionalService.visualizar(id_prescricao);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("visualizarTodos/{id_paciente}")
+    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<List<PrescricaoNutricionalResumoDTO>> visualizarTodos(@PathVariable Integer id_paciente) {
+
+        List<PrescricaoNutricionalResumoDTO> response = prescricaoNutricionalService.visualizarTodos(id_paciente);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
