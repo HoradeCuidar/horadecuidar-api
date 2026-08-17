@@ -5,6 +5,7 @@ import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.enums.StatusPrescricao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.Refeicao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
+import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,14 @@ public class PrescricaoNutricionalService {
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
 
         return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
+    }
+
+    @Transactional()
+    public PrescricaoNutricionalResponseDTO visualizar(Integer id_prescricao){
+        return prescricaoNutricionalMapper.modeltoResponseDTO(
+                prescricaoNutricionalRepository.findById(id_prescricao)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"))
+                );
     }
 
     private void validarDatas(PrescricaoNutricional prescricaoNutricional) {

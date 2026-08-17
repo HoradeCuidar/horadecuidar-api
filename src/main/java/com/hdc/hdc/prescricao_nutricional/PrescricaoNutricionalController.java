@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/nutricional")
@@ -35,9 +32,6 @@ public class PrescricaoNutricionalController {
             @CurrentUser Usuario profissionalDaSaude
             ) {
 
-        System.out.println("USUARIO: " + profissionalDaSaude);
-        System.out.println("ID: " + profissionalDaSaude.getId());
-
         prescricaoNutricionalCreateDTO.setProfissionalId(profissionalDaSaude.getId());
 
         PrescricaoNutricionalResponseDTO response = prescricaoNutricionalService.cadastrar(
@@ -45,5 +39,14 @@ public class PrescricaoNutricionalController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("visualizar/{id_prescricao}")
+    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<PrescricaoNutricionalResponseDTO> visualizar(@PathVariable Integer id_prescricao) {
+
+        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalService.visualizar(id_prescricao);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
