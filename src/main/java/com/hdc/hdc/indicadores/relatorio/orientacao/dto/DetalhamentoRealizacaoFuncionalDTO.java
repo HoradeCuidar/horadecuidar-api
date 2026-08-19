@@ -1,4 +1,4 @@
-package com.hdc.hdc.relatorio.orientacao.dto;
+package com.hdc.hdc.indicadores.relatorio.orientacao.dto;
 
 import com.hdc.hdc.orientacao_funcional.registro.SensacaoFinal;
 import com.hdc.hdc.orientacao_funcional.registro.StatusRealizacao;

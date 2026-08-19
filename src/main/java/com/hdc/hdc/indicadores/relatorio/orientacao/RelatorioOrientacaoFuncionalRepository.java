@@ -1,9 +1,9 @@
-package com.hdc.hdc.relatorio.orientacao;
+package com.hdc.hdc.indicadores.relatorio.orientacao;
 
 import com.hdc.hdc.orientacao_funcional.registro.SensacaoFinal;
 import com.hdc.hdc.orientacao_funcional.registro.StatusRealizacao;
-import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentoRealizacaoFuncionalDTO;
-import com.hdc.hdc.relatorio.orientacao.dto.ResumoFuncionalDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.DetalhamentoRealizacaoFuncionalDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.ResumoFuncionalDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

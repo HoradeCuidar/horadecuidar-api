@@ -1,4 +1,4 @@
-package com.hdc.hdc.relatorio.adesao.dto;
+package com.hdc.hdc.indicadores.relatorio.adesao.dto;
 
 import org.springframework.data.domain.Page;
 

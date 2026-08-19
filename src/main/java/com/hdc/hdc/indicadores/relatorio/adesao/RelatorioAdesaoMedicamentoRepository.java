@@ -1,8 +1,8 @@
-package com.hdc.hdc.relatorio.adesao;
+package com.hdc.hdc.indicadores.relatorio.adesao;
 
-import com.hdc.hdc.relatorio.adesao.dto.DadosDetalhamentoDiarioMedicamento;
-import com.hdc.hdc.relatorio.adesao.dto.DadosEvolucaoSemanalMedicamento;
-import com.hdc.hdc.relatorio.adesao.dto.DadosResumoAdesaoMedicamento;
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.DadosDetalhamentoDiarioMedicamento;
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.DadosEvolucaoSemanalMedicamento;
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.DadosResumoAdesaoMedicamento;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
