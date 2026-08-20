@@ -1,6 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.profissional;
 
-import com.hdc.hdc.adesao.classificacao.CalculadoraClassificacaoAdesao;
+import com.hdc.hdc.adesao.classificacao.ClassificacaoAdesaoService;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoValidationService;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.RelatorioAdesaoDTO;
@@ -40,7 +40,7 @@ public class PrescricaoMedicamentoProfissionalService {
     private final OcorrenciaMedicamentoValidationService ocorrenciaService;
     private final PrescricaoMedicamentoMapper mapper;
 
-    private final CalculadoraClassificacaoAdesao calculadoraClassificacaoAdesao;
+    private final ClassificacaoAdesaoService classificacaoAdesaoService;
 
     @Transactional
     public PrescricaoMedicamentoResponseDTO criarPrescricao(
@@ -70,7 +70,7 @@ public class PrescricaoMedicamentoProfissionalService {
         prescricaoRepository.flush();
 
         ocorrenciaService.geradorOcorrencias(prescricao);
-        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
+        classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
 
         return mapper.toResponseDTO(salva);
     }
@@ -99,7 +99,7 @@ public class PrescricaoMedicamentoProfissionalService {
         prescricaoRepository.flush();
 
         ocorrenciaService.geradorOcorrencias(prescricaoSalva);
-        calculadoraClassificacaoAdesao.recalcular(prescricaoSalva.getPaciente().getId());
+        classificacaoAdesaoService.recalcular(prescricaoSalva.getPaciente().getId());
 
         return mapper.toResponseDTO(prescricaoSalva);
     }
@@ -120,7 +120,7 @@ public class PrescricaoMedicamentoProfissionalService {
             throw new EntityInUseException("Prescrição de Medicamento");
         }
 
-        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
+        classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
         ocorrenciaMedicamentoRepository.deleteByPrescricaoId(prescricaoId);
         prescricaoRepository.deleteById(prescricaoId);
     }
@@ -143,7 +143,7 @@ public class PrescricaoMedicamentoProfissionalService {
             ocorrenciaService.cancelarOcorrencias(salvo);
         }
 
-        calculadoraClassificacaoAdesao.recalcular(prescricao.getPaciente().getId());
+        classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
 
         return mapper.toResponseDTO(salvo);
     }

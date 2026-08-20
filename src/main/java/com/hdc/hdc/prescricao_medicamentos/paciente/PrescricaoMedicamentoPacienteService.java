@@ -1,6 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.paciente;
 
-import com.hdc.hdc.adesao.classificacao.CalculadoraClassificacaoAdesao;
+import com.hdc.hdc.adesao.classificacao.ClassificacaoAdesaoService;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.OcorrenciaMedicamentoResponseDTO;
@@ -39,7 +39,7 @@ public class PrescricaoMedicamentoPacienteService {
     private final PacienteRepository pacienteRepository;
     private final ItemMedicacaoRepository itemMedicacaoRepository;
 
-    private final CalculadoraClassificacaoAdesao calculadoraClassificacaoAdesao;
+    private final ClassificacaoAdesaoService classificacaoAdesaoService;
 
     public ItemMedicacaoDiaDTO listarMedicacoesDoDia(LocalDate data) {
         List<OcorrenciaMedicamento> ocorrenciasDia = adesaoRepository.findAllByDataPrevista(data);
@@ -84,7 +84,7 @@ public class PrescricaoMedicamentoPacienteService {
 
         OcorrenciaMedicamento salva = adesaoRepository.save(ocorrencia);
         adesaoRepository.flush();
-        calculadoraClassificacaoAdesao.recalcular(pacienteId);
+        classificacaoAdesaoService.recalcular(pacienteId);
 
         return toRegistroAdesaoResponseDTO(salva);
     }
@@ -117,7 +117,7 @@ public class PrescricaoMedicamentoPacienteService {
 
         OcorrenciaMedicamento salvo = adesaoRepository.save(adesao);
         adesaoRepository.flush();
-        calculadoraClassificacaoAdesao.recalcular(pacienteId);
+        classificacaoAdesaoService.recalcular(pacienteId);
 
         return toRegistroAdesaoResponseDTO(salvo);
     }

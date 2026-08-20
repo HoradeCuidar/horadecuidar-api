@@ -38,6 +38,11 @@ import java.time.ZoneId;
 @RequiredArgsConstructor
 public class CalculadoraClassificacaoAdesao {
 
+    /*
+    * Recebe esperado, percentual e classificacaoAnterior e
+    * responde qual é a nova classificação.
+    * */
+
     private static final int MINIMO_OCORRENCIAS = 7;
     private static final BigDecimal LIMITE_BAIXA_ADESAO = new BigDecimal("70");
     private static final BigDecimal LIMITE_ADESAO_ADEQUADA = new BigDecimal("80");
@@ -46,54 +51,6 @@ public class CalculadoraClassificacaoAdesao {
     private final ResumoAdesaoPacienteRepository resumoAdesaoPacienteRepository;
     private final ConsultaAdesaoPacienteRepository consultaAdesaoPacienteRepository;
     private final PacienteRepository pacienteRepository;
-
-    @Transactional
-    public void recalcular(Integer pacienteId) {
-
-        LocalDate dataFinal = LocalDate.now(ZoneId.of(ZONE)).minusDays(1);
-        LocalDate dataInicial = dataFinal.minusDays(13);
-
-        DadosCalculoAdesaoDTO dados =
-                consultaAdesaoPacienteRepository.buscarDados(
-                        pacienteId,
-                        dataInicial,
-                        dataFinal
-                );
-
-        BigDecimal percentual = calcularPercentual(dados.realizado(), dados.esperado());
-
-        ResumoAdesaoPaciente resumo = resumoAdesaoPacienteRepository
-                .findByPacienteId(pacienteId)
-                .orElse(criarResumo(pacienteId));
-
-        // Descobre a classificação anterior
-        ClassificacaoAdesao classificacaoAnterior =
-                resumo.getClassificacao() == null
-                        ? ClassificacaoAdesao.DADOS_INSUFICIENTES
-                        : resumo.getClassificacao();
-
-        ClassificacaoAdesao novaClassificacao =
-                classificar(
-                        dados.esperado(),
-                        percentual,
-                        classificacaoAnterior
-                );
-
-        // Atualizar os dados
-        resumo.setPeriodoInicio(dataInicial);
-        resumo.setPeriodoFim(dataFinal);
-
-        resumo.setEsperado((int) dados.esperado());
-        resumo.setRealizado((int) dados.realizado());
-        resumo.setNaoRealizado((int) dados.naoRealizado());
-        resumo.setSemRegistro((int) dados.semRegistro());
-
-        resumo.setPercentual(percentual);
-        resumo.setClassificacao(novaClassificacao);
-        resumo.setCalculadoEm(LocalDateTime.now(ZoneId.of(ZONE)));
-
-        resumoAdesaoPacienteRepository.save(resumo);
-    }
 
     public ClassificacaoAdesao classificar(
             Integer esperado,
@@ -117,41 +74,5 @@ public class CalculadoraClassificacaoAdesao {
         }
 
         return ClassificacaoAdesao.ATENCAO;
-    }
-
-    private BigDecimal calcularPercentual(
-            long realizado,
-            long esperado
-    ) {
-        if (esperado == 0) {
-            return null;
-        }
-
-        return BigDecimal.valueOf(realizado)
-                .multiply(BigDecimal.valueOf(100))
-                .divide(
-                        BigDecimal.valueOf(esperado),
-                        2,
-                        RoundingMode.HALF_UP
-                );
-    }
-
-    private ResumoAdesaoPaciente criarResumo(
-            Integer pacienteId
-    ) {
-        Paciente paciente = pacienteRepository
-                .findById(pacienteId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Paciente não encontrado."
-                        )
-                );
-
-        ResumoAdesaoPaciente resumo =
-                new ResumoAdesaoPaciente();
-
-        resumo.setPaciente(paciente);
-
-        return resumo;
     }
 }
