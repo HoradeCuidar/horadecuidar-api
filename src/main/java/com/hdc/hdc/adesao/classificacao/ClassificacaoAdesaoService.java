@@ -34,6 +34,15 @@ public class ClassificacaoAdesaoService {
     private final PacienteRepository pacienteRepository;
     private final CalculadoraClassificacaoAdesao calculadora;
 
+    /*
+    * gatilhos de atualização imediata:
+    *   registrar adesão;
+    *   atualizar adesão;
+    *   criar prescrição;
+    *   atualizar prescrição;
+    *   inativar/reativar prescrição.
+    */
+
     @Transactional
     public void recalcular(Integer pacienteId) {
 
