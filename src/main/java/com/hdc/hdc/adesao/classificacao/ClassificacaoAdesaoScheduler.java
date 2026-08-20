@@ -20,7 +20,7 @@ public class ClassificacaoAdesaoScheduler {
     private final ClassificacaoAdesaoService classificacaoAdesaoService;
 
     @Scheduled(
-            cron = "0 35 9 * * *",
+            cron = "0 10 0 * * *",
             zone = "America/Fortaleza"
     )
     public void atualizarClassificacoesDiarias() {
