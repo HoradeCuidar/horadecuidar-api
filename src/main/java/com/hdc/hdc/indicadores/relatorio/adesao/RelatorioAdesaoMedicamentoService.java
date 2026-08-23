@@ -1,7 +1,7 @@
-package com.hdc.hdc.relatorio.adesao;
+package com.hdc.hdc.indicadores.relatorio.adesao;
 
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.*;
 import com.hdc.hdc.pacientes.PacienteRepository;
-import com.hdc.hdc.relatorio.adesao.dto.*;
 import com.hdc.hdc.util.exception.InvalidValueException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;

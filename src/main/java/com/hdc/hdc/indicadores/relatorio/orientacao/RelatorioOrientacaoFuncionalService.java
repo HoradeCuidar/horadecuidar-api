@@ -1,9 +1,9 @@
-package com.hdc.hdc.relatorio.orientacao;
+package com.hdc.hdc.indicadores.relatorio.orientacao;
 
 import com.hdc.hdc.pacientes.PacienteRepository;
-import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentoRealizacaoFuncionalDTO;
-import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentoOrientacaoFuncionalResponseDTO;
-import com.hdc.hdc.relatorio.orientacao.dto.ResumoFuncionalDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.DetalhamentoRealizacaoFuncionalDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.DetalhamentoOrientacaoFuncionalResponseDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.ResumoFuncionalDTO;
 import com.hdc.hdc.util.exception.InvalidValueException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;

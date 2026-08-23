@@ -26,7 +26,7 @@ public class PacienteController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('PACIENTE')")
     public ResponseEntity<PacienteResponseDto> perfil(@CurrentUser Usuario usuario) {
-        return ResponseEntity.ok(pacienteService.visualizarPerfil(usuario.getId()));
+        return ResponseEntity.ok(pacienteService.visualizarPorId(usuario.getId()));
     }
 
     @PostMapping()

@@ -27,6 +27,8 @@ public record PacienteCreateDto(
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate dataDeNascimento,
 
+    Integer idade,
+
     @NotBlank(message = "Telefone é obrigatório")
     @Pattern(
             regexp = "^\\d{10,11}$",

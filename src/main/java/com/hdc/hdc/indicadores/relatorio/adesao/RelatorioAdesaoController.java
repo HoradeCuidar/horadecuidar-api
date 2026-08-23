@@ -1,7 +1,7 @@
-package com.hdc.hdc.relatorio.adesao;
+package com.hdc.hdc.indicadores.relatorio.adesao;
 
-import com.hdc.hdc.relatorio.adesao.dto.DetalhamentoAdesaoMedicamentoResponseDTO;
-import com.hdc.hdc.relatorio.adesao.dto.ResumoMedicamentoDTO;
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.DetalhamentoAdesaoMedicamentoResponseDTO;
+import com.hdc.hdc.indicadores.relatorio.adesao.dto.ResumoMedicamentoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

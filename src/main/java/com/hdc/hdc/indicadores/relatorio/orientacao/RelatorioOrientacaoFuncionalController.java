@@ -1,7 +1,7 @@
-package com.hdc.hdc.relatorio.orientacao;
+package com.hdc.hdc.indicadores.relatorio.orientacao;
 
-import com.hdc.hdc.relatorio.orientacao.dto.DetalhamentoOrientacaoFuncionalResponseDTO;
-import com.hdc.hdc.relatorio.orientacao.dto.ResumoFuncionalDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.DetalhamentoOrientacaoFuncionalResponseDTO;
+import com.hdc.hdc.indicadores.relatorio.orientacao.dto.ResumoFuncionalDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
