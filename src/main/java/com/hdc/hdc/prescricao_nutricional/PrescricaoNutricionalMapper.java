@@ -37,5 +37,12 @@ public interface PrescricaoNutricionalMapper {
     @Mapping(source = "dataInicio", target = "dataInicio", qualifiedByName = "toStringDate")
     @Mapping(source = "dataFim", target = "dataFim", qualifiedByName = "toStringDate")
     @Mapping(source = "dataEncerramento", target = "dataEncerramento", qualifiedByName = "toStringDate")
+    PrescricaoNutricionalResumoDTO modeltoResumoDTO(PrescricaoNutricional model);
+
+    @Named("modeltoResponseDTO")
+    @Mapping(source = "status", target = "status", qualifiedByName = "statusPrescricaoToString")
+    @Mapping(source = "dataInicio", target = "dataInicio", qualifiedByName = "toStringDate")
+    @Mapping(source = "dataFim", target = "dataFim", qualifiedByName = "toStringDate")
+    @Mapping(source = "dataEncerramento", target = "dataEncerramento", qualifiedByName = "toStringDate")
     List<PrescricaoNutricionalResumoDTO> modeltoResumoDTO(List<PrescricaoNutricional> model);
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StatusPrescricao {
     ATIVA("Ativa"),
+    INATIVA("Inativa"),
     ENCERRADA("Encerrada");
 
     public final String statusPrescricao;

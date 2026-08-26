@@ -61,4 +61,13 @@ public class PrescricaoNutricionalController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PatchMapping("ativar/{id_prescricao}")
+    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<PrescricaoNutricionalResumoDTO> ativarPrescricao(@PathVariable Integer id_prescricao) {
+
+        PrescricaoNutricionalResumoDTO response = prescricaoNutricionalService.ativarPrescricao(id_prescricao);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
