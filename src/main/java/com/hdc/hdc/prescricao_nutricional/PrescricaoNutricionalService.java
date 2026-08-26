@@ -60,6 +60,18 @@ public class PrescricaoNutricionalService {
                 prescricaoNutricionalRepository.save(prescricaoNutricional));
     }
 
+    public PrescricaoNutricionalResumoDTO inativarPrescricao(Integer id_prescricao){
+        PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
+
+        prescricaoNutricional.setStatus(StatusPrescricao.INATIVA);
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(
+                prescricaoNutricionalRepository.save(prescricaoNutricional));
+    }
+
+    // Funções Auxiliares
+
     private void validarDatas(PrescricaoNutricional prescricaoNutricional) {
 
         if (prescricaoNutricional.getDataInicio().isAfter(prescricaoNutricional.getDataFim())) {
