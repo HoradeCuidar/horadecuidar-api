@@ -48,6 +48,8 @@ public class PrescricaoMedicamentoProfissionalService {
             PrescricaoMedicamentoRequestDTO dto,
             Usuario profissional
     ) {
+        ocorrenciaService.validarPeriodo(dto.getDataInicio(), dto.getDataFim());
+
         Paciente paciente = pacienteRepository
                 .findById(pacienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado."));
@@ -87,9 +89,7 @@ public class PrescricaoMedicamentoProfissionalService {
                 .findById(prescricaoId)
                 .orElseThrow(() -> new EntityNotFoundException("Prescrição de medicamento não encontrada."));
 
-        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
-
-        ocorrenciaService.cancelarOcorrenciasFuturasPendentes(prescricaoId, hoje);
+        ocorrenciaService.validarAtualizacaoDoPeriodo(prescricao, request);
 
         ocorrenciaService.atualizarDadosDaPrescricao(prescricao, request, profissional);
 
@@ -98,7 +98,7 @@ public class PrescricaoMedicamentoProfissionalService {
         PrescricaoMedicamento prescricaoSalva = prescricaoRepository.save(prescricao);
         prescricaoRepository.flush();
 
-        ocorrenciaService.geradorOcorrencias(prescricaoSalva);
+        ocorrenciaService.sincronizarOcorrencias(prescricaoSalva, LocalDate.now(ZoneId.systemDefault()));
         classificacaoAdesaoService.recalcular(prescricaoSalva.getPaciente().getId());
 
         return mapper.toResponseDTO(prescricaoSalva);
@@ -113,16 +113,17 @@ public class PrescricaoMedicamentoProfissionalService {
         }
 
         boolean possuiAdesao = ocorrenciaMedicamentoRepository.existsByPrescricaoIdAndStatusIn(
-                prescricaoId, List.of(StatusAdesao.REALIZADO, StatusAdesao.NAO_REALIZADO)
+                prescricaoId, List.of(StatusAdesao.REALIZADO)
         );
 
         if (possuiAdesao) {
             throw new EntityInUseException("Prescrição de Medicamento");
         }
 
-        classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
         ocorrenciaMedicamentoRepository.deleteByPrescricaoId(prescricaoId);
         prescricaoRepository.deleteById(prescricaoId);
+        prescricaoRepository.flush();
+        classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
     }
 
     @Transactional
@@ -138,9 +139,9 @@ public class PrescricaoMedicamentoProfissionalService {
         prescricaoRepository.flush();
 
         if (salvo.isAtivo()) {
-            ocorrenciaService.reativarOcorrencias(salvo);
+            ocorrenciaService.sincronizarOcorrencias(salvo, LocalDate.now(ZoneId.systemDefault()));
         } else {
-            ocorrenciaService.cancelarOcorrencias(salvo);
+            ocorrenciaService.cancelarOcorrenciasFuturas(salvo, LocalDate.now(ZoneId.systemDefault()));
         }
 
         classificacaoAdesaoService.recalcular(prescricao.getPaciente().getId());
@@ -174,13 +175,13 @@ public class PrescricaoMedicamentoProfissionalService {
     }
 
     private static @NonNull RelatorioAdesaoDTO getRelatorioAdesaoDTO(UUID prescricaoId, List<OcorrenciaMedicamento> adesoes, int realizacoes) {
-        int totalEsperado = adesoes.size();
+        int totalEsperado = (int) adesoes.stream()
+                .filter(adesao -> adesao.getStatus() != StatusAdesao.CANCELADO)
+                .count();
 
-        // Total esperado provisório seja no mínimo as realizações (evita divisão por zero)
-        if (totalEsperado == 0)
-            totalEsperado = realizacoes > 0 ? realizacoes : 1;
-
-        double percentual = ((double) realizacoes / totalEsperado) * 100;
+        double percentual = totalEsperado == 0
+                ? 0.0
+                : ((double) realizacoes / totalEsperado) * 100;
 
         RelatorioAdesaoDTO dto = new RelatorioAdesaoDTO();
         dto.setPrescricaoId(prescricaoId);
