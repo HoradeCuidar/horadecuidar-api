@@ -16,6 +16,8 @@ import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.util.exception.EntityInUseException;
+import com.hdc.hdc.util.exception.InvalidValueException;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,7 @@ public class PrescricaoMedicamentoProfissionalService {
 
         Paciente paciente = pacienteRepository
                 .findById(pacienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado."));
+                .orElseThrow(() -> new InvalidValueException("Paciente", "Paciente não encontrado."));
 
         PrescricaoMedicamento prescricao = new PrescricaoMedicamento();
         prescricao.setPaciente(paciente);
@@ -61,6 +63,8 @@ public class PrescricaoMedicamentoProfissionalService {
         prescricao.setDataFim(dto.getDataFim());
         prescricao.setObservacao(dto.getObservacao());
         prescricao.setAtivo(true);
+
+        this.validarDatas(prescricao);
 
         List<ItemMedicacao> itens = dto.getMedicacoes().stream()
                 .map(itemDto -> mapper.toItemMedicacaoEntity(itemDto, prescricao))
@@ -109,7 +113,7 @@ public class PrescricaoMedicamentoProfissionalService {
         PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
+            throw new InvalidValueException("Prescrição", "A prescrição não pertence a este paciente.");
         }
 
         boolean possuiAdesao = ocorrenciaMedicamentoRepository.existsByPrescricaoIdAndStatusIn(
@@ -131,7 +135,7 @@ public class PrescricaoMedicamentoProfissionalService {
         PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
+            throw new InvalidValueException("Prescrição", "A prescrição não pertence a este paciente.");
         }
 
         prescricao.setAtivo(!prescricao.isAtivo());
@@ -165,7 +169,7 @@ public class PrescricaoMedicamentoProfissionalService {
         PrescricaoMedicamento prescricao = this.getPrescricao(prescricaoId);
 
         if (!prescricao.getPaciente().getId().equals(pacienteId)) {
-            throw new IllegalArgumentException("A prescrição não pertence a este paciente.");
+            throw new InvalidValueException("Prescrição", "A prescrição não pertence a este paciente.");
         }
 
         List<OcorrenciaMedicamento> adesoes = ocorrenciaMedicamentoRepository.findByPrescricaoId(prescricaoId);
@@ -193,6 +197,19 @@ public class PrescricaoMedicamentoProfissionalService {
 
     private PrescricaoMedicamento getPrescricao(UUID prescricaoId) {
         return prescricaoRepository.findById(prescricaoId)
-                .orElseThrow(() -> new IllegalArgumentException("Prescrição não encontrada."));
+                .orElseThrow(() -> new InvalidValueException("Prescrição", "Prescrição não encontrada."));
+    }
+
+    private void validarDatas(PrescricaoMedicamento prescricao) {
+        LocalDate dataInicio = prescricao.getDataInicio();
+        LocalDate dataFim = prescricao.getDataFim();
+
+        if (dataInicio.isAfter(dataFim)) {
+            throw new InvalidValueException("Data Fim", "A data de início não pode ser posterior à data de fim.");
+        }
+
+        if(dataFim.isBefore(LocalDate.now(ZoneId.systemDefault()))) {
+            throw new InvalidValueException("Data Fim", "A data de fim não pode ser anterior à data atual.");
+        }
     }
 }

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,7 @@ public class OcorrenciaMedicamentoValidationService {
 
     /** Gera a agenda inicial de forma idempotente. */
     public void geradorOcorrencias(PrescricaoMedicamento prescricao) {
-        sincronizarOcorrencias(prescricao, null);
+        sincronizarOcorrencias(prescricao, LocalDate.now(ZoneId.systemDefault()));
     }
 
     /**
