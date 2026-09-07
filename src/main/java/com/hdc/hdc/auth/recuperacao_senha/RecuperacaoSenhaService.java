@@ -52,7 +52,7 @@ public class RecuperacaoSenhaService {
 
             tokenRepository.save(token);
 
-            String link = frontendUrl +
+            String link = frontendUrl.replaceAll("/+$", "") +
                     "/reset-password?token=" + token.getToken();
 
             this.emailMontagemService.enviarRecuperacaoSenha(
@@ -90,8 +90,7 @@ public class RecuperacaoSenhaService {
         this.emailMontagemService.enviarResetSenha(
                 user.getEmail(),
                 user.getNome(),
-                LocalDateTime.now(),
-                "localhost:5173/login"
+                LocalDateTime.now()
         );
         log.info("Reset de senha realizado para: {}", user.getUsername());
     }
