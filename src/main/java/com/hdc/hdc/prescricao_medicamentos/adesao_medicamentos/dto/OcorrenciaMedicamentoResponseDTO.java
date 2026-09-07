@@ -1,6 +1,7 @@
 package com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto;
 
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacaoDTO;
+import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.UUID;
 public record OcorrenciaMedicamentoResponseDTO(
         Long id,
         UUID prescricaoId,
+        StatusAdesao status,
         ItemMedicacaoDTO itemMedicacao,
         LocalDate dataPrevista,
         Integer ordemNoDia,

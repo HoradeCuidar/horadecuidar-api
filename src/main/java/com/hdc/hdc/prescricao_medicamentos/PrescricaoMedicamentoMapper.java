@@ -1,12 +1,12 @@
 package com.hdc.hdc.prescricao_medicamentos;
 
+import com.hdc.hdc.medicamentos.Medicamento;
+import com.hdc.hdc.medicamentos.MedicamentoService;
+import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacaoDTO;
 import com.hdc.hdc.prescricao_medicamentos.dto.PrescricaoMedicamentoResponseDTO;
-import com.hdc.hdc.usuarios.dto.UsuarioDTO;
-import com.hdc.hdc.medicamentos.Medicamento;
 import com.hdc.hdc.usuarios.Usuario;
-import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
-import com.hdc.hdc.medicamentos.MedicamentoService;
+import com.hdc.hdc.usuarios.dto.UsuarioDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,10 +1,10 @@
 package com.hdc.hdc.avaliacao_fisica;
 
-import com.hdc.hdc.pacientes.Paciente;
 import com.hdc.hdc.avaliacao_fisica.enums.FlexibilidadeFisica;
 import com.hdc.hdc.avaliacao_fisica.enums.NivelAssimetria;
-import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.orientacao_funcional.tag.TagFuncional;
+import com.hdc.hdc.pacientes.Paciente;
+import com.hdc.hdc.usuarios.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

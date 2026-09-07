@@ -1,5 +1,6 @@
 package com.hdc.hdc.prescricao_medicamentos.paciente;
 
+import com.hdc.hdc.adesao.classificacao.ClassificacaoAdesaoService;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamento;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.OcorrenciaMedicamentoRepository;
 import com.hdc.hdc.prescricao_medicamentos.adesao_medicamentos.dto.OcorrenciaMedicamentoResponseDTO;
@@ -11,11 +12,7 @@ import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacao;
 import com.hdc.hdc.prescricao_medicamentos.associacoes.ItemMedicacaoRepository;
 import com.hdc.hdc.prescricao_medicamentos.enums.IntervaloTipo;
 import com.hdc.hdc.prescricao_medicamentos.enums.StatusAdesao;
-import com.hdc.hdc.prescricao_medicamentos.paciente.dto.HistoricoPessoalDTO;
-import com.hdc.hdc.prescricao_medicamentos.paciente.dto.ItemMedicacaoDiaDTO;
-import com.hdc.hdc.prescricao_medicamentos.paciente.dto.PrescricaoAtivaPacienteDTO;
-import com.hdc.hdc.prescricao_medicamentos.paciente.dto.RegistroAdesaoRequestDTO;
-import com.hdc.hdc.prescricao_medicamentos.paciente.dto.RegistroAdesaoResponseDTO;
+import com.hdc.hdc.prescricao_medicamentos.paciente.dto.*;
 import com.hdc.hdc.util.exception.InvalidValueException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -41,6 +39,8 @@ public class PrescricaoMedicamentoPacienteService {
     private final PacienteRepository pacienteRepository;
     private final ItemMedicacaoRepository itemMedicacaoRepository;
 
+    private final ClassificacaoAdesaoService classificacaoAdesaoService;
+
     public ItemMedicacaoDiaDTO listarMedicacoesDoDia(LocalDate data) {
         List<OcorrenciaMedicamento> ocorrenciasDia = adesaoRepository.findAllByDataPrevista(data);
         List<OcorrenciaMedicamentoResponseDTO> ocorrencias = new ArrayList<>();
@@ -49,6 +49,7 @@ public class PrescricaoMedicamentoPacienteService {
             ocorrencias.add( new OcorrenciaMedicamentoResponseDTO(
                     ocorrencia.getId(),
                     ocorrencia.getPrescricao().getId(),
+                    ocorrencia.getStatus(),
                     prescricaoMapper.toItemMedicacaoDTO(ocorrencia.getItemMedicacao()),
                     ocorrencia.getDataPrevista(),
                     ocorrencia.getOrdemNoDia(),
@@ -68,7 +69,7 @@ public class PrescricaoMedicamentoPacienteService {
         validarPaciente(pacienteId);
         validarRequestRegistro(request);
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
 
         OcorrenciaMedicamento ocorrencia = adesaoRepository
                                                 .findById(request.getOcorrenciaId())
@@ -78,10 +79,13 @@ public class PrescricaoMedicamentoPacienteService {
         validarOcorrenciaParaRegistro(ocorrencia, hoje);
 
         ocorrencia.setStatus(request.getStatus());
-        ocorrencia.setDataHoraRegistro(LocalDateTime.now());
+        ocorrencia.setDataHoraRegistro(LocalDateTime.now(ZoneId.systemDefault()));
         ocorrencia.setObservacao(request.getObservacao());
 
         OcorrenciaMedicamento salva = adesaoRepository.save(ocorrencia);
+        adesaoRepository.flush();
+        classificacaoAdesaoService.recalcular(pacienteId);
+
         return toRegistroAdesaoResponseDTO(salva);
     }
 
@@ -101,7 +105,7 @@ public class PrescricaoMedicamentoPacienteService {
             throw new InvalidValueException("adesaoId", "O registro de adesão não pertence a este paciente.");
         }
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
         LocalDate dataRegistro = adesao.getDataPrevista() != null ? adesao.getDataPrevista() : adesao.getDataHoraRegistro().toLocalDate();
         if (dataRegistro.isBefore(hoje.minusDays(3))) {
             throw new InvalidValueException("adesaoId", "Não é possível alterar um registro de adesão de mais de 3 dias atrás.");
@@ -109,16 +113,19 @@ public class PrescricaoMedicamentoPacienteService {
 
         adesao.setStatus(request.getStatus());
         adesao.setObservacao(request.getObservacao());
-        adesao.setDataHoraRegistro(LocalDateTime.now());
+        adesao.setDataHoraRegistro(LocalDateTime.now(ZoneId.systemDefault()));
 
         OcorrenciaMedicamento salvo = adesaoRepository.save(adesao);
+        adesaoRepository.flush();
+        classificacaoAdesaoService.recalcular(pacienteId);
+
         return toRegistroAdesaoResponseDTO(salvo);
     }
 
     public List<PrescricaoAtivaPacienteDTO> listarPrescricoesAtivas(Integer pacienteId) {
         validarPaciente(pacienteId);
         List<PrescricaoMedicamento> ativas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now());
+                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now(ZoneId.systemDefault()));
 
         return ativas.stream()
                 .map(this::toPrescricaoAtivaPacienteDTO)
@@ -128,7 +135,7 @@ public class PrescricaoMedicamentoPacienteService {
     public HistoricoPessoalDTO consultarHistorico(Integer pacienteId, String periodo) {
         validarPaciente(pacienteId);
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
         LocalDate inicio;
         LocalDate fim;
         String periodoLabel;
@@ -154,7 +161,7 @@ public class PrescricaoMedicamentoPacienteService {
 
         // Calcular total de itens esperados no período
         List<PrescricaoMedicamento> prescricoesAtivas =
-                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now());
+                prescricaoRepository.findAtivasByPacienteId(pacienteId, LocalDate.now(ZoneId.systemDefault()));
 
         int totalEsperado = calcularTotalEsperadoNoPeriodo(prescricoesAtivas, inicio, fim);
 
@@ -209,7 +216,7 @@ public class PrescricaoMedicamentoPacienteService {
             case SEMANA -> {
                 long semanasDesdeInicio = ChronoUnit.WEEKS.between(dataInicio, hoje);
                 yield semanasDesdeInicio % intervaloValor == 0
-                        && dataInicio.getDayOfWeek() == hoje.getDayOfWeek();
+                        && dataInicio.getDayOfWeek().equals(hoje.getDayOfWeek());
             }
             case MES -> {
                 long mesesDesdeInicio = ChronoUnit.MONTHS.between(dataInicio, hoje);
@@ -236,7 +243,7 @@ public class PrescricaoMedicamentoPacienteService {
             LocalDate inicio, LocalDate fim
     ) {
         int total = 0;
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
 
         for (PrescricaoMedicamento prescricao : prescricoes) {
             if (prescricao.getMedicacoes() == null) continue;

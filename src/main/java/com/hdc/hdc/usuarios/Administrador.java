@@ -23,6 +23,7 @@ public class Administrador extends Usuario {
                          String username,
                          String senha,
                          LocalDate dataDeNascimento,
+                         Integer idade,
                          Role role,
                          Status status,
                          String telefone,
@@ -34,6 +35,6 @@ public class Administrador extends Usuario {
                          Genero genero,
                          String email,
                          String fotoDePerfil){
-        super(id, nome, username, senha, dataDeNascimento, role, status, telefone, rua, bairro, estado, cidade, numeroDaCasa, genero, email, fotoDePerfil);
+        super(id, nome, username, senha, dataDeNascimento, idade, role, status, telefone, rua, bairro, estado, cidade, numeroDaCasa, genero, email, fotoDePerfil);
     }
 }

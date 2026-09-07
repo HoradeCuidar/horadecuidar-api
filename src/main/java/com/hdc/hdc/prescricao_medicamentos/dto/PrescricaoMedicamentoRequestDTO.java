@@ -15,6 +15,7 @@ public class PrescricaoMedicamentoRequestDTO {
     @NotNull(message = "A data de início é obrigatória.")
     private LocalDate dataInicio;
 
+    @NotNull(message = "A data final é obrigatória.")
     private LocalDate dataFim;
 
     private String observacao;
