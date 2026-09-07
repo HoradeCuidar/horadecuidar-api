@@ -2,6 +2,7 @@ package com.hdc.hdc.infra.security.configuration;
 
 import com.hdc.hdc.infra.security.filter.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +15,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @Profile("prod")
@@ -22,10 +26,25 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfigurationsProd{
 
     private final SecurityFilter securityFilter;
+    private final String frontendUrl;
 
     @Autowired
-    public SecurityConfigurationsProd(SecurityFilter securityFilter) {
+    public SecurityConfigurationsProd(SecurityFilter securityFilter,
+                                      @Value("${frontend.url}") String frontendUrl) {
         this.securityFilter = securityFilter;
+        this.frontendUrl = frontendUrl.trim().replaceAll("/+$", "");
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(List.of(frontendUrl));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
     @Bean
