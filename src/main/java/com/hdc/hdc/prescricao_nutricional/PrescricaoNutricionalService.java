@@ -2,12 +2,16 @@ package com.hdc.hdc.prescricao_nutricional;
 
 import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
 import com.hdc.hdc.prescricao_nutricional.enums.StatusPrescricao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.Refeicao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
+import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PrescricaoNutricionalService {
@@ -32,6 +36,41 @@ public class PrescricaoNutricionalService {
 
         return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
     }
+
+    @Transactional()
+    public PrescricaoNutricionalResponseDTO visualizar(Integer id_prescricao){
+        return prescricaoNutricionalMapper.modeltoResponseDTO(
+                prescricaoNutricionalRepository.findById(id_prescricao)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"))
+                );
+    }
+
+    public List<PrescricaoNutricionalResumoDTO> visualizarTodos(Integer id_paciente){
+        return prescricaoNutricionalMapper.modeltoResumoDTO(
+                prescricaoNutricionalRepository.findAllByPacienteId(id_paciente));
+    }
+
+    public PrescricaoNutricionalResumoDTO ativarPrescricao(Integer id_prescricao){
+        PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
+
+        prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(
+                prescricaoNutricionalRepository.save(prescricaoNutricional));
+    }
+
+    public PrescricaoNutricionalResumoDTO inativarPrescricao(Integer id_prescricao){
+        PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
+
+        prescricaoNutricional.setStatus(StatusPrescricao.INATIVA);
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(
+                prescricaoNutricionalRepository.save(prescricaoNutricional));
+    }
+
+    // Funções Auxiliares
 
     private void validarDatas(PrescricaoNutricional prescricaoNutricional) {
 
