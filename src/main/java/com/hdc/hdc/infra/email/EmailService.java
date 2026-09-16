@@ -1,41 +1,57 @@
 package com.hdc.hdc.infra.email;
 
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import com.hdc.hdc.util.exception.FailedSendEmailException;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final com.hdc.hdc.util.send_email.EmailService emailService;
 
     @Async
-    public void enviarHtml(String email, String assunto, String html, java.util.Map<String, String> inlineResources) {
-
+    public void enviarHtml(String email, String assunto, String html, Map<String, String> inlineResources) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(email);
-            helper.setSubject(assunto);
-            helper.setText(html, true);
-
-            if (inlineResources != null) {
-                for (java.util.Map.Entry<String, String> entry : inlineResources.entrySet()) {
-                    ClassPathResource resource = new ClassPathResource(entry.getValue());
-                    helper.addInline(entry.getKey(), resource);
-                }
-            }
-
-            mailSender.send(message);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar e-mail", e);
+            emailService.sendEmail(List.of(email), assunto, html, toInlineAttachments(inlineResources));
+        } catch (IOException e) {
+            throw new FailedSendEmailException("email", "Não foi possível preparar os recursos do e-mail.");
         }
+    }
+
+    private List<com.hdc.hdc.util.send_email.EmailAttachment> toInlineAttachments(Map<String, String> inlineResources)
+            throws IOException {
+        if (inlineResources == null || inlineResources.isEmpty()) {
+            return List.of();
+        }
+
+        List<com.hdc.hdc.util.send_email.EmailAttachment> attachments = new ArrayList<>();
+        for (Map.Entry<String, String> entry : inlineResources.entrySet()) {
+            ClassPathResource resource = new ClassPathResource(entry.getValue());
+            String filename = resource.getFilename();
+            if (filename == null || !resource.exists()) {
+                throw new IOException("Recurso inline não encontrado.");
+            }
+            byte[] bytes;
+            try (var inputStream = resource.getInputStream()) {
+                bytes = inputStream.readAllBytes();
+            }
+            String content = Base64.getEncoder().encodeToString(bytes);
+            String contentType = MediaTypeFactory.getMediaType(filename)
+                    .map(MediaType::toString)
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            attachments.add(new com.hdc.hdc.util.send_email.EmailAttachment(filename, content, contentType, entry.getKey()));
+        }
+        return List.copyOf(attachments);
     }
 }

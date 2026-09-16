@@ -153,6 +153,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(FailedSendEmailException.class)
+    public ResponseEntity<ErrorResponseDTO> handleFailedSendEmailException(FailedSendEmailException ex) {
+        HttpStatus status = HttpStatus.BAD_GATEWAY;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
     // Tratamento para Exceções Genéricas (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleAllExceptions(Exception ex) {
