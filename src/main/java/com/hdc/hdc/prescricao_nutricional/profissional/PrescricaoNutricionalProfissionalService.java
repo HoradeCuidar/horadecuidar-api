@@ -1,11 +1,15 @@
-package com.hdc.hdc.prescricao_nutricional;
+package com.hdc.hdc.prescricao_nutricional.profissional;
 
+import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricional;
+import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalMapper;
+import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalRepository;
 import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
 import com.hdc.hdc.prescricao_nutricional.enums.StatusPrescricao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.Refeicao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
+import com.hdc.hdc.util.exception.InvalidValueException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +18,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PrescricaoNutricionalService {
+public class PrescricaoNutricionalProfissionalService {
 
     private final PrescricaoNutricionalRepository prescricaoNutricionalRepository;
     private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
 
     @Autowired
-    PrescricaoNutricionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
-                                 PrescricaoNutricionalMapper prescricaoNutricionalMapper){
+    PrescricaoNutricionalProfissionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
+                                             PrescricaoNutricionalMapper prescricaoNutricionalMapper){
         this.prescricaoNutricionalRepository = prescricaoNutricionalRepository;
         this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
     }
@@ -29,9 +33,14 @@ public class PrescricaoNutricionalService {
     @Transactional
     public PrescricaoNutricionalResponseDTO cadastrar(PrescricaoNutricional prescricaoNutricional) {
 
-        validarDatas(prescricaoNutricional);
+        if (prescricaoNutricional.getDataInicio().isAfter(prescricaoNutricional.getDataFim())) {
+            throw new InvalidValueException(
+                    "A data de início não pode ser posterior à data final."
+            );
+        }
 
         vincularEntidades(prescricaoNutricional);
+
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
 
         return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
@@ -70,21 +79,35 @@ public class PrescricaoNutricionalService {
                 prescricaoNutricionalRepository.save(prescricaoNutricional));
     }
 
-    // Funções Auxiliares
+    @Transactional
+    public PrescricaoNutricionalResponseDTO editar(Integer id_prescricao,
+                                                   PrescricaoNutricional novaPrescricaoNutricional) {
 
-    private void validarDatas(PrescricaoNutricional prescricaoNutricional) {
+        PrescricaoNutricional antigaPrescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
+                        .orElseThrow(() -> new ResourceNotFoundException("Prescrição nutricional não encontrada"));
 
-        if (prescricaoNutricional.getDataInicio().isAfter(prescricaoNutricional.getDataFim())) {
-            throw new IllegalArgumentException(
-                    "A data de início não pode ser posterior à data final."
+        if (antigaPrescricaoNutricional.getStatus() == StatusPrescricao.ENCERRADA) {
+            throw new InvalidValueException(
+                    "Não é possível editar uma prescrição encerrada!"
             );
         }
+
+        novaPrescricaoNutricional.setId(id_prescricao);
+        novaPrescricaoNutricional.setPacienteId(antigaPrescricaoNutricional.getPacienteId());
+        novaPrescricaoNutricional.setProfissionalId(antigaPrescricaoNutricional.getProfissionalId());
+        novaPrescricaoNutricional.setDataInicio(antigaPrescricaoNutricional.getDataInicio());
+        novaPrescricaoNutricional.setStatus(antigaPrescricaoNutricional.getStatus());
+
+        vincularEntidades(novaPrescricaoNutricional);
+
+        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(novaPrescricaoNutricional));
     }
 
-    private void vincularEntidades(PrescricaoNutricional prescricao) {
+    // MÉTODOS AUXILIARES
+    private void vincularEntidades(PrescricaoNutricional prescricaoNutricional) {
 
-        for (Refeicao refeicao : prescricao.getRefeicoes()) {
-            refeicao.setPrescricao(prescricao);
+        for (Refeicao refeicao : prescricaoNutricional.getRefeicoes()) {
+            refeicao.setPrescricao(prescricaoNutricional);
             for (OpcaoRefeicao opcao : refeicao.getOpcoes()) {
                 opcao.setRefeicao(refeicao);
                 for (AlimentoPrescrito alimento : opcao.getAlimentos()) {
@@ -93,4 +116,5 @@ public class PrescricaoNutricionalService {
             }
         }
     }
+
 }
