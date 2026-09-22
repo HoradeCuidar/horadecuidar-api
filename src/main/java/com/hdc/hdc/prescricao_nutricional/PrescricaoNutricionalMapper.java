@@ -3,6 +3,7 @@ package com.hdc.hdc.prescricao_nutricional;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
+import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalUpdateDTO;
 import com.hdc.hdc.prescricao_nutricional.refeicao.RefeicaoMapper;
 import com.hdc.hdc.util.formatter.DataFormatter;
 import com.hdc.hdc.util.formatter.StatusPrescricaoFormatter;
@@ -45,4 +46,7 @@ public interface PrescricaoNutricionalMapper {
     @Mapping(source = "dataFim", target = "dataFim", qualifiedByName = "toStringDate")
     @Mapping(source = "dataEncerramento", target = "dataEncerramento", qualifiedByName = "toStringDate")
     List<PrescricaoNutricionalResumoDTO> modeltoResumoDTO(List<PrescricaoNutricional> model);
+
+    @Named("updateDTOtoModel")
+    PrescricaoNutricional updateDTOtoModel(PrescricaoNutricionalUpdateDTO dto);
 }
