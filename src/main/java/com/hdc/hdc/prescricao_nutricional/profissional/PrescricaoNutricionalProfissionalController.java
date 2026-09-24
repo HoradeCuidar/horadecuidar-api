@@ -1,8 +1,10 @@
-package com.hdc.hdc.prescricao_nutricional;
+package com.hdc.hdc.prescricao_nutricional.profissional;
 
+import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalMapper;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
+import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalUpdateDTO;
 import com.hdc.hdc.usuarios.Usuario;
 import com.hdc.hdc.util.notations.currenteUser.CurrentUser;
 import jakarta.validation.Valid;
@@ -16,15 +18,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/nutricional")
-public class PrescricaoNutricionalController {
+public class PrescricaoNutricionalProfissionalController {
 
-    private final PrescricaoNutricionalService prescricaoNutricionalService;
+    private final PrescricaoNutricionalProfissionalService prescricaoNutricionalProfissionalService;
     private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
 
     @Autowired
-    PrescricaoNutricionalController(PrescricaoNutricionalService prescricaoNutricionalService,
-                                    PrescricaoNutricionalMapper prescricaoNutricionalMapper){
-        this.prescricaoNutricionalService = prescricaoNutricionalService;
+    PrescricaoNutricionalProfissionalController(PrescricaoNutricionalProfissionalService prescricaoNutricionalProfissionalService,
+                                                PrescricaoNutricionalMapper prescricaoNutricionalMapper){
+        this.prescricaoNutricionalProfissionalService = prescricaoNutricionalProfissionalService;
         this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
     }
 
@@ -37,7 +39,7 @@ public class PrescricaoNutricionalController {
 
         prescricaoNutricionalCreateDTO.setProfissionalId(profissionalDaSaude.getId());
 
-        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalService.cadastrar(
+        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalProfissionalService.cadastrar(
                 prescricaoNutricionalMapper.createDTOtoModel(prescricaoNutricionalCreateDTO)
         );
 
@@ -48,7 +50,7 @@ public class PrescricaoNutricionalController {
     @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResponseDTO> visualizar(@PathVariable Integer id_prescricao) {
 
-        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalService.visualizar(id_prescricao);
+        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalProfissionalService.visualizar(id_prescricao);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -57,7 +59,7 @@ public class PrescricaoNutricionalController {
     @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<List<PrescricaoNutricionalResumoDTO>> visualizarTodos(@PathVariable Integer id_paciente) {
 
-        List<PrescricaoNutricionalResumoDTO> response = prescricaoNutricionalService.visualizarTodos(id_paciente);
+        List<PrescricaoNutricionalResumoDTO> response = prescricaoNutricionalProfissionalService.visualizarTodos(id_paciente);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -66,7 +68,7 @@ public class PrescricaoNutricionalController {
     @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResumoDTO> ativarPrescricao(@PathVariable Integer id_prescricao) {
 
-        PrescricaoNutricionalResumoDTO response = prescricaoNutricionalService.ativarPrescricao(id_prescricao);
+        PrescricaoNutricionalResumoDTO response = prescricaoNutricionalProfissionalService.ativarPrescricao(id_prescricao);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -75,7 +77,22 @@ public class PrescricaoNutricionalController {
     @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResumoDTO> inativarPrescricao(@PathVariable Integer id_prescricao) {
 
-        PrescricaoNutricionalResumoDTO response = prescricaoNutricionalService.inativarPrescricao(id_prescricao);
+        PrescricaoNutricionalResumoDTO response = prescricaoNutricionalProfissionalService.inativarPrescricao(id_prescricao);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("editar/{id_prescricao}")
+    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    public ResponseEntity<PrescricaoNutricionalResponseDTO> editar(
+            @Valid @RequestBody PrescricaoNutricionalUpdateDTO prescricaoNutricionalUpdateDTO,
+            @PathVariable Integer id_prescricao
+    ) {
+
+        PrescricaoNutricionalResponseDTO response = prescricaoNutricionalProfissionalService.editar(
+                id_prescricao,
+                prescricaoNutricionalMapper.updateDTOtoModel(prescricaoNutricionalUpdateDTO)
+        );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
