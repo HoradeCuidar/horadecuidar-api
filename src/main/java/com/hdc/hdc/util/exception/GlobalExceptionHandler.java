@@ -1,5 +1,6 @@
 package com.hdc.hdc.util.exception;
 
+import com.hdc.hdc.exames.ArmazenamentoExameException;
 import com.hdc.hdc.util.exception.dto.ErrorResponseDTO;
 import com.hdc.hdc.util.exception.model.InvalidOperationException;
 import org.apache.coyote.BadRequestException;
@@ -97,6 +98,14 @@ public class GlobalExceptionHandler {
                 status.getReasonPhrase()
         );
         return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(ArmazenamentoExameException.class)
+    public ResponseEntity<ErrorResponseDTO> handleArmazenamentoExameException(ArmazenamentoExameException ex) {
+        HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+        return ResponseEntity.status(status).body(new ErrorResponseDTO(
+                "arquivo", ex.getMessage(), status.value(), status.getReasonPhrase()
+        ));
     }
 
     // Tratamento das demais exceções
