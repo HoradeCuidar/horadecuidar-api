@@ -3,6 +3,7 @@ package com.hdc.hdc.prescricao_nutricional.profissional;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricional;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalMapper;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalRepository;
+import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicaoService;
 import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
@@ -15,6 +16,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -22,12 +25,15 @@ public class PrescricaoNutricionalProfissionalService {
 
     private final PrescricaoNutricionalRepository prescricaoNutricionalRepository;
     private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
+    private final OcorrenciaRefeicaoService ocorrenciaRefeicaoService;
 
     @Autowired
     PrescricaoNutricionalProfissionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
-                                             PrescricaoNutricionalMapper prescricaoNutricionalMapper){
+                                             PrescricaoNutricionalMapper prescricaoNutricionalMapper,
+                                             OcorrenciaRefeicaoService ocorrenciaRefeicaoService){
         this.prescricaoNutricionalRepository = prescricaoNutricionalRepository;
         this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
+        this.ocorrenciaRefeicaoService = ocorrenciaRefeicaoService;
     }
 
     @Transactional
@@ -39,11 +45,23 @@ public class PrescricaoNutricionalProfissionalService {
             );
         }
 
+        if (prescricaoNutricionalRepository.existsByPacienteIdAndStatus(
+                prescricaoNutricional.getPacienteId(), StatusPrescricao.ATIVA)) {
+            throw new InvalidValueException(
+                    "Já existe uma prescrição nutricional ativa para este paciente."
+            );
+        }
+
         vincularEntidades(prescricaoNutricional);
 
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
 
-        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
+        PrescricaoNutricional prescricaoSalva = prescricaoNutricionalRepository.save(prescricaoNutricional);
+        prescricaoNutricionalRepository.flush();
+
+        ocorrenciaRefeicaoService.gerarOcorrencias(prescricaoSalva);
+
+        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoSalva);
     }
 
     @Transactional()
@@ -59,24 +77,39 @@ public class PrescricaoNutricionalProfissionalService {
                 prescricaoNutricionalRepository.findAllByPacienteId(id_paciente));
     }
 
+    @Transactional
     public PrescricaoNutricionalResumoDTO ativarPrescricao(Integer id_prescricao){
         PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
                 .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
 
-        prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
+        if (prescricaoNutricionalRepository.existsByPacienteIdAndStatus(
+                prescricaoNutricional.getPacienteId(), StatusPrescricao.ATIVA)) {
+            throw new InvalidValueException(
+                    "Já existe uma prescrição nutricional ativa para este paciente."
+            );
+        }
 
-        return prescricaoNutricionalMapper.modeltoResumoDTO(
-                prescricaoNutricionalRepository.save(prescricaoNutricional));
+        prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
+        PrescricaoNutricional salva = prescricaoNutricionalRepository.save(prescricaoNutricional);
+
+        ocorrenciaRefeicaoService.reativarOcorrenciasFuturas(
+                salva, LocalDate.now(ZoneId.systemDefault()));
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(salva);
     }
 
+    @Transactional
     public PrescricaoNutricionalResumoDTO inativarPrescricao(Integer id_prescricao){
         PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
                 .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
 
         prescricaoNutricional.setStatus(StatusPrescricao.INATIVA);
+        PrescricaoNutricional salva = prescricaoNutricionalRepository.save(prescricaoNutricional);
 
-        return prescricaoNutricionalMapper.modeltoResumoDTO(
-                prescricaoNutricionalRepository.save(prescricaoNutricional));
+        ocorrenciaRefeicaoService.cancelarOcorrenciasFuturas(
+                salva, LocalDate.now(ZoneId.systemDefault()));
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(salva);
     }
 
     @Transactional

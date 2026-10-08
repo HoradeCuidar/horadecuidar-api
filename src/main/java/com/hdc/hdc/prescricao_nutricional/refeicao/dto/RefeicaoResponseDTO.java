@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RefeicaoResponseDTO {
 
+    private Integer id;
     private String nome;
     private Integer ordem;
     private String observacoes;

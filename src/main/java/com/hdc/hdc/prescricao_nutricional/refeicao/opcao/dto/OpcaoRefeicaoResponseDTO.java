@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OpcaoRefeicaoResponseDTO {
 
+    private Integer id;
     private Integer ordem;
     private String descricao;
     private List<AlimentoPrescritoResponseDTO> alimentos;
