@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 @Service
 public class TokenService{
@@ -49,6 +49,6 @@ public class TokenService{
     }
 
     private Instant getExpiracionDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        return ZonedDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant();
     }
 }
