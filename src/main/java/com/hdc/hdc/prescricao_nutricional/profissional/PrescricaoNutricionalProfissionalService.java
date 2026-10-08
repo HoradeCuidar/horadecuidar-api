@@ -70,6 +70,13 @@ public class PrescricaoNutricionalProfissionalService {
         PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
                 .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
 
+        if (prescricaoNutricionalRepository.existsByPacienteIdAndStatus(
+                prescricaoNutricional.getPacienteId(), StatusPrescricao.ATIVA)) {
+            throw new InvalidValueException(
+                    "Já existe uma prescrição nutricional ativa para este paciente."
+            );
+        }
+
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
 
         return prescricaoNutricionalMapper.modeltoResumoDTO(
