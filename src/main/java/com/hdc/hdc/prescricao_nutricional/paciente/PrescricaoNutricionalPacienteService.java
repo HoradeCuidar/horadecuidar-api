@@ -4,11 +4,15 @@ import com.hdc.hdc.pacientes.PacienteRepository;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricional;
 import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicao;
 import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicaoRepository;
+import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.dto.OcorrenciaRefeicaoResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.enums.StatusAdesao;
 import com.hdc.hdc.prescricao_nutricional.enums.StatusPrescricao;
+import com.hdc.hdc.prescricao_nutricional.paciente.dto.RefeicaoDiaDTO;
 import com.hdc.hdc.prescricao_nutricional.paciente.dto.RegistroAdesaoNutricionalRequestDTO;
 import com.hdc.hdc.prescricao_nutricional.paciente.dto.RegistroAdesaoNutricionalResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.refeicao.RefeicaoMapper;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
+import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicaoMapper;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicaoRepository;
 import com.hdc.hdc.util.exception.InvalidValueException;
 import com.hdc.hdc.util.exception.ResourceNotFoundException;
@@ -19,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,6 +34,22 @@ public class PrescricaoNutricionalPacienteService {
     private final PacienteRepository pacienteRepository;
     private final OcorrenciaRefeicaoRepository ocorrenciaRefeicaoRepository;
     private final OpcaoRefeicaoRepository opcaoRefeicaoRepository;
+    private final RefeicaoMapper refeicaoMapper;
+    private final OpcaoRefeicaoMapper opcaoRefeicaoMapper;
+
+    public RefeicaoDiaDTO listarRefeicoesDoDia(Integer pacienteId, LocalDate data) {
+        validarPaciente(pacienteId);
+
+        List<OcorrenciaRefeicao> ocorrenciasDia = ocorrenciaRefeicaoRepository
+                .findDoDiaByPacienteAndPrescricaoStatus(pacienteId, StatusPrescricao.ATIVA, data);
+
+        List<OcorrenciaRefeicaoResponseDTO> ocorrencias = new ArrayList<>();
+        for (OcorrenciaRefeicao ocorrencia : ocorrenciasDia) {
+            ocorrencias.add(toOcorrenciaResponseDTO(ocorrencia));
+        }
+
+        return new RefeicaoDiaDTO(data, ocorrencias);
+    }
 
     @Transactional
     public RegistroAdesaoNutricionalResponseDTO registrarAdesao(
@@ -172,6 +194,22 @@ public class PrescricaoNutricionalPacienteService {
             throw new InvalidValueException("ocorrenciaId",
                     "Não é possível registrar uma ocorrência de dia anterior.");
         }
+    }
+
+    private OcorrenciaRefeicaoResponseDTO toOcorrenciaResponseDTO(OcorrenciaRefeicao ocorrencia) {
+        return new OcorrenciaRefeicaoResponseDTO(
+                ocorrencia.getId(),
+                ocorrencia.getPrescricao().getId(),
+                ocorrencia.getStatus(),
+                refeicaoMapper.modeltoResponseDTO(ocorrencia.getRefeicao()),
+                ocorrencia.getOpcao() != null
+                        ? opcaoRefeicaoMapper.modeltoResponseDTO(ocorrencia.getOpcao())
+                        : null,
+                ocorrencia.getDataPrevista(),
+                ocorrencia.getOrdemNoDia(),
+                ocorrencia.getDataHoraRegistro(),
+                ocorrencia.getObservacao()
+        );
     }
 
     private RegistroAdesaoNutricionalResponseDTO toResponseDTO(OcorrenciaRefeicao ocorrencia) {
