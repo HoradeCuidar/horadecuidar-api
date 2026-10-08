@@ -5,6 +5,7 @@ import com.hdc.hdc.prescricao_nutricional.enums.StatusAdesao;
 import com.hdc.hdc.prescricao_nutricional.refeicao.Refeicao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,6 +53,15 @@ public class OcorrenciaRefeicaoService {
         if (!novasOcorrencias.isEmpty()) {
             ocorrenciaRefeicaoRepository.saveAll(novasOcorrencias);
         }
+    }
+
+    @Transactional
+    public int finalizarOcorrenciasPendentesExpiradas(LocalDate hoje) {
+        return ocorrenciaRefeicaoRepository.marcarPendentesExpiradas(
+                StatusAdesao.PENDENTE,
+                StatusAdesao.NAO_REALIZADO,
+                hoje
+        );
     }
 
     private record ChaveOcorrencia(Integer refeicaoId, LocalDate dataPrevista) {
