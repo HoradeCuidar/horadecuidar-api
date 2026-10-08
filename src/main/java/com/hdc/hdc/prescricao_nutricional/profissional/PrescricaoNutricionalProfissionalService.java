@@ -39,6 +39,13 @@ public class PrescricaoNutricionalProfissionalService {
             );
         }
 
+        if (prescricaoNutricionalRepository.existsByPacienteIdAndStatus(
+                prescricaoNutricional.getPacienteId(), StatusPrescricao.ATIVA)) {
+            throw new InvalidValueException(
+                    "Já existe uma prescrição nutricional ativa para este paciente."
+            );
+        }
+
         vincularEntidades(prescricaoNutricional);
 
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
