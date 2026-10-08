@@ -3,6 +3,7 @@ package com.hdc.hdc.prescricao_nutricional.profissional;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricional;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalMapper;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalRepository;
+import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicaoService;
 import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResumoDTO;
@@ -22,12 +23,15 @@ public class PrescricaoNutricionalProfissionalService {
 
     private final PrescricaoNutricionalRepository prescricaoNutricionalRepository;
     private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
+    private final OcorrenciaRefeicaoService ocorrenciaRefeicaoService;
 
     @Autowired
     PrescricaoNutricionalProfissionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
-                                             PrescricaoNutricionalMapper prescricaoNutricionalMapper){
+                                             PrescricaoNutricionalMapper prescricaoNutricionalMapper,
+                                             OcorrenciaRefeicaoService ocorrenciaRefeicaoService){
         this.prescricaoNutricionalRepository = prescricaoNutricionalRepository;
         this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
+        this.ocorrenciaRefeicaoService = ocorrenciaRefeicaoService;
     }
 
     @Transactional
@@ -50,7 +54,12 @@ public class PrescricaoNutricionalProfissionalService {
 
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
 
-        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoNutricionalRepository.save(prescricaoNutricional));
+        PrescricaoNutricional prescricaoSalva = prescricaoNutricionalRepository.save(prescricaoNutricional);
+        prescricaoNutricionalRepository.flush();
+
+        ocorrenciaRefeicaoService.gerarOcorrencias(prescricaoSalva);
+
+        return prescricaoNutricionalMapper.modeltoResponseDTO(prescricaoSalva);
     }
 
     @Transactional()
