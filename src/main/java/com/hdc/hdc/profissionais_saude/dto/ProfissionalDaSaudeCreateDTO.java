@@ -37,27 +37,23 @@ public class ProfissionalDaSaudeCreateDTO {
 
     private Integer  idade;
 
-    @NotBlank(message = "Telefone é obrigatório")
+    @NotBlank(message = "O contato do profissional é obrigatório")
     @Pattern(
-            regexp = "^\\d{10,11}$",
+            regexp = "^$|^\\d{10,11}$",
             message = "Telefone deve conter 10 ou 11 dígitos"
     )
     private String telefone;
 
-    @NotBlank(message = "Rua é obrigatória")
     private String rua;
 
-    @NotBlank(message = "Bairro é obrigatório")
     private String bairro;
 
-    @NotBlank(message = "Estado é obrigatório")
-    @Size(min = 2, max = 2, message = "Estado deve conter 2 letras")
+
+    @Pattern(regexp = "^$|^[A-Za-z]{2}$", message = "Estado deve conter 2 letras")
     private String estado;
 
-    @NotBlank(message = "Cidade é obrigatória")
     private String cidade;
 
-    @NotBlank(message = "Número da casa é obrigatório")
     private String numeroDaCasa;
 
     @NotNull(message = "Gênero é obrigatório")

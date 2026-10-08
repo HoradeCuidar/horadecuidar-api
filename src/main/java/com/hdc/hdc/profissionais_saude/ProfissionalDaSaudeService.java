@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 public class ProfissionalDaSaudeService {
@@ -35,6 +37,9 @@ public class ProfissionalDaSaudeService {
     }
 
     public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude) {
+
+        profissionalDaSaude.setIdade(Period.between(
+                profissionalDaSaude.getDataDeNascimento(), LocalDate.now()).getYears());
 
         // PERSONALIZAR DEPOIS
         if (profissionalDaSaudeRepository.existsByEmail(profissionalDaSaude.getEmail())) {
