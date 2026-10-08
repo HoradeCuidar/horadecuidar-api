@@ -5,7 +5,6 @@ import com.hdc.hdc.util.exception.FailedSendEmailException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,7 +19,6 @@ public class EmailService {
 
     private final com.hdc.hdc.util.send_email.EmailService emailService;
 
-    @Async
     public void enviarHtml(String email, String assunto, String html, Map<String, String> inlineResources) {
         try {
             emailService.sendEmail(List.of(email), assunto, html, toInlineAttachments(inlineResources));

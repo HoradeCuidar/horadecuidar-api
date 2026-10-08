@@ -41,6 +41,7 @@ public class SecurityConfigurationsProd{
         corsConfiguration.setAllowedOrigins(List.of(frontendUrl));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setExposedHeaders(List.of("X-Invitation-Status"));
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);

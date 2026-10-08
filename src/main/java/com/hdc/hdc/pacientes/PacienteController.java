@@ -1,6 +1,7 @@
 package com.hdc.hdc.pacientes;
 
 import com.hdc.hdc.pacientes.dto.PacienteCreateDto;
+import com.hdc.hdc.infra.email.ConviteCadastroService;
 import com.hdc.hdc.pacientes.dto.PacienteResponseDto;
 import com.hdc.hdc.pacientes.dto.PacienteSelfUpdateDto;
 import com.hdc.hdc.usuarios.Usuario;
@@ -21,6 +22,7 @@ import java.net.URI;
 public class PacienteController {
 
     private final PacienteService pacienteService;
+    private final ConviteCadastroService conviteCadastroService;
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
@@ -34,9 +36,13 @@ public class PacienteController {
     @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PacienteResponseDto> cadastrar(@Valid @RequestBody PacienteCreateDto paciente) {
         var created = pacienteService.cadastrar(paciente);
+        boolean conviteEnviado = conviteCadastroService.enviar(
+                created.nome(), created.email(), created.username(), paciente.senha());
         URI uri = URI.create("/paciente/" + created.id());
 
-        return ResponseEntity.created(uri).body(created);
+        return ResponseEntity.created(uri)
+                .header("X-Invitation-Status", conviteEnviado ? "sent" : "failed")
+                .body(created);
     }
 
     @GetMapping("/{id}")
