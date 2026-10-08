@@ -16,6 +16,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -75,6 +77,7 @@ public class PrescricaoNutricionalProfissionalService {
                 prescricaoNutricionalRepository.findAllByPacienteId(id_paciente));
     }
 
+    @Transactional
     public PrescricaoNutricionalResumoDTO ativarPrescricao(Integer id_prescricao){
         PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
                 .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
@@ -87,19 +90,26 @@ public class PrescricaoNutricionalProfissionalService {
         }
 
         prescricaoNutricional.setStatus(StatusPrescricao.ATIVA);
+        PrescricaoNutricional salva = prescricaoNutricionalRepository.save(prescricaoNutricional);
 
-        return prescricaoNutricionalMapper.modeltoResumoDTO(
-                prescricaoNutricionalRepository.save(prescricaoNutricional));
+        ocorrenciaRefeicaoService.reativarOcorrenciasFuturas(
+                salva, LocalDate.now(ZoneId.systemDefault()));
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(salva);
     }
 
+    @Transactional
     public PrescricaoNutricionalResumoDTO inativarPrescricao(Integer id_prescricao){
         PrescricaoNutricional prescricaoNutricional = prescricaoNutricionalRepository.findById(id_prescricao)
                 .orElseThrow(() -> new ResourceNotFoundException("Prescrição não encontrada"));
 
         prescricaoNutricional.setStatus(StatusPrescricao.INATIVA);
+        PrescricaoNutricional salva = prescricaoNutricionalRepository.save(prescricaoNutricional);
 
-        return prescricaoNutricionalMapper.modeltoResumoDTO(
-                prescricaoNutricionalRepository.save(prescricaoNutricional));
+        ocorrenciaRefeicaoService.cancelarOcorrenciasFuturas(
+                salva, LocalDate.now(ZoneId.systemDefault()));
+
+        return prescricaoNutricionalMapper.modeltoResumoDTO(salva);
     }
 
     @Transactional

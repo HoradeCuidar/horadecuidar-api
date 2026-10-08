@@ -56,6 +56,24 @@ public class OcorrenciaRefeicaoService {
     }
 
     @Transactional
+    public void cancelarOcorrenciasFuturas(PrescricaoNutricional prescricao, LocalDate hoje) {
+        ocorrenciaRefeicaoRepository.findByPrescricaoId(prescricao.getId()).stream()
+                .filter(OcorrenciaRefeicao::estaPendente)
+                .filter(ocorrencia -> !ocorrencia.getDataPrevista().isBefore(hoje))
+                .forEach(OcorrenciaRefeicao::cancelar);
+    }
+
+    @Transactional
+    public void reativarOcorrenciasFuturas(PrescricaoNutricional prescricao, LocalDate hoje) {
+        ocorrenciaRefeicaoRepository.findByPrescricaoId(prescricao.getId()).stream()
+                .filter(ocorrencia -> ocorrencia.getStatus() == StatusAdesao.CANCELADO)
+                .filter(ocorrencia -> !ocorrencia.getDataPrevista().isBefore(hoje))
+                .forEach(OcorrenciaRefeicao::reativar);
+
+        gerarOcorrencias(prescricao);
+    }
+
+    @Transactional
     public int finalizarOcorrenciasPendentesExpiradas(LocalDate hoje) {
         return ocorrenciaRefeicaoRepository.marcarPendentesExpiradas(
                 StatusAdesao.PENDENTE,

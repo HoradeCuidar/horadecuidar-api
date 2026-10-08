@@ -63,4 +63,28 @@ public class OcorrenciaRefeicao {
 
     @Column(columnDefinition = "text")
     private String observacao;
+
+    public boolean estaPendente() {
+        return status == StatusAdesao.PENDENTE;
+    }
+
+    public void cancelar() {
+        if (!estaPendente()) {
+            throw new IllegalStateException(
+                    "Somente ocorrências pendentes podem ser canceladas."
+            );
+        }
+
+        this.status = StatusAdesao.CANCELADO;
+    }
+
+    public void reativar() {
+        if (status != StatusAdesao.CANCELADO) {
+            throw new IllegalStateException(
+                    "Somente ocorrências canceladas podem ser reativadas."
+            );
+        }
+
+        this.status = StatusAdesao.PENDENTE;
+    }
 }
