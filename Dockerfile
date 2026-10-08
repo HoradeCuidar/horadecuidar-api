@@ -1,21 +1,16 @@
 FROM maven:3.9.12-eclipse-temurin-25 AS builder
+WORKDIR /build
 
-WORKDIR /app
-
-COPY pom.xml .
-
-RUN mvn -B -q -e -DskipTests dependency:go-offline
-
+COPY pom.xml mvnw ./
+COPY .mvn .mvn
 COPY src ./src
 
-RUN mvn -B -q package -DskipTests
+RUN mvn -e -B clean package -DskipTests
 
-FROM eclipse-temurin:25-jre-alpine
-
+FROM eclipse-temurin:25-jdk-alpine
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /build/target/*.jar /app/app.jar
 
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
