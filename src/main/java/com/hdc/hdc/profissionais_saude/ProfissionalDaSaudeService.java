@@ -1,7 +1,6 @@
 package com.hdc.hdc.profissionais_saude;
 
 import com.hdc.hdc.infra.bucket.service.R2Service;
-import com.hdc.hdc.infra.email.EmailMontagemService;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
 import com.hdc.hdc.usuarios.enums.Role;
 import com.hdc.hdc.usuarios.enums.Status;
@@ -14,27 +13,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 public class ProfissionalDaSaudeService {
 
     private final ProfissionalDaSaudeRepository profissionalDaSaudeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailMontagemService emailMontagemService;
     private final R2Service r2Service;
 
     @Autowired
     public ProfissionalDaSaudeService(ProfissionalDaSaudeRepository profissionalDaSaudeRepository,
             PasswordEncoder passwordEncoder,
-            EmailMontagemService emailMontagemService,
             R2Service r2Service) {
         this.profissionalDaSaudeRepository = profissionalDaSaudeRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailMontagemService = emailMontagemService;
         this.r2Service = r2Service;
     }
 
     public ProfissionalDaSaude cadastrar(ProfissionalDaSaude profissionalDaSaude) {
+
+        profissionalDaSaude.setIdade(Period.between(
+                profissionalDaSaude.getDataDeNascimento(), LocalDate.now()).getYears());
 
         // PERSONALIZAR DEPOIS
         if (profissionalDaSaudeRepository.existsByEmail(profissionalDaSaude.getEmail())) {
@@ -45,12 +46,6 @@ public class ProfissionalDaSaudeService {
         if (profissionalDaSaudeRepository.existsByUsername(profissionalDaSaude.getUsername())) {
             throw new ResourceNotFoundException("Já existe um profissional cadastrado com este username");
         }
-
-        emailMontagemService.enviarConfirmacaoCadastro(
-                profissionalDaSaude.getNome(),
-                profissionalDaSaude.getEmail(),
-                profissionalDaSaude.getUsername(),
-                profissionalDaSaude.getSenha());
 
         profissionalDaSaude.setSenha(passwordEncoder.encode(profissionalDaSaude.getSenha()));
         profissionalDaSaude.setRole(Role.PROFISSIONAL_DA_SAUDE);
