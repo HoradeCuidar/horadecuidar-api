@@ -129,6 +129,12 @@ public class RelatorioAdesaoMedicamentoService {
     ) {
         validarPaciente(pacienteId);
         validarPeriodo(dataInicial, dataFinal);
+        if (pagina < 0) {
+            throw new InvalidValueException("pagina", "A página não pode ser negativa.");
+        }
+        if (tamanho <= 0) {
+            throw new InvalidValueException("limite", "O limite deve ser maior que zero.");
+        }
 
         LocalDate ultimaDataConcluida = LocalDate.now(ZoneId.systemDefault()).minusDays(1);
 
@@ -141,7 +147,7 @@ public class RelatorioAdesaoMedicamentoService {
             return new DetalhamentoAdesaoMedicamentoResponseDTO(
                     dataInicial,
                     dataFinalConsiderada,
-                    toPageDetalhamentoMedicacao(new ArrayList<>(), tamanho)
+                    toPageDetalhamentoMedicacao(new ArrayList<>(), pagina, tamanho)
             );
         }
 
@@ -157,7 +163,7 @@ public class RelatorioAdesaoMedicamentoService {
         return new DetalhamentoAdesaoMedicamentoResponseDTO(
                 dataInicial,
                 dataFinalConsiderada,
-                toPageDetalhamentoMedicacao(dados, tamanho));
+                toPageDetalhamentoMedicacao(dados, pagina, tamanho));
     }
 
     /*
@@ -273,24 +279,18 @@ public class RelatorioAdesaoMedicamentoService {
         }
     }
 
-    private Page<DetalhamentoDiarioMedicamentoDTO> toPageDetalhamentoMedicacao(List<DadosDetalhamentoDiarioMedicamento> dados, Integer tamanho) {
+    private Page<DetalhamentoDiarioMedicamentoDTO> toPageDetalhamentoMedicacao(List<DadosDetalhamentoDiarioMedicamento> dados, int pagina, int tamanho) {
         long totalElementos = dados.isEmpty()
                 ? 0
                 : dados.getFirst().totalElementos();
 
-        int totalPaginas = totalElementos == 0
-                ? 0
-                : (int) Math.ceil(
-                (double) totalElementos / tamanho
-        );
-
-        Pageable pageable = PageRequest.of(totalPaginas, tamanho);
+        Pageable pageable = PageRequest.of(pagina, tamanho);
 
         List<DetalhamentoDiarioMedicamentoDTO> conteudo =
                 dados.stream()
                         .map(this::toDetalhamentoDTO)
                         .toList();
 
-        return new PageImpl<>(conteudo, pageable, dados.size());
+        return new PageImpl<>(conteudo, pageable, totalElementos);
     }
 }

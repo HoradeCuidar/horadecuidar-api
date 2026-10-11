@@ -184,7 +184,7 @@ public class RelatorioAdesaoMedicamentoRepository {
             OFFSET :deslocamento
             """;
 
-        int deslocamento = pagina * tamanho;
+        long deslocamento = (long) pagina * tamanho;
 
         MapSqlParameterSource parametros =
                 new MapSqlParameterSource()
