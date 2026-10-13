@@ -19,7 +19,7 @@ public class RealizacaoExercicioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE') and #pacienteId == principal.id")
     public ResponseEntity<RegistroRealizacaoFuncionalResponseDTO> registrarRealizacaoFuncional(
             @PathVariable("pacienteId") Integer pacienteId,
             @Valid @RequestBody RegistroRealizacaoFuncionalRequestDTO request
@@ -31,7 +31,7 @@ public class RealizacaoExercicioController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE') and #pacienteId == principal.id")
     public ResponseEntity<RegistroRealizacaoFuncionalResponseDTO> alterarRealizacaoFuncional(
             @PathVariable("pacienteId") Integer pacienteId,
             @PathVariable("id") Long registroId,
@@ -42,7 +42,7 @@ public class RealizacaoExercicioController {
 
     @PatchMapping("/{id}/status")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE') and #pacienteId == principal.id")
     public ResponseEntity<RegistroRealizacaoFuncionalResponseDTO> alterarStatus(
             @PathVariable("pacienteId") Integer pacienteId,
             @PathVariable("id") Long exercicioId,
@@ -52,7 +52,7 @@ public class RealizacaoExercicioController {
 
     @PatchMapping("/{id}/sensacao-final")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE') and #pacienteId == principal.id")
     public ResponseEntity<RegistroRealizacaoFuncionalResponseDTO> alterarSensacaoFinal(
             @PathVariable("pacienteId") Integer pacienteId,
             @PathVariable("id") Long exercicioId,
@@ -62,7 +62,7 @@ public class RealizacaoExercicioController {
 
     @GetMapping("/historico")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE', 'PACIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFISSIONAL_DA_SAUDE') or (hasRole('PACIENTE') and #pacienteId == principal.id)")
     public ResponseEntity<Page<RegistroRealizacaoFuncionalResponseDTO>> historicoDoPaciente(
             @PathVariable Integer pacienteId,
             @RequestParam(value = "number-page", defaultValue = "0") Integer numberPage,

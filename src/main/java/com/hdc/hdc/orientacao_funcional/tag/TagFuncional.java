@@ -19,6 +19,9 @@ public class TagFuncional {
     @Column(nullable = false, unique = true, length = 100)
     private String nome;
 
+    @Builder.Default
+    private boolean ativo = true;
+
     @Column(columnDefinition = "text")
     private String descricao;
 }
