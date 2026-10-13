@@ -36,6 +36,9 @@ public class RealizacaoExercicioService {
         OrientacaoFuncional orientacao = orientacaoRepository.findById(request.id())
                 .orElseThrow(() -> new IllegalArgumentException("Orientação funcional não encontrada."));
 
+        if (orientacao.getStatus() != com.hdc.hdc.orientacao_funcional.orientacao.StatusOrientacao.PUBLICADA) {
+            throw new com.hdc.hdc.util.exception.InvalidValueException("orientacao", "Somente orientações publicadas permitem novas realizações.");
+        }
         LocalDateTime agora = LocalDateTime.now();
 //        LocalDateTime inicioDia = agora.toLocalDate().atStartOfDay();
 //        LocalDateTime fimDia = inicioDia.plusDays(1);

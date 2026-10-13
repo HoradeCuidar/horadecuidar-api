@@ -56,4 +56,29 @@ public class OrientacaoFuncional {
 
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
+
+    @Column(columnDefinition = "text")
+    private String resumo;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private com.hdc.hdc.orientacao_funcional.categoria.CategoriaOrientacao categoria;
+    private Integer duracaoEstimada;
+    @Column(columnDefinition = "text")
+    private String materiais;
+    @Enumerated(EnumType.STRING)
+    private StatusOrientacao status = StatusOrientacao.RASCUNHO;
+    @ManyToOne @JoinColumn(name = "revisado_por")
+    private Usuario revisadoPor;
+    private LocalDateTime publicadoEm;
+    private boolean cuidadosRevisados;
+    @Version private Long versao;
+    @OneToMany(mappedBy="orientacao", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OrderBy("ordem ASC")
+    private List<PassoOrientacao> passos = new ArrayList<>();
+    @OneToMany(mappedBy="orientacao", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OrderBy("ordem ASC")
+    private List<CuidadoOrientacao> cuidados = new ArrayList<>();
+    @OneToMany(mappedBy="orientacao", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OrderBy("ordem ASC")
+    private List<MidiaOrientacao> midias = new ArrayList<>();
 }

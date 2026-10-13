@@ -28,7 +28,7 @@ public class TagFuncionalController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE','PACIENTE')")
     public ResponseEntity<List<TagFuncionalDTO>> findAll() {
         return ResponseEntity.ok().body(service.getAll());
     }

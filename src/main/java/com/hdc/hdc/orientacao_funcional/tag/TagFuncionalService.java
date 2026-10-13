@@ -30,7 +30,7 @@ public class TagFuncionalService {
 
     @Transactional(readOnly = true)
     public List<TagFuncionalDTO> getAll() {
-        return repository.findAll().stream().map(mapper::toDTO).toList();
+        return repository.findAll().stream().filter(t -> t.isAtivo()).map(mapper::toDTO).toList();
     }
 
     public void update(Long id, TagFuncionalCreateDto dto) {
@@ -43,10 +43,10 @@ public class TagFuncionalService {
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Tag Funcional", "Tag funcional com id " + id + " não encontrada.");
-        }
-        repository.deleteById(id);
+        TagFuncional tag = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("tag", "Tag não encontrada."));
+        tag.setAtivo(false);
+        repository.save(tag);
     }
 
     private void validarUnicidade(String nome) {
