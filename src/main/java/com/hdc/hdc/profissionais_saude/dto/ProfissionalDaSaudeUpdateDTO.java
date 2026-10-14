@@ -40,20 +40,15 @@ public class ProfissionalDaSaudeUpdateDTO {
     )
     private String telefone;
 
-    @NotBlank(message = "Rua é obrigatória")
     private String rua;
 
-    @NotBlank(message = "Bairro é obrigatório")
     private String bairro;
 
-    @NotBlank(message = "Estado é obrigatório")
-    @Size(min = 2, max = 2, message = "Estado deve conter 2 letras")
+    @Pattern(regexp = "^$|^[A-Za-z]{2}$", message = "Estado deve conter 2 letras")
     private String estado;
 
-    @NotBlank(message = "Cidade é obrigatória")
     private String cidade;
 
-    @NotBlank(message = "Número da casa é obrigatório")
     private String numeroDaCasa;
 
     @NotNull(message = "Gênero é obrigatório")
