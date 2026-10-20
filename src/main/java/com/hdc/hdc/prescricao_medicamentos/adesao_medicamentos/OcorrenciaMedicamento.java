@@ -50,7 +50,7 @@ public class OcorrenciaMedicamento {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private StatusAdesao status = StatusAdesao.PENDENTE;;
+    private StatusAdesao status = StatusAdesao.PENDENTE;
 
     private LocalDateTime dataHoraRegistro;
 
@@ -74,5 +74,15 @@ public class OcorrenciaMedicamento {
         }
 
         this.status = StatusAdesao.CANCELADO;
+    }
+
+    public void reativar() {
+        if (status != StatusAdesao.CANCELADO) {
+            throw new IllegalStateException(
+                    "Somente ocorrências canceladas podem ser reativadas."
+            );
+        }
+
+        this.status = StatusAdesao.PENDENTE;
     }
 }

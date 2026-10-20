@@ -83,23 +83,4 @@ public interface OcorrenciaMedicamentoRepository extends JpaRepository<Ocorrenci
             StatusAdesao status
     );
 
-    boolean existsByItemMedicacaoIdAndDataPrevistaAndOrdemNoDiaAndStatusNot(
-            Long itemMedicacaoId,
-            LocalDate dataPrevista,
-            Integer ordemNoDia,
-            StatusAdesao status
-    );
-
-    @Query("""
-    select o
-    from OcorrenciaMedicamento o
-    where o.prescricao.id = :prescricaoId
-      and o.dataPrevista >= :dataInicial
-      and o.status = :status
-    """)
-    List<OcorrenciaMedicamento> buscarOcorrenciasFuturas(
-            @Param("prescricaoId") UUID prescricaoId,
-            @Param("dataInicial") LocalDate dataInicial,
-            @Param("status") StatusAdesao status
-    );
 }

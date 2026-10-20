@@ -1,6 +1,7 @@
 package com.hdc.hdc.profissionais_saude;
 
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeCreateDTO;
+import com.hdc.hdc.infra.email.ConviteCadastroService;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeResponseDTO;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeSelfUpdateDTO;
 import com.hdc.hdc.profissionais_saude.dto.ProfissionalDaSaudeUpdateDTO;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -24,21 +26,29 @@ public class ProfissionalDaSaudeController {
 
     private final ProfissionalDaSaudeService profissionalDaSaudeService;
     private final ProfissionalDaSaudeMapper profissionalDaSaudeMapper;
+    private final ConviteCadastroService conviteCadastroService;
 
     @Autowired
     public ProfissionalDaSaudeController(ProfissionalDaSaudeService profissionalDaSaudeService,
-                                         ProfissionalDaSaudeMapper profissionalDaSaudeMapper){
+                                         ProfissionalDaSaudeMapper profissionalDaSaudeMapper,
+                                         ConviteCadastroService conviteCadastroService){
         this.profissionalDaSaudeService = profissionalDaSaudeService;
         this.profissionalDaSaudeMapper = profissionalDaSaudeMapper;
+        this.conviteCadastroService = conviteCadastroService;
     }
 
     @PostMapping("/cadastrar")
-    public ProfissionalDaSaudeResponseDTO cadastrar(
+    public ResponseEntity<ProfissionalDaSaudeResponseDTO> cadastrar(
             @RequestBody @Valid ProfissionalDaSaudeCreateDTO profissionalDaSaudeCreateDTO
             ){
-        return profissionalDaSaudeMapper.modeltoResponseDTO(
-                    profissionalDaSaudeService.cadastrar(
-                        profissionalDaSaudeMapper.createDTOtoModel(profissionalDaSaudeCreateDTO)));
+        var profissional = profissionalDaSaudeService.cadastrar(
+                profissionalDaSaudeMapper.createDTOtoModel(profissionalDaSaudeCreateDTO));
+        boolean conviteEnviado = conviteCadastroService.enviar(
+                profissional.getNome(), profissional.getEmail(), profissional.getUsername(),
+                profissionalDaSaudeCreateDTO.getSenha());
+        return ResponseEntity.ok()
+                .header("X-Invitation-Status", conviteEnviado ? "sent" : "failed")
+                .body(profissionalDaSaudeMapper.modeltoResponseDTO(profissional));
     }
 
     @GetMapping("/visualizar/{id_profissional}")

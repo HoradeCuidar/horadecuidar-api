@@ -1,5 +1,6 @@
 package com.hdc.hdc.util.exception;
 
+import com.hdc.hdc.exames.ArmazenamentoExameException;
 import com.hdc.hdc.util.exception.dto.ErrorResponseDTO;
 import com.hdc.hdc.util.exception.model.InvalidOperationException;
 import org.apache.coyote.BadRequestException;
@@ -99,6 +100,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(ArmazenamentoExameException.class)
+    public ResponseEntity<ErrorResponseDTO> handleArmazenamentoExameException(ArmazenamentoExameException ex) {
+        HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+        return ResponseEntity.status(status).body(new ErrorResponseDTO(
+                "arquivo", ex.getMessage(), status.value(), status.getReasonPhrase()
+        ));
+    }
+
     // Tratamento das demais exceções
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponseDTO>> handleValidationException(MethodArgumentNotValidException e) {
@@ -147,6 +156,18 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 "login",
                 "Credenciais inválidas: verifique seu usuário e senha.",
+                status.value(),
+                status.getReasonPhrase()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(FailedSendEmailException.class)
+    public ResponseEntity<ErrorResponseDTO> handleFailedSendEmailException(FailedSendEmailException ex) {
+        HttpStatus status = HttpStatus.BAD_GATEWAY;
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                ex.getField(),
+                ex.getMessage(),
                 status.value(),
                 status.getReasonPhrase()
         );

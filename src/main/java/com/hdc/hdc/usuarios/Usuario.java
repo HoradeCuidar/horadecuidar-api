@@ -42,6 +42,9 @@ public class Usuario implements UserDetails {
     @Column(name = "data_de_nascimento", nullable = false)
     private LocalDate dataDeNascimento;
 
+    @Column(name = "idade", nullable = false)
+    private Integer idade;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50, insertable = false, updatable = false)
     private Role role;

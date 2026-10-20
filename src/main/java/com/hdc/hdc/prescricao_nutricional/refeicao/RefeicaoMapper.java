@@ -2,6 +2,7 @@ package com.hdc.hdc.prescricao_nutricional.refeicao;
 
 import com.hdc.hdc.prescricao_nutricional.refeicao.dto.RefeicaoCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.refeicao.dto.RefeicaoResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.refeicao.dto.RefeicaoUpdateDTO;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicaoMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
@@ -27,4 +28,10 @@ public interface RefeicaoMapper {
 
     @Named("modeltoResponseDTO")
     List<RefeicaoResponseDTO> modeltoResponseDTO(List<Refeicao> model);
+
+    @Named("updateDTOtoModel")
+    Refeicao updateDTOtoModel(RefeicaoUpdateDTO dto);
+
+    @Named("updateDTOtoModel")
+    List<Refeicao> updateDTOtoModel(List<RefeicaoUpdateDTO> dto);
 }

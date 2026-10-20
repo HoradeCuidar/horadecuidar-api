@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -61,6 +62,52 @@ public class ConsultaAdesaoPacienteRepository {
                                 resultado.getInt("nao_realizado"),
                                 resultado.getInt("sem_registro")
                         )
+        );
+    }
+
+    public List<Integer> buscarPacientesParaRecalculo(
+            LocalDate dataInicial,
+            LocalDate dataFinal
+    ) {
+        String sql = """
+            SELECT DISTINCT paciente_id
+            FROM (
+            SELECT p.paciente_id
+            FROM prescricao_medicamento p
+
+            INNER JOIN ocorrencia_medicamento o
+                ON o.prescricao_id = p.id
+
+            INNER JOIN usuarios u
+                ON u.id = p.paciente_id
+
+            WHERE u.status = 'ATIVO'
+              AND o.data_prevista BETWEEN :dataInicial AND :dataFinal
+              AND o.status <> 'CANCELADO'
+
+            UNION
+
+            SELECT rap.paciente_id
+            FROM resumo_adesao_paciente rap
+
+            INNER JOIN usuarios u
+                ON u.id = rap.paciente_id
+
+            WHERE u.status = 'ATIVO'
+              AND rap.classificacao <> 'DADOS_INSUFICIENTES'
+            ) pacientes
+        """;
+
+        MapSqlParameterSource parametros =
+                new MapSqlParameterSource()
+                        .addValue("dataInicial", dataInicial)
+                        .addValue("dataFinal", dataFinal);
+
+        return jdbcTemplate.query(
+                sql,
+                parametros,
+                (resultado, numeroLinha) ->
+                        resultado.getInt("paciente_id")
         );
     }
 }

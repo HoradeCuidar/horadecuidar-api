@@ -5,6 +5,7 @@ import com.hdc.hdc.prescricao_medicamentos.enums.IntervaloTipo;
 import com.hdc.hdc.prescricao_medicamentos.enums.ViaAdministracao;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
@@ -22,9 +23,11 @@ public class ItemMedicacaoDTO {
     private DosagemUnidade dosagemUnidade;
 
     @NotNull(message = "A quantidade de doses é obrigatória.")
+    @Positive(message = "A quantidade de doses deve ser maior que zero.")
     private Integer quantidadeDoses;
 
     @NotNull(message = "O valor do intervalo é obrigatório.")
+    @Positive(message = "O valor do intervalo deve ser maior que zero.")
     private Integer intervaloValor;
 
     @NotNull(message = "O tipo do intervalo é obrigatório.")

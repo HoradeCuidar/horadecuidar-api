@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PrescricaoNutricionalResponseDTO {
 
+    private Integer id;
     private Integer pacienteId;
     private Integer profissionalId;
     private String dataInicio;

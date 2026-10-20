@@ -2,6 +2,7 @@ package com.hdc.hdc.prescricao_nutricional.alimento;
 
 import com.hdc.hdc.prescricao_nutricional.alimento.dto.AlimentoPrescritoCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.alimento.dto.AlimentoPrescritoResponseDTO;
+import com.hdc.hdc.prescricao_nutricional.alimento.dto.AlimentoPrescritoUpdateDTO;
 import com.hdc.hdc.util.formatter.UnidadeMedidaFormatter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,4 +31,10 @@ public interface AlimentoPrescritoMapper {
     @Named("modeltoResponseDTO")
     @Mapping(source = "unidade", target = "unidade", qualifiedByName = "unidadeMedidaToString")
     List<AlimentoPrescritoResponseDTO> modeltoResponseDTO(List<AlimentoPrescrito> model);
+
+    @Named("updateDTOtoModel")
+    AlimentoPrescrito updateDTOtoModel(AlimentoPrescritoUpdateDTO dto);
+
+    @Named("updateDTOtoModel")
+    List<AlimentoPrescrito> updateDTOtoModel(List<AlimentoPrescritoUpdateDTO> dto);
 }

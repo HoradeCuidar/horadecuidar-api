@@ -16,7 +16,18 @@ public record OrientacaoFuncionalResponseDTO(
         Boolean ativo,
         List<TagFuncionalDTO> tags,
         LocalDateTime dataCriacao,
-        LocalDateTime dataAtualizacao
+        LocalDateTime dataAtualizacao,
+        String resumo,
+        com.hdc.hdc.orientacao_funcional.categoria.CategoriaOrientacao categoria,
+        Integer duracaoEstimada,
+        String materiais,
+        com.hdc.hdc.orientacao_funcional.orientacao.StatusOrientacao status,
+        Integer revisadoPorId,
+        LocalDateTime publicadoEm,
+        boolean cuidadosRevisados,
+        List<PassoDTO> passos,
+        List<CuidadoDTO> cuidados,
+        List<MidiaDTO> midias
 ) {
 }
 

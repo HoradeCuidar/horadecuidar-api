@@ -19,8 +19,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -59,26 +61,44 @@ class PacienteControllerIntegracaoTest {
                 // Simula um usuário logado com as permissões corretas
                 // Arrange: Criamos os dados que serão enviados na requisição
                 PacienteCreateDto dto = new PacienteCreateDto(
-                                "João Silva",
-                                "joao.silva",
-                                "senha12345",
-                                LocalDate.of(1990, 5, 20), "11999999999",
-                                Genero.MASCULINO,
-                                "joao@email.com",
-                                "Rua A",
-                                "Centro",
-                                "SP",
-                                "São Paulo",
-                                "123",
-                                Collections.emptyList(),
-                                "");
+                        "João Silva",
+                        "joao.silva",
+                        "senha12345",
+                        LocalDate.of(1990, Month.MAY, 20),
+                        56,
+                        "11999999999",
+                        Genero.MASCULINO,
+                        "joao@email.com",
+                        "Rua A",
+                        "Centro",
+                        "SP",
+                        "São Paulo",
+                        "123",
+                        Collections.emptyList(),
+                        "");
 
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "João Silva", "joao@email.com", "joao.silva", "1990-05-20", null,
-                                "ATIVO", "11999999999", "Rua A", "Centro", "SP", "São Paulo", "123",
-                                "MASCULINO", Collections.emptyList(), "", "");
+                        1,
+                        "João Silva",
+                        "joao@email.com",
+                        "joao.silva",
+                        null,
+                        "1990-05-20",
+                        56,
+                        null,
+                        "ATIVO",
+                        "11999999999",
+                        "Rua A",
+                        "Centro",
+                        "SP",
+                        "São Paulo",
+                        "123",
+                        "MASCULINO",
+                        Collections.emptyList(),
+                        "",
+                        "");
 
-                Mockito.when(pacienteService.cadastrar(Mockito.any(PacienteCreateDto.class)))
+                when(pacienteService.cadastrar(Mockito.any(PacienteCreateDto.class)))
                                 .thenReturn(responseDto);
 
                 // Act & Assert: chama POST para "/api/paciente" passando o "dto" transformado em JSON
@@ -101,7 +121,9 @@ class PacienteControllerIntegracaoTest {
                                 "Maria Silva",
                                 "maria@email.com",
                                 "maria.silva",
+                                null,
                                 "1995-08-15",
+                                null,
                                 null,
                                 "ATIVO",
                                 "11988888888",
@@ -115,7 +137,7 @@ class PacienteControllerIntegracaoTest {
                                 "Nenhuma",
                         "foto_de_perfil_url");
 
-                Mockito.when(pacienteService.visualizarPorId(idBuscado))
+                when(pacienteService.visualizarPorId(idBuscado))
                                 .thenReturn(responseDto);
 
                 mockMvc.perform(get("/api/paciente/{id}", idBuscado)
@@ -130,7 +152,7 @@ class PacienteControllerIntegracaoTest {
         void shouldReturn404WhenUserNotFound() throws Exception {
                 // Teste de visualização de paciente por ID quando o paciente não é encontrado
                 Integer idInexistente = 999;
-                Mockito.when(pacienteService.visualizarPorId(idInexistente))
+                when(pacienteService.visualizarPorId(idInexistente))
                                 .thenThrow(new com.hdc.hdc.util.exception.ResourceNotFoundException(
                                                 "Paciente não encontrado"));
 
@@ -147,7 +169,9 @@ class PacienteControllerIntegracaoTest {
                                 "João Silva",
                                 "joao.silva",
                                 "senha12345",
-                                LocalDate.of(1990, 5, 20), "11999999999",
+                                LocalDate.of(1990, Month.MAY, 20),
+                                56,
+                                "11999999999",
                                 Genero.MASCULINO,
                                 "email-invalido", // Email inválido
                                 "Rua A",
@@ -170,11 +194,27 @@ class PacienteControllerIntegracaoTest {
                 // Teste de visualização de paciente por email
                 String emailBuscado = "maria@email.com";
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "Maria Silva", emailBuscado, "maria.silva", "1995-08-15", null,
-                                "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
+                                1,
+                                "Maria Silva",
+                                emailBuscado,
+                                "maria.silva",
+                                null,
+                                "1995-08-15",
+                                null,
+                                null,
+                                "ATIVO",
+                                "11988888888",
+                                "Rua B",
+                                "Centro",
+                                "SP",
+                                "São Paulo",
+                                "456",
+                                "FEMININO",
+                                Collections.emptyList(),
+                                "Nenhuma",
+                                "foto_de_perfil_url");
 
-                Mockito.when(pacienteService.visualizarPorEmail(emailBuscado))
+                when(pacienteService.visualizarPorEmail(emailBuscado))
                                 .thenReturn(responseDto);
 
                 mockMvc.perform(get("/api/paciente/email")
@@ -190,13 +230,29 @@ class PacienteControllerIntegracaoTest {
         void shouldReturnAllUsersPaged() throws Exception {
                 // Teste de visualização de todos os pacientes paginados
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
-                                "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
+                                1,
+                                "Maria Silva",
+                                "maria@email.com",
+                                "maria.silva",
+                                null,
+                                "1995-08-15",
+                                null,
+                                null,
+                                "ATIVO",
+                                "11988888888",
+                                "Rua B",
+                                "Centro",
+                                "SP",
+                                "São Paulo",
+                                "456",
+                                "FEMININO",
+                                Collections.emptyList(),
+                                "Nenhuma",
+                                "foto_de_perfil_url");
                 org.springframework.data.domain.Page<PacienteResponseDto> page = new org.springframework.data.domain.PageImpl<>(
                                 java.util.List.of(responseDto));
 
-                Mockito.when(pacienteService.visualizarTodos(0, 10))
+                when(pacienteService.visualizarTodos(0, 10))
                                 .thenReturn(page);
 
                 mockMvc.perform(get("/api/paciente")
@@ -214,13 +270,29 @@ class PacienteControllerIntegracaoTest {
                 // Teste de visualização de pacientes por nome
                 String nomeBuscado = "Maria";
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
-                                "ATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
+                                1,
+                                "Maria Silva",
+                                "maria@email.com",
+                                "maria.silva",
+                                null,
+                                "1995-08-15",
+                                null,
+                                null,
+                                "ATIVO",
+                                "11988888888",
+                                "Rua B",
+                                "Centro",
+                                "SP",
+                                "São Paulo",
+                                "456",
+                                "FEMININO",
+                                Collections.emptyList(),
+                                "Nenhuma",
+                                "foto_de_perfil_url");
                 org.springframework.data.domain.Page<PacienteResponseDto> page = new org.springframework.data.domain.PageImpl<>(
                                 java.util.List.of(responseDto));
 
-                Mockito.when(pacienteService.encontrarPorNome(nomeBuscado))
+                when(pacienteService.encontrarPorNome(nomeBuscado))
                                 .thenReturn(page);
 
                 mockMvc.perform(get("/api/paciente/nome")
@@ -238,7 +310,9 @@ class PacienteControllerIntegracaoTest {
                 Integer idAtualizar = 1;
                 PacienteCreateDto dto = new PacienteCreateDto(
                                 "João Silva Atualizado", "joao.silva", "senha12345",
-                                LocalDate.of(1990, 5, 20), "11999999999", Genero.MASCULINO,
+                                LocalDate.of(1990, Month.MAY, 20),
+                                56,
+                                "11999999999", Genero.MASCULINO,
                                 "joao@email.com", "Rua A", "Centro", "SP", "São Paulo", "123",
                                 Collections.emptyList(), "");
 
@@ -269,11 +343,27 @@ class PacienteControllerIntegracaoTest {
                 // Teste de alteração de status de paciente
                 Integer idAlterar = 1;
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "Maria Silva", "maria@email.com", "maria.silva", "1995-08-15", null,
-                                "INATIVO", "11988888888", "Rua B", "Centro", "SP", "São Paulo", "456",
-                                "FEMININO", Collections.emptyList(), "Nenhuma", "foto_de_perfil_url");
+                                1,
+                                "Maria Silva",
+                                "maria@email.com",
+                                "maria.silva",
+                                null,
+                                "1995-08-15",
+                                null,
+                                null,
+                                "INATIVO",
+                                "11988888888",
+                                "Rua B",
+                                "Centro",
+                                "SP",
+                                "São Paulo",
+                                "456",
+                                "FEMININO",
+                                Collections.emptyList(),
+                                "Nenhuma",
+                                "foto_de_perfil_url");
 
-                Mockito.when(pacienteService.alterarStatus(idAlterar))
+                when(pacienteService.alterarStatus(idAlterar))
                                 .thenReturn(responseDto);
 
                 mockMvc.perform(patch("/api/paciente/status/{id}", idAlterar).with(csrf())
@@ -289,7 +379,7 @@ class PacienteControllerIntegracaoTest {
                                 "joao.editado@email.com",
                                 "11999999999",
                                 Genero.MASCULINO,
-                                LocalDate.of(1990, 5, 20),
+                                LocalDate.of(1990, Month.MAY, 20),
                                 "Rua Editada",
                                 "Bairro Editado",
                                 "SP",
@@ -298,9 +388,25 @@ class PacienteControllerIntegracaoTest {
                 );
 
                 PacienteResponseDto responseDto = new PacienteResponseDto(
-                                1, "João Silva Editado", "joao.editado@email.com", "joao.silva", "1990-05-20", Role.PACIENTE,
-                                "ATIVO", "11999999999", "Rua Editada", "Bairro Editado", "SP", "São Paulo", "123",
-                                "MASCULINO", Collections.emptyList(), "", "foto_de_perfil_url");
+                                1,
+                                "João Silva Editado",
+                                "joao.editado@email.com",
+                                "joao.silva",
+                                null,
+                                "1990-05-20",
+                                null,
+                                Role.PACIENTE,
+                                "ATIVO",
+                                "11999999999",
+                                "Rua Editada",
+                                "Bairro Editado",
+                                "SP",
+                                "São Paulo",
+                                "123",
+                                "MASCULINO",
+                                Collections.emptyList(),
+                                "",
+                                "foto_de_perfil_url");
 
                 Usuario mockUsuario = new Usuario();
                 mockUsuario.setId(1);
@@ -310,7 +416,7 @@ class PacienteControllerIntegracaoTest {
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUsuario, null, mockUsuario.getAuthorities());
 
-                Mockito.when(pacienteService.atualizarPerfil(Mockito.any(PacienteSelfUpdateDto.class), Mockito.eq(1)))
+                when(pacienteService.atualizarPerfil(Mockito.any(PacienteSelfUpdateDto.class), Mockito.eq(1)))
                                 .thenReturn(responseDto);
 
                 mockMvc.perform(put("/api/paciente/perfil").with(csrf()).with(authentication(auth))
