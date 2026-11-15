@@ -16,8 +16,8 @@ class FlywayNutricionalBancoLimpoTest {
         assertTrue(result.success);
         try (var connection = DriverManager.getConnection(url, "postgres", "nutri_test");
              var statement = connection.createStatement();
-             var rows = statement.executeQuery("SELECT COUNT(*) FROM information_schema.tables WHERE table_name IN ('prescricao_nutricional','ocorrencia_refeicao','substituicao_alimentar')")) {
-            assertTrue(rows.next()); assertEquals(3, rows.getInt(1));
+             var rows = statement.executeQuery("SELECT COUNT(*) FROM information_schema.tables WHERE table_name IN ('prescricao_nutricional','ocorrencia_refeicao','substituicao_alimentar','modelo_nutricional')")) {
+            assertTrue(rows.next()); assertEquals(4, rows.getInt(1));
         }
     }
 }
