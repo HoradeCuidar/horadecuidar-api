@@ -31,7 +31,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @PostMapping("cadastrar")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResponseDTO> cadastrar(
             @Valid @RequestBody PrescricaoNutricionalCreateDTO prescricaoNutricionalCreateDTO,
             @CurrentUser Usuario profissionalDaSaude
@@ -47,7 +47,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @GetMapping("visualizar/{id_prescricao}")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResponseDTO> visualizar(@PathVariable Integer id_prescricao) {
 
         PrescricaoNutricionalResponseDTO response = prescricaoNutricionalProfissionalService.visualizar(id_prescricao);
@@ -56,7 +56,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @GetMapping("visualizarTodos/{id_paciente}")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<List<PrescricaoNutricionalResumoDTO>> visualizarTodos(@PathVariable Integer id_paciente) {
 
         List<PrescricaoNutricionalResumoDTO> response = prescricaoNutricionalProfissionalService.visualizarTodos(id_paciente);
@@ -65,7 +65,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @PatchMapping("ativar/{id_prescricao}")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResumoDTO> ativarPrescricao(@PathVariable Integer id_prescricao) {
 
         PrescricaoNutricionalResumoDTO response = prescricaoNutricionalProfissionalService.ativarPrescricao(id_prescricao);
@@ -74,7 +74,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @PatchMapping("inativar/{id_prescricao}")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResumoDTO> inativarPrescricao(@PathVariable Integer id_prescricao) {
 
         PrescricaoNutricionalResumoDTO response = prescricaoNutricionalProfissionalService.inativarPrescricao(id_prescricao);
@@ -83,7 +83,7 @@ public class PrescricaoNutricionalProfissionalController {
     }
 
     @PutMapping("editar/{id_prescricao}")
-    @PreAuthorize("hasAnyRole('PROFISSIONAL_DA_SAUDE')")
+    @PreAuthorize("hasAnyRole('ADMIN','PROFISSIONAL_DA_SAUDE')")
     public ResponseEntity<PrescricaoNutricionalResponseDTO> editar(
             @Valid @RequestBody PrescricaoNutricionalUpdateDTO prescricaoNutricionalUpdateDTO,
             @PathVariable Integer id_prescricao
