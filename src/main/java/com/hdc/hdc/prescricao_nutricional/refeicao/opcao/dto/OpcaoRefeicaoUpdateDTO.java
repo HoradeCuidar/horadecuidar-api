@@ -18,9 +18,11 @@ import java.util.List;
 public class OpcaoRefeicaoUpdateDTO {
 
     @Min(value = 1, message = "A ordem deve ser maior que zero")
+    private Integer id;
     private Integer ordem;
 
     private String descricao;
+    private String orientacoesPreparo;
 
     @Valid
     @NotEmpty(message = "A opção deve possuir pelo menos um alimento")

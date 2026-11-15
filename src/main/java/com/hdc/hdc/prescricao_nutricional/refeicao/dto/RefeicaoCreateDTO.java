@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -25,6 +26,7 @@ public class RefeicaoCreateDTO {
     private Integer ordem;
 
     private String observacoes;
+    private LocalTime horario;
 
     @Valid
     @NotEmpty(message = "A refeição deve possuir pelo menos uma opção")

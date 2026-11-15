@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
+import com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentarResponseDTO;
 
 @Getter
 @Setter
@@ -18,4 +20,6 @@ public class AlimentoPrescritoResponseDTO {
     private BigDecimal quantidade;
     private String unidade;
     private String observacao;
+    private String medidaCaseira;
+    private List<SubstituicaoAlimentarResponseDTO> substituicoes;
 }

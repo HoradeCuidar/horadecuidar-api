@@ -17,5 +17,6 @@ public class OpcaoRefeicaoResponseDTO {
     private Integer id;
     private Integer ordem;
     private String descricao;
+    private String orientacoesPreparo;
     private List<AlimentoPrescritoResponseDTO> alimentos;
 }

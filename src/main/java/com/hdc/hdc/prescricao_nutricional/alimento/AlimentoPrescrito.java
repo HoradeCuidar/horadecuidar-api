@@ -1,6 +1,9 @@
 package com.hdc.hdc.prescricao_nutricional.alimento;
 
 import com.hdc.hdc.prescricao_nutricional.alimento.enums.UnidadeDeMedida;
+import com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentar;
+import java.util.ArrayList;
+import java.util.List;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.OpcaoRefeicao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,4 +41,11 @@ public class AlimentoPrescrito {
 
     @Column(columnDefinition = "TEXT")
     private String observacao;
+
+    @Column(name = "medida_caseira", columnDefinition = "TEXT")
+    private String medidaCaseira;
+
+    @OneToMany(mappedBy = "alimento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("ordem ASC")
+    private List<SubstituicaoAlimentar> substituicoes = new ArrayList<>();
 }

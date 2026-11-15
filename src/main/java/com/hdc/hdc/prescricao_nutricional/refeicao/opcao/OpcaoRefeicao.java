@@ -33,6 +33,9 @@ public class OpcaoRefeicao {
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
+    @Column(name = "orientacoes_preparo", columnDefinition = "TEXT")
+    private String orientacoesPreparo;
+
     @OneToMany(mappedBy = "opcao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AlimentoPrescrito> alimentos = new ArrayList<>();
 }
