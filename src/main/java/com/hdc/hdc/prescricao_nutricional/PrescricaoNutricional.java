@@ -46,6 +46,13 @@ public class PrescricaoNutricional {
     @Column(columnDefinition = "TEXT")
     private String observacoes;
 
+    @Column(name = "modelo_origem_id")
+    private Integer modeloOrigemId;
+    @Column(name = "modelo_origem_versao")
+    private Integer modeloOrigemVersao;
+    @Column(name = "modelo_origem_nome", length = 160)
+    private String modeloOrigemNome;
+
     @OneToMany(mappedBy = "prescricao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Refeicao> refeicoes = new ArrayList<>();
 }

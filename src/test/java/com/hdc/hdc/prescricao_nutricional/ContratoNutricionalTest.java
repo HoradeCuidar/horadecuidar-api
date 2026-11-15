@@ -28,7 +28,7 @@ class ContratoNutricionalTest {
         alimento.setMedidaCaseira("5 colheres"); alimento.setSubstituicoes(List.of(sub));
         var opcao = new OpcaoRefeicaoCreateDTO(1, "Padrão", "Cozinhar", List.of(alimento)); opcao.setOrientacoesPreparo("Cozinhar");
         var refeicao = new RefeicaoCreateDTO("Almoço", 1, null, LocalTime.NOON, List.of(opcao)); refeicao.setHorario(LocalTime.NOON);
-        var dto = new PrescricaoNutricionalCreateDTO(1, 2, LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), null, List.of(refeicao));
+        var dto = new PrescricaoNutricionalCreateDTO(1, 2, LocalDate.now().plusDays(1), LocalDate.now().plusDays(3), null, null, null, List.of(refeicao));
         var mapper = new PrescricaoNutricionalMapperImpl();
         ReflectionTestUtils.setField(mapper, "statusPrescricaoFormatter", new StatusPrescricaoFormatter());
         ReflectionTestUtils.setField(mapper, "dataFormatter", new DataFormatter());
