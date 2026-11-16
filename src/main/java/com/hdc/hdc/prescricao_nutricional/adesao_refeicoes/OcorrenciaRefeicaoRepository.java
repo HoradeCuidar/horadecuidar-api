@@ -16,6 +16,8 @@ public interface OcorrenciaRefeicaoRepository extends JpaRepository<OcorrenciaRe
 
     List<OcorrenciaRefeicao> findByPrescricaoId(Integer prescricaoId);
 
+    void deleteByPrescricaoId(Integer prescricaoId);
+
     @Query("""
             SELECT o FROM OcorrenciaRefeicao o
             JOIN FETCH o.prescricao p

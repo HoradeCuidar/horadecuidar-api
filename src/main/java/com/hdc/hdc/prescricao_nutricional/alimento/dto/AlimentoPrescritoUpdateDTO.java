@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
+import com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentarUpdateDTO;
+import jakarta.validation.Valid;
 
 @Getter
 @Setter
@@ -18,6 +21,7 @@ import java.math.BigDecimal;
 public class AlimentoPrescritoUpdateDTO {
 
     @NotBlank(message = "Descrição do alimento é obrigatória")
+    private Integer id;
     private String descricao;
 
     @NotNull(message = "Quantidade é obrigatória")
@@ -28,4 +32,6 @@ public class AlimentoPrescritoUpdateDTO {
     private UnidadeDeMedida unidade;
 
     private String observacao;
+    private String medidaCaseira;
+    @Valid private List<SubstituicaoAlimentarUpdateDTO> substituicoes;
 }

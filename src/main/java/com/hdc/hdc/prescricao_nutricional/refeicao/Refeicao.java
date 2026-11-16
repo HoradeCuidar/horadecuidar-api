@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class Refeicao {
 
     @Column(columnDefinition = "TEXT")
     private String observacoes;
+
+    @Column(name = "horario")
+    private LocalTime horario;
 
     @OneToMany(mappedBy = "refeicao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OpcaoRefeicao> opcoes = new ArrayList<>();

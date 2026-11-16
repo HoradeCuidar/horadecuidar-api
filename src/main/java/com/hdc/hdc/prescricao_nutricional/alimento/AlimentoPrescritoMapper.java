@@ -13,7 +13,8 @@ import java.util.List;
 @Mapper(
         componentModel = "spring",
         uses = {
-                UnidadeMedidaFormatter.class
+                UnidadeMedidaFormatter.class,
+                com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentarMapper.class
         }
 )
 public interface AlimentoPrescritoMapper {

@@ -21,6 +21,7 @@ public class OpcaoRefeicaoCreateDTO {
     private Integer ordem;
 
     private String descricao;
+    private String orientacoesPreparo;
 
     @Valid
     @NotEmpty(message = "A opção deve possuir pelo menos um alimento")

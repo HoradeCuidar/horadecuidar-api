@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -18,5 +19,6 @@ public class RefeicaoResponseDTO {
     private String nome;
     private Integer ordem;
     private String observacoes;
+    private LocalTime horario;
     private List<OpcaoRefeicaoResponseDTO> opcoes;
 }
