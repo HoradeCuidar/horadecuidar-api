@@ -22,5 +22,9 @@ public class PrescricaoNutricionalResponseDTO {
     private String dataEncerramento;
     private String status;
     private String observacoes;
+
+    private Integer modeloOrigemId;
+    private Integer modeloOrigemVersao;
+    private String modeloOrigemNome;
     private List<RefeicaoResponseDTO> refeicoes;
 }

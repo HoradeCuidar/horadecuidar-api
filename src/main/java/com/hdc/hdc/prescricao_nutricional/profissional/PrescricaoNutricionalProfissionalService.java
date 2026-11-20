@@ -5,6 +5,7 @@ import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalMapper;
 import com.hdc.hdc.prescricao_nutricional.PrescricaoNutricionalRepository;
 import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicaoService;
 import com.hdc.hdc.prescricao_nutricional.adesao_refeicoes.OcorrenciaRefeicaoRepository;
+import com.hdc.hdc.prescricao_nutricional.modelo.ModeloNutricionalRepository;
 import com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentar;
 import com.hdc.hdc.prescricao_nutricional.alimento.AlimentoPrescrito;
 import com.hdc.hdc.prescricao_nutricional.dto.PrescricaoNutricionalResponseDTO;
@@ -32,16 +33,19 @@ public class PrescricaoNutricionalProfissionalService {
     private final PrescricaoNutricionalMapper prescricaoNutricionalMapper;
     private final OcorrenciaRefeicaoService ocorrenciaRefeicaoService;
     private final OcorrenciaRefeicaoRepository ocorrenciaRefeicaoRepository;
+    private final ModeloNutricionalRepository modeloNutricionalRepository;
 
     @Autowired
     PrescricaoNutricionalProfissionalService(PrescricaoNutricionalRepository prescricaoNutricionalRepository,
                                              PrescricaoNutricionalMapper prescricaoNutricionalMapper,
                                              OcorrenciaRefeicaoService ocorrenciaRefeicaoService,
-                                             OcorrenciaRefeicaoRepository ocorrenciaRefeicaoRepository){
+                                             OcorrenciaRefeicaoRepository ocorrenciaRefeicaoRepository,
+                                             ModeloNutricionalRepository modeloNutricionalRepository){
         this.prescricaoNutricionalRepository = prescricaoNutricionalRepository;
         this.prescricaoNutricionalMapper = prescricaoNutricionalMapper;
         this.ocorrenciaRefeicaoService = ocorrenciaRefeicaoService;
         this.ocorrenciaRefeicaoRepository = ocorrenciaRefeicaoRepository;
+        this.modeloNutricionalRepository = modeloNutricionalRepository;
     }
 
     @Transactional
@@ -58,6 +62,18 @@ public class PrescricaoNutricionalProfissionalService {
             throw new InvalidValueException(
                     "Já existe uma prescrição nutricional ativa para este paciente."
             );
+        }
+
+        if (prescricaoNutricional.getModeloOrigemId() != null) {
+            var modelo = modeloNutricionalRepository.findById(prescricaoNutricional.getModeloOrigemId())
+                    .orElseThrow(() -> new InvalidValueException("Modelo de origem não encontrado."));
+            if (!modelo.getVersao().equals(prescricaoNutricional.getModeloOrigemVersao())) {
+                throw new InvalidValueException("O modelo foi alterado. Reabra-o antes de emitir a prescrição.");
+            }
+            prescricaoNutricional.setModeloOrigemNome(modelo.getNome());
+        } else {
+            prescricaoNutricional.setModeloOrigemVersao(null);
+            prescricaoNutricional.setModeloOrigemNome(null);
         }
 
         vincularEntidades(prescricaoNutricional);

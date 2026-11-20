@@ -6,6 +6,7 @@ import com.hdc.hdc.prescricao_nutricional.alimento.*;
 import com.hdc.hdc.prescricao_nutricional.alimento.enums.UnidadeDeMedida;
 import com.hdc.hdc.prescricao_nutricional.alimento.substituicao.SubstituicaoAlimentar;
 import com.hdc.hdc.prescricao_nutricional.enums.*;
+import com.hdc.hdc.prescricao_nutricional.modelo.*;
 import com.hdc.hdc.prescricao_nutricional.refeicao.*;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.*;
 import com.hdc.hdc.util.exception.InvalidValueException;
@@ -25,6 +26,7 @@ class PrescricaoNutricionalProfissionalServiceTest {
     @Mock PrescricaoNutricionalMapper mapper;
     @Mock OcorrenciaRefeicaoService ocorrencias;
     @Mock OcorrenciaRefeicaoRepository ocorrenciaRepository;
+    @Mock ModeloNutricionalRepository modelos;
     @InjectMocks PrescricaoNutricionalProfissionalService service;
 
     private PrescricaoNutricional prescricao(LocalDate inicio) {
@@ -65,6 +67,32 @@ class PrescricaoNutricionalProfissionalServiceTest {
         assertSame(alimento, alimento.getSubstituicoes().get(0).getAlimento());
         assertTrue(p.getRefeicoes().get(1).getOpcoes().get(0).getAlimentos().get(0).getSubstituicoes().isEmpty());
         verify(ocorrencias).gerarOcorrencias(p);
+    }
+
+    @Test void cadastroRegistraOrigemDoModeloSemDependerDeleParaHistorico() {
+        var p = prescricao(LocalDate.now().plusDays(2));
+        p.setModeloOrigemId(7);
+        p.setModeloOrigemVersao(3);
+        var modelo = new ModeloNutricional();
+        modelo.setId(7); modelo.setNome("Plano base"); modelo.setVersao(3);
+        when(modelos.findById(7)).thenReturn(Optional.of(modelo));
+        when(prescricoes.save(p)).thenReturn(p);
+
+        service.cadastrar(p);
+
+        assertEquals("Plano base", p.getModeloOrigemNome());
+        assertEquals(3, p.getModeloOrigemVersao());
+        verify(ocorrencias).gerarOcorrencias(p);
+    }
+
+    @Test void cadastroRejeitaVersaoDesatualizadaDoModelo() {
+        var p = prescricao(LocalDate.now().plusDays(2));
+        p.setModeloOrigemId(7); p.setModeloOrigemVersao(2);
+        var modelo = new ModeloNutricional(); modelo.setVersao(3);
+        when(modelos.findById(7)).thenReturn(Optional.of(modelo));
+
+        assertThrows(InvalidValueException.class, () -> service.cadastrar(p));
+        verify(prescricoes, never()).save(any());
     }
 
     @Test void edicaoFuturaPreservaIdsERecriaOcorrencias() {

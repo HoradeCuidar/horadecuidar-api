@@ -34,6 +34,9 @@ public class PrescricaoNutricionalCreateDTO {
 
     private String observacoes;
 
+    private Integer modeloOrigemId;
+    private Integer modeloOrigemVersao;
+
     @Valid
     @NotEmpty(message = "A prescrição deve possuir pelo menos uma refeição")
     private List<RefeicaoCreateDTO> refeicoes;

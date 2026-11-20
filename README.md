@@ -84,6 +84,21 @@ O backend do **Hora de Cuidar (HDC)** é desenvolvido em **Java** utilizando o *
 
 A aplicação é responsável por gerenciar regras de negócio, autenticação, persistência de dados e integração com o banco de dados.
 
+### Modelos nutricionais
+
+Profissionais de saúde e administradores podem manter modelos reutilizáveis em `/api/modelos-nutricionais`:
+
+| Método | Caminho | Operação |
+| --- | --- | --- |
+| `GET` | `/api/modelos-nutricionais` | Listar resumos |
+| `GET` | `/api/modelos-nutricionais/{id}` | Consultar a árvore completa |
+| `POST` | `/api/modelos-nutricionais` | Criar modelo |
+| `PUT` | `/api/modelos-nutricionais/{id}` | Editar modelo |
+| `POST` | `/api/modelos-nutricionais/{id}/duplicar` | Criar cópia independente |
+| `DELETE` | `/api/modelos-nutricionais/{id}` | Excluir modelo |
+
+O corpo de criação contém `nome`, `referenciaKcal` opcional, `descricao` opcional e `refeicoes` (a mesma árvore de refeições, opções, alimentos e substituições da prescrição). Na edição, envie também a `versao` recebida na consulta; uma versão desatualizada é rejeitada. O modelo não contém participante nem datas. Ao emitir uma prescrição com `modeloOrigemId` e `modeloOrigemVersao`, a API copia o plano recebido e registra nome e versão de origem sem vincular o histórico à permanência do modelo.
+
 ### Modelagem do Sistema
 ```mermaid
   erDiagram
