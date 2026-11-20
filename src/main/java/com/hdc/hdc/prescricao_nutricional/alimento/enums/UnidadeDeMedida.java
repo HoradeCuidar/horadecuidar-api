@@ -13,6 +13,9 @@ public enum UnidadeDeMedida {
     UNIDADE("Unidade"),
     FATIA("Fatia"),
     COLHER("Colher"),
+    COLHER_SOPA("Colher de sopa"),
+    COLHER_CHA("Colher de chá"),
+    COLHER_SOBREMESA("Colher de sobremesa"),
     XICARA("Xícara");
 
     public final String unidadeDeMedida;

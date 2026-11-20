@@ -10,6 +10,7 @@ import com.hdc.hdc.prescricao_nutricional.refeicao.dto.RefeicaoCreateDTO;
 import com.hdc.hdc.prescricao_nutricional.refeicao.opcao.dto.OpcaoRefeicaoCreateDTO;
 import com.hdc.hdc.util.formatter.DataFormatter;
 import com.hdc.hdc.util.formatter.StatusPrescricaoFormatter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.mockito.ArgumentCaptor;
@@ -21,9 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ContratoNutricionalTest {
+    @Test void unidadesDeColherNovasEAntigasSaoCompativeisComJson() throws Exception {
+        var json = new ObjectMapper();
+        for (var unidade : List.of(UnidadeDeMedida.COLHER, UnidadeDeMedida.COLHER_SOPA,
+                UnidadeDeMedida.COLHER_CHA, UnidadeDeMedida.COLHER_SOBREMESA)) {
+            assertEquals(unidade, json.readValue(json.writeValueAsString(unidade), UnidadeDeMedida.class));
+        }
+    }
+
     @Test void mapeamentoRecuperaEstruturaCompleta() {
         var sub = new SubstituicaoAlimentarCreateDTO(); sub.setDescricao("Cuscuz"); sub.setQuantidade(new BigDecimal("120"));
-        sub.setUnidade(UnidadeDeMedida.G); sub.setMedidaCaseira("6 colheres"); sub.setOrdem(1);
+        sub.setUnidade(UnidadeDeMedida.COLHER_SOPA); sub.setMedidaCaseira("6 colheres de sopa cheias"); sub.setOrdem(1);
         var alimento = new AlimentoPrescritoCreateDTO(); alimento.setDescricao("Arroz"); alimento.setQuantidade(new BigDecimal("125")); alimento.setUnidade(UnidadeDeMedida.G);
         alimento.setMedidaCaseira("5 colheres"); alimento.setSubstituicoes(List.of(sub));
         var opcao = new OpcaoRefeicaoCreateDTO(1, "Padrão", "Cozinhar", List.of(alimento)); opcao.setOrientacoesPreparo("Cozinhar");
@@ -39,7 +48,8 @@ class ContratoNutricionalTest {
         assertEquals("Cozinhar", opcaoResposta.getOrientacoesPreparo());
         var alimentoResposta = opcaoResposta.getAlimentos().get(0);
         assertEquals("5 colheres", alimentoResposta.getMedidaCaseira());
-        assertEquals("6 colheres", alimentoResposta.getSubstituicoes().get(0).getMedidaCaseira());
+        assertEquals("6 colheres de sopa cheias", alimentoResposta.getSubstituicoes().get(0).getMedidaCaseira());
+        assertEquals(UnidadeDeMedida.COLHER_SOPA, alimentoResposta.getSubstituicoes().get(0).getUnidade());
         assertEquals("Cuscuz", alimentoResposta.getSubstituicoes().get(0).getDescricao());
     }
 
